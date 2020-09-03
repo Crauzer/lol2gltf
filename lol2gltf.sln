@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.30413.136
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "lol2gltf", "lol2gltf\lol2gltf.csproj", "{9D878A83-941F-449A-85E0-10AC757DCD2D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lol2gltf.Shared", "lol2gltf.Shared\lol2gltf.Shared.csproj", "{A80CE167-535A-4FE6-B19D-5DEA1A882DC8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -15,6 +17,10 @@ Global
 		{9D878A83-941F-449A-85E0-10AC757DCD2D}.Debug|x64.Build.0 = Debug|x64
 		{9D878A83-941F-449A-85E0-10AC757DCD2D}.Release|x64.ActiveCfg = Release|x64
 		{9D878A83-941F-449A-85E0-10AC757DCD2D}.Release|x64.Build.0 = Release|x64
+		{A80CE167-535A-4FE6-B19D-5DEA1A882DC8}.Debug|x64.ActiveCfg = Debug|x64
+		{A80CE167-535A-4FE6-B19D-5DEA1A882DC8}.Debug|x64.Build.0 = Debug|x64
+		{A80CE167-535A-4FE6-B19D-5DEA1A882DC8}.Release|x64.ActiveCfg = Release|x64
+		{A80CE167-535A-4FE6-B19D-5DEA1A882DC8}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,3 @@
+[submodule "SharpGLTF"]
+	path = SharpGLTF
+	url = https://github.com/vpenades/SharpGLTF

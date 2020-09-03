@@ -21,6 +21,13 @@ namespace lol2gltf
 
         [Option("texture-paths", Default = null, Required = false, HelpText = "Paths to the textures used by the material-names argument")]
         public IEnumerable<string> MaterialTexturePaths { get; set; }
+
+        [Option('o', "output-path", Default = null, Required = true,
+            HelpText = 
+            "Where the glTF file should be saved.\n" +
+            "Use .gltf extension to save a JSON .glTF file with a resoruce file (.bin)\n" +
+            "Use .glb extension to save a binary glTF gile")]
+        public string OutputPath { get; set; }
     }
 
     [Verb("convert-skinned-model", HelpText = "Converts a SKN (Simple Skin) file with a SKL (Skeleton) file to a glTF with optional textures and animations")]
@@ -34,5 +41,12 @@ namespace lol2gltf
 
         [Option("animations", Group = "animations", Default = null, HelpText = "Paths to the ANM (Animation) files used for conversion")]
         public string AnimationPaths { get; set; }
+    }
+
+    [Verb("dump-simple-skin", HelpText = "Displays all data about the provided SKN (Simple Skin)")]
+    public class DumpSimpleSkinInfoOptions
+    {
+        [Option('s', "simple-skin", Default = null, Required = true, HelpText = "Path to the SKN (Simple Skin) file")]
+        public string SimpleSkinPath { get; set; }
     }
 }

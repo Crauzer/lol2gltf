@@ -15,6 +15,19 @@
   </p>
 </p>
 
-# Preview:
-![](https://thumbs.gfycat.com/ShorttermThoroughDingo-size_restricted.gif)
-![](https://thumbs.gfycat.com/HappyRectangularAntelopegroundsquirrel-size_restricted.gif)
+<p align="center">
+  <a href="https://github.com/Crauzer/lol2gltf/wiki">
+      <h1 align="center"> How to use </h1>
+  </a>
+</p>
+
+<h1 align="center"> Preview </h1>
+
+<p align="center">
+  <a href="https://thumbs.gfycat.com/HappyRectangularAntelopegroundsquirrel-size_restricted.gif">
+    <img src="https://thumbs.gfycat.com/HappyRectangularAntelopegroundsquirrel-size_restricted.gif"></>
+  </a>
+  <a href="https://thumbs.gfycat.com/ShorttermThoroughDingo-size_restricted.gif">
+    <img src="https://thumbs.gfycat.com/ShorttermThoroughDingo-size_restricted.gif"></>
+  </a>
+</p>

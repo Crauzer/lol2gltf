@@ -12,7 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\lol2gltf.Shared\lol2gltf.Shared.csproj" />
     <ProjectReference Include="..\SharpGLTF\src\SharpGLTF.Toolkit\SharpGLTF.Toolkit.csproj" />
   </ItemGroup>
 

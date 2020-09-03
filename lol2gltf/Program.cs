@@ -41,7 +41,7 @@ namespace lol2gltf
 
                 gltf.Save(opts.OutputPath);
             }
-            catch(Exception exception)
+            catch (Exception exception)
             {
                 Console.WriteLine("Failed to convert Simple Skin to glTF");
                 Console.WriteLine(exception);
@@ -57,9 +57,9 @@ namespace lol2gltf
                 SimpleSkin simpleSkin = ReadSimpleSkin(opts.SimpleSkinPath);
                 Skeleton skeleton = ReadSkeleton(opts.SkeletonPath);
                 var materialTextureMap = CreateMaterialTextureMap(opts.TextureMaterialNames, opts.MaterialTexturePaths);
-                
+
                 List<(string, LeagueAnimation)> animations = null;
-                if(!string.IsNullOrEmpty(opts.AnimationsFolder))
+                if (!string.IsNullOrEmpty(opts.AnimationsFolder))
                 {
                     string[] animationFiles = Directory.GetFiles(opts.AnimationsFolder, "*.anm");
                     animations = ReadAnimations(animationFiles);
@@ -116,7 +116,7 @@ namespace lol2gltf
         {
             List<(string, LeagueAnimation)> animations = new();
 
-            foreach(string animationPath in animationPaths)
+            foreach (string animationPath in animationPaths)
             {
                 string animationName = Path.GetFileNameWithoutExtension(animationPath);
                 LeagueAnimation animation = new LeagueAnimation(animationPath);
@@ -133,15 +133,15 @@ namespace lol2gltf
 
             int materialCount = materials.Count();
             int texturesCount = textures.Count();
-            if(materialCount != texturesCount)
+            if (materialCount != texturesCount)
             {
                 Console.WriteLine("Warning: Detected mismatch of material and texture counts");
             }
 
             int i = 0;
-            foreach(string material in materials)
+            foreach (string material in materials)
             {
-                if(i < texturesCount)
+                if (i < texturesCount)
                 {
                     MagickImage textureImage = null;
                     string texture = textures.ElementAt(i);
@@ -160,7 +160,6 @@ namespace lol2gltf
 
             return materialTextureMap;
         }
-        
 
         private static int DumpSimpleSkinInfo(DumpSimpleSkinInfoOptions opts)
         {
@@ -183,7 +182,7 @@ namespace lol2gltf
 
             Console.WriteLine("Submesh Count: " + simpleSkin.Submeshes.Count);
 
-            foreach(SimpleSkinSubmesh submesh in simpleSkin.Submeshes)
+            foreach (SimpleSkinSubmesh submesh in simpleSkin.Submeshes)
             {
                 Console.WriteLine("--- SUBMESH ---");
                 Console.WriteLine("Material: " + submesh.Name);

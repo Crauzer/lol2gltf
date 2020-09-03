@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using CommandLine;
 using Fantome.Libraries.League.Helpers.Structures;
 using Fantome.Libraries.League.IO.SimpleSkin;
@@ -26,10 +27,18 @@ namespace lol2gltf
 
         private static int ConvertSimpleSkin(SimpleSkinOptions opts)
         {
-            SimpleSkin simpleSkin = ReadSimpleSkin(opts.SimpleSkinPath);
-            if (simpleSkin is not null)
+            try
             {
+                SimpleSkin simpleSkin = ReadSimpleSkin(opts.SimpleSkinPath);
+                var materialTextureMap = CreateMaterialTextureMap(opts.MaterialTexturePaths, opts.MaterialTexturePaths);
+                var gltf = simpleSkin.ToGltf(materialTextureMap);
 
+                gltf.Save(opts.OutputPath);
+            }
+            catch(Exception exception)
+            {
+                Console.WriteLine("Failed to convert Simple Skin to glTF");
+                Console.WriteLine(exception);
             }
 
             return 1;
@@ -55,8 +64,7 @@ namespace lol2gltf
             }
             catch (Exception exception)
             {
-                Console.WriteLine("Failed to read specified SKN file\n" + exception);
-                return null;
+                throw new Exception("Error: Failed to read specified SKN file", exception);
             }
         }
 
@@ -64,7 +72,32 @@ namespace lol2gltf
         {
             Dictionary<string, MagickImage> materialTextureMap = new();
 
+            int materialCount = materials.Count();
+            int texturesCount = textures.Count();
+            if(materialCount != texturesCount)
+            {
+                Console.WriteLine("Warning: Detected mismatch of material and texture counts");
+            }
 
+            int i = 0;
+            foreach(string material in materials)
+            {
+                if(i < texturesCount)
+                {
+                    MagickImage textureImage = null;
+                    string texture = textures.ElementAt(i);
+
+                    try { textureImage = new MagickImage(texture); }
+                    catch (Exception exception)
+                    {
+                        throw new Exception("Error: Failed to create an Image object for texture: " + texture, exception);
+                    }
+
+                    materialTextureMap.Add(material, textureImage);
+                }
+
+                i++;
+            }
 
             return materialTextureMap;
         }

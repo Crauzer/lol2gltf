@@ -7,8 +7,7 @@ using CommandLine;
 
 namespace lol2gltf
 {
-    [Verb("convert-simple-skin", HelpText = "Converts an SKN (Simple Skin) file to a glTF with optional textures")]
-    public class SimpleSkinOptions
+    public interface IBaseSimpleSkinOptions
     {
         [Option("simple-skin", Default = null, Required = true, HelpText = "Path to the SKN (Simple Skin) file")]
         public string SimpleSkinPath { get; set; }
@@ -30,9 +29,23 @@ namespace lol2gltf
         public string OutputPath { get; set; }
     }
 
-    [Verb("convert-skinned-model", HelpText = "Converts a SKN (Simple Skin) file with a SKL (Skeleton) file to a glTF with optional textures and animations")]
-    public class SkinnedModelOptions : SimpleSkinOptions
+    [Verb("convert-simple-skin", HelpText = "Converts an SKN (Simple Skin) file to a glTF with optional textures")]
+    public class SimpleSkinOptions : IBaseSimpleSkinOptions
     {
+        public string SimpleSkinPath { get; set; }
+        public IEnumerable<string> TextureMaterialNames { get; set; }
+        public IEnumerable<string> MaterialTexturePaths { get; set; }
+        public string OutputPath { get; set; }
+    }
+
+    [Verb("convert-skinned-model", HelpText = "Converts a SKN (Simple Skin) file with a SKL (Skeleton) file to a glTF with optional textures and animations")]
+    public class SkinnedModelOptions : IBaseSimpleSkinOptions
+    {
+        public string SimpleSkinPath { get; set; }
+        public IEnumerable<string> TextureMaterialNames { get; set; }
+        public IEnumerable<string> MaterialTexturePaths { get; set; }
+        public string OutputPath { get; set; }
+
         [Option("skeleton", Default = null, Required = true, HelpText = "Path to the SKL (Skeleton) file")]
         public string SkeletonPath { get; set; }
 
@@ -40,7 +53,7 @@ namespace lol2gltf
         public string AnimationsFolder { get; set; }
 
         [Option("animations", Group = "animations", Default = null, HelpText = "Paths to the ANM (Animation) files used for conversion")]
-        public string AnimationPaths { get; set; }
+        public IEnumerable<string> AnimationPaths { get; set; }
     }
 
     [Verb("dump-simple-skin", HelpText = "Displays all data about the provided SKN (Simple Skin)")]

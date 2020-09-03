@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using CommandLine;
 using Fantome.Libraries.League.Helpers.Structures;
 using Fantome.Libraries.League.IO.SimpleSkin;
+using Fantome.Libraries.League.IO.SkeletonFile;
 using ImageMagick;
+
+using LeagueAnimation = Fantome.Libraries.League.IO.AnimationFile.Animation;
 
 namespace lol2gltf
 {
@@ -14,7 +18,7 @@ namespace lol2gltf
         static void Main(string[] args)
         {
             Parser.Default.ParseArguments<
-                SimpleSkinOptions,
+                IBaseSimpleSkinOptions,
                 SkinnedModelOptions,
                 DumpSimpleSkinInfoOptions>(args)
                 .MapResult(
@@ -24,6 +28,8 @@ namespace lol2gltf
                     errors => HandleErrors(errors)
                 );
         }
+
+        // ------------- COMMANDS ------------- \\
 
         private static int ConvertSimpleSkin(SimpleSkinOptions opts)
         {
@@ -46,15 +52,43 @@ namespace lol2gltf
 
         private static int ConvertSkinnedModel(SkinnedModelOptions opts)
         {
+            try
+            {
+                SimpleSkin simpleSkin = ReadSimpleSkin(opts.SimpleSkinPath);
+                Skeleton skeleton = ReadSkeleton(opts.SkeletonPath);
+                var materialTextureMap = CreateMaterialTextureMap(opts.TextureMaterialNames, opts.MaterialTexturePaths);
+                
+                List<(string, LeagueAnimation)> animations = null;
+                if(!string.IsNullOrEmpty(opts.AnimationsFolder))
+                {
+                    string[] animationFiles = Directory.GetFiles(opts.AnimationsFolder, "*.anm");
+                    animations = ReadAnimations(animationFiles);
+                }
+                else
+                {
+                    animations = ReadAnimations(opts.AnimationPaths);
+                }
+
+                var gltf = simpleSkin.ToGltf(skeleton, materialTextureMap, animations);
+
+                gltf.Save(opts.OutputPath);
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine("Failed to convert Simple Skin to glTF");
+                Console.WriteLine(exception);
+            }
 
             return 1;
         }
 
         private static int HandleErrors(IEnumerable<Error> errors)
         {
-
+            // dont handle errors cuz uhhhhhhhh idk
             return 1;
         }
+
+        // ------------- BACKING FUNCTIONS ------------- \\
 
         private static SimpleSkin ReadSimpleSkin(string location)
         {
@@ -66,6 +100,31 @@ namespace lol2gltf
             {
                 throw new Exception("Error: Failed to read specified SKN file", exception);
             }
+        }
+        private static Skeleton ReadSkeleton(string location)
+        {
+            try
+            {
+                return new Skeleton(location);
+            }
+            catch (Exception exception)
+            {
+                throw new Exception("Error: Failed to read specified SKL file", exception);
+            }
+        }
+        private static List<(string, LeagueAnimation)> ReadAnimations(IEnumerable<string> animationPaths)
+        {
+            List<(string, LeagueAnimation)> animations = new();
+
+            foreach(string animationPath in animationPaths)
+            {
+                string animationName = Path.GetFileNameWithoutExtension(animationPath);
+                LeagueAnimation animation = new LeagueAnimation(animationPath);
+
+                animations.Add((animationName, animation));
+            }
+
+            return animations;
         }
 
         private static Dictionary<string, MagickImage> CreateMaterialTextureMap(IEnumerable<string> materials, IEnumerable<string> textures)
@@ -101,6 +160,7 @@ namespace lol2gltf
 
             return materialTextureMap;
         }
+        
 
         private static int DumpSimpleSkinInfo(DumpSimpleSkinInfoOptions opts)
         {

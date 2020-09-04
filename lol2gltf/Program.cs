@@ -36,7 +36,7 @@ namespace lol2gltf
             try
             {
                 SimpleSkin simpleSkin = ReadSimpleSkin(opts.SimpleSkinPath);
-                var materialTextureMap = CreateMaterialTextureMap(opts.MaterialTexturePaths, opts.MaterialTexturePaths);
+                var materialTextureMap = CreateMaterialTextureMap(opts.TextureMaterialNames, opts.MaterialTexturePaths);
                 var gltf = simpleSkin.ToGltf(materialTextureMap);
 
                 gltf.Save(opts.OutputPath);

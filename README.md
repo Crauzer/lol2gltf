@@ -6,6 +6,9 @@
 
   <p align="center">
     <a href="https://github.com/Crauzer/lol2gltf/releases">
+      <img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/Crauzer/lol2gltf?color=teal&label=Download&logo=github&style=for-the-badge">
+    </a>
+  <a href="https://github.com/Crauzer/lol2gltf/releases">
       <img alt="GitHub All Releases" src="https://img.shields.io/github/downloads/Crauzer/lol2gltf/total?style=for-the-badge">
     </a>
   </p>
@@ -20,6 +23,20 @@
       <h1 align="center"> How to use </h1>
   </a>
 </p>
+
+* Features:
+* * SKN -> glTF
+* * SKN + SKL -> glTF
+* * SKN + SKL + Animations -> glTF
+* * Texture bundling
+
+* Upcoming features:
+* * Non-cmd Application with a good looking UI
+* * Converting glTF back to SKN, SKL and ANM
+
+* Known Issues:
+* * Version 1.0 has a bug where textures will not be exported to glTF if you also don't supply animations
+* * Version 1.0 exports the model flipped on the X axis
 
 <h1 align="center"> Preview </h1>
 

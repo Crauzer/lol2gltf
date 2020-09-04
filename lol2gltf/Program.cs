@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using CommandLine;
 using Fantome.Libraries.League.Helpers.Structures;
-using Fantome.Libraries.League.IO.SimpleSkin;
+using Fantome.Libraries.League.IO.SimpleSkinFile;
 using Fantome.Libraries.League.IO.SkeletonFile;
 using ImageMagick;
 

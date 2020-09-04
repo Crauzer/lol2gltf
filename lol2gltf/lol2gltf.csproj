@@ -31,11 +31,25 @@
 
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.9.0-preview1" />
-    <PackageReference Include="Fantome.Libraries.League" Version="1.4.3" />
+    <PackageReference Include="Fantome.Libraries.League" Version="1.4.4" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SharpGLTF\src\SharpGLTF.Toolkit\SharpGLTF.Toolkit.csproj" />
+    <Reference Include="SharpGLTF.Core">
+      <HintPath>SharpGLTF.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpGLTF.Toolkit">
+      <HintPath>SharpGLTF.Toolkit.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="SharpGLTF.Core.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="SharpGLTF.Toolkit.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

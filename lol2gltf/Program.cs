@@ -77,7 +77,7 @@ namespace lol2gltf
                 {
                     if(!animation.Item2.IsCompatibleWithSkeleton(skeleton))
                     {
-                        Console.WriteLine("Warning: Found an animation that's not compatible with the provided skeleton - " + animation.Item1);
+                        Console.WriteLine("Warning: Found an animation that's potentially not compatible with the provided skeleton - " + animation.Item1);
                     }
                 }
 

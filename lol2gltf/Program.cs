@@ -7,6 +7,8 @@ using CommandLine;
 using Fantome.Libraries.League.Helpers.Structures;
 using Fantome.Libraries.League.IO.SimpleSkinFile;
 using Fantome.Libraries.League.IO.SkeletonFile;
+using Fantome.Libraries.League.IO.StaticObjectFile;
+using Fantome.Libraries.League.IO.WGT;
 using ImageMagick;
 
 using LeagueAnimation = Fantome.Libraries.League.IO.AnimationFile.Animation;
@@ -25,7 +27,8 @@ namespace lol2gltf
                     (SimpleSkinOptions opts) => ConvertSimpleSkin(opts),
                     (SkinnedModelOptions opts) => ConvertSkinnedModel(opts),
                     (DumpSimpleSkinInfoOptions opts) => DumpSimpleSkinInfo(opts),
-                    errors => HandleErrors(errors)
+                    (CreateSimpleSkinFromLegacyOptions opts) => CreateSimpleSkinFromLegacy(opts),
+                    errors => 1
                 );
         }
 
@@ -91,9 +94,22 @@ namespace lol2gltf
             return 1;
         }
 
-        private static int HandleErrors(IEnumerable<Error> errors)
+        private static int CreateSimpleSkinFromLegacy(CreateSimpleSkinFromLegacyOptions opts)
         {
-            // dont handle errors cuz uhhhhhhhh idk
+            try
+            {
+                StaticObject staticObject = StaticObject.ReadSCO(opts.StaticObjectPath);
+                WGTFile weightFile = new WGTFile(opts.WeightFilePath);
+                SimpleSkin simpleSkin = new SimpleSkin(staticObject, weightFile);
+
+                simpleSkin.Write(opts.SimpleSkinPath);
+            }
+            catch(Exception exception)
+            {
+                Console.WriteLine("Failed to convert Simple Skin to glTF");
+                Console.WriteLine(exception);
+            }
+
             return 1;
         }
 

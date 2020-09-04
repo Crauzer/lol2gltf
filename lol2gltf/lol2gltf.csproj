@@ -15,7 +15,6 @@
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <PublishSingleFile>true</PublishSingleFile>
     <SatelliteResourceLanguages> en </SatelliteResourceLanguages>
-    <OutputPath>bin\Release</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleasePortable|x64'">
@@ -26,7 +25,6 @@
     <SatelliteResourceLanguages> en </SatelliteResourceLanguages>
     <PublishReadyToRun>true</PublishReadyToRun>
     <PublishReadyToRunShowWarnings>true</PublishReadyToRunShowWarnings>
-    <OutputPath>bin\ReleasePortable\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>

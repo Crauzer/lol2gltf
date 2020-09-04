@@ -62,4 +62,17 @@ namespace lol2gltf
         [Option('s', "simple-skin", Default = null, Required = true, HelpText = "Path to the SKN (Simple Skin) file")]
         public string SimpleSkinPath { get; set; }
     }
+
+    [Verb("create-skn-from-legacy", HelpText = "Creates a Simple Skin (SKN) from legacy SCO + WGT file combination")]
+    public class CreateSimpleSkinFromLegacyOptions
+    {
+        [Option("sco", Required = true, HelpText = "Path to the SCO file")]
+        public string StaticObjectPath { get; set; }
+
+        [Option("wgt", Required = true, HelpText = "Path to the WGT file")]
+        public string WeightFilePath { get; set; }
+
+        [Option('o', "output-path", Required = true, HelpText = "Path where to save the created SKN")]
+        public string SimpleSkinPath { get; set; }
+    }
 }

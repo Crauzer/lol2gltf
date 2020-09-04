@@ -6,7 +6,7 @@
 
   <p align="center">
     <a href="https://github.com/Crauzer/lol2gltf/releases">
-      <img alt="GitHub All Releases" src="https://img.shields.io/github/downloads/Crauzer/lol2gltf/total?style=for-the-badge">
+      <img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/Crauzer/lol2gltf?color=teal&label=Download&logo=github&style=for-the-badge">
     </a>
   </p>
 

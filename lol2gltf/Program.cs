@@ -139,7 +139,7 @@ namespace lol2gltf
         }
         private static List<(string, LeagueAnimation)> ReadAnimations(IEnumerable<string> animationPaths)
         {
-            List<(string, LeagueAnimation)> animations = new();
+            var animations = new List<(string, LeagueAnimation)>();
 
             foreach (string animationPath in animationPaths)
             {
@@ -154,7 +154,7 @@ namespace lol2gltf
 
         private static Dictionary<string, MagickImage> CreateMaterialTextureMap(IEnumerable<string> materials, IEnumerable<string> textures)
         {
-            Dictionary<string, MagickImage> materialTextureMap = new();
+            var materialTextureMap = new Dictionary<string, MagickImage>();
 
             int materialCount = materials.Count();
             int texturesCount = textures.Count();
@@ -189,7 +189,7 @@ namespace lol2gltf
         private static int DumpSimpleSkinInfo(DumpSimpleSkinInfoOptions opts)
         {
             SimpleSkin simpleSkin = ReadSimpleSkin(opts.SimpleSkinPath);
-            if (simpleSkin is not null)
+            if (simpleSkin != null)
             {
                 DumpSimpleSkinInfo(simpleSkin);
             }

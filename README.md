@@ -21,6 +21,15 @@
   </a>
 </p>
 
+* Features:
+* * SKN -> glTF
+* * SKN + SKL -> glTF
+* * SKN + SKL + Animations -> glTF
+* * Texture bundling
+
+* Upcoming features:
+* * Non-cmd Application with a good looking UI
+
 <h1 align="center"> Preview </h1>
 
 <p align="center">

@@ -18,7 +18,7 @@ namespace lol2gltf
         static void Main(string[] args)
         {
             Parser.Default.ParseArguments<
-                IBaseSimpleSkinOptions,
+                SimpleSkinOptions,
                 SkinnedModelOptions,
                 DumpSimpleSkinInfoOptions>(args)
                 .MapResult(
@@ -67,6 +67,15 @@ namespace lol2gltf
                 else
                 {
                     animations = ReadAnimations(opts.AnimationPaths);
+                }
+
+                // Check animation compatibility
+                foreach(var animation in animations)
+                {
+                    if(!animation.Item2.IsCompatibleWithSkeleton(skeleton))
+                    {
+                        Console.WriteLine("Warning: Found an animation that's not compatible with the provided skeleton - " + animation.Item1);
+                    }
                 }
 
                 var gltf = simpleSkin.ToGltf(skeleton, materialTextureMap, animations);

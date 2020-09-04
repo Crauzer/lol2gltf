@@ -31,3 +31,8 @@
     <img src="https://thumbs.gfycat.com/ShorttermThoroughDingo-size_restricted.gif"></>
   </a>
 </p>
+
+# Special thanks to:
+[vpenades](https://github.com/vpenades) for creating the [SharpGLTF library](https://github.com/vpenades/SharpGLTF) and fixing a critical bug before release
+
+**moonshadow565** - for helping me reverse engineer the ANM file format

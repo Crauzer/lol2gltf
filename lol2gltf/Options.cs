@@ -7,7 +7,7 @@ using CommandLine;
 
 namespace lol2gltf
 {
-    public interface IBaseSimpleSkinOptions
+    public interface IBaseSimpleSkinToGltfOptions
     {
         [Option("simple-skin", Default = null, Required = true, HelpText = "Path to the SKN (Simple Skin) file")]
         public string SimpleSkinPath { get; set; }
@@ -29,8 +29,20 @@ namespace lol2gltf
         public string OutputPath { get; set; }
     }
 
+    public interface IBaseMapGeometryToGltfOptions
+    {
+        [Option('m', "mapgeo", Required = true, HelpText = "Path to a Map Geometry file")]
+        public string MapGeometryPath { get; set; }
+    
+        [Option('o', "output", Required = true, HelpText =
+            "Where the glTF file should be saved.\n" +
+            "Use .gltf extension to save a JSON .glTF file with a resoruce file (.bin)\n" +
+            "Use .glb extension to save a binary glTF gile")]
+        public string OutputPath { get; set; }
+    }
+
     [Verb("convert-simple-skin", HelpText = "Converts an SKN (Simple Skin) file to a glTF with optional textures")]
-    public class SimpleSkinOptions : IBaseSimpleSkinOptions
+    public class SimpleSkinToGltfOptions : IBaseSimpleSkinToGltfOptions
     {
         public string SimpleSkinPath { get; set; }
         public IEnumerable<string> TextureMaterialNames { get; set; }
@@ -39,7 +51,7 @@ namespace lol2gltf
     }
 
     [Verb("convert-skinned-model", HelpText = "Converts a SKN (Simple Skin) file with a SKL (Skeleton) file to a glTF with optional textures and animations")]
-    public class SkinnedModelOptions : IBaseSimpleSkinOptions
+    public class SkinnedModelToGltfOptions : IBaseSimpleSkinToGltfOptions
     {
         public string SimpleSkinPath { get; set; }
         public IEnumerable<string> TextureMaterialNames { get; set; }
@@ -74,5 +86,12 @@ namespace lol2gltf
 
         [Option('o', "output-path", Required = true, HelpText = "Path where to save the created SKN")]
         public string SimpleSkinPath { get; set; }
+    }
+
+    [Verb("convert-map-geometry", HelpText = "Convertes a Map Geometry (mapgeo) to a glTF")]
+    public class ConvertMapGeometryToGltfOptions : IBaseMapGeometryToGltfOptions
+    {
+        public string MapGeometryPath { get; set; }
+        public string OutputPath { get; set; }
     }
 }

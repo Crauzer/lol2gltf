@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "lol2gltf": {
+      "commandName": "Project",
+      "commandLineArgs": "convert-map-geometry -m base_srx.mapgeo -o mapgeo.glb"
+    }
+  }
+}

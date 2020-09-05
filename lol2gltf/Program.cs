@@ -5,12 +5,13 @@ using System.IO;
 using System.Linq;
 using CommandLine;
 using Fantome.Libraries.League.Helpers.Structures;
+using Fantome.Libraries.League.IO.MapGeometry;
 using Fantome.Libraries.League.IO.SimpleSkinFile;
 using Fantome.Libraries.League.IO.SkeletonFile;
 using Fantome.Libraries.League.IO.StaticObjectFile;
 using Fantome.Libraries.League.IO.WGT;
 using ImageMagick;
-
+using SharpGLTF.Schema2;
 using LeagueAnimation = Fantome.Libraries.League.IO.AnimationFile.Animation;
 
 namespace lol2gltf
@@ -20,21 +21,24 @@ namespace lol2gltf
         static void Main(string[] args)
         {
             Parser.Default.ParseArguments<
-                SimpleSkinOptions,
-                SkinnedModelOptions,
-                DumpSimpleSkinInfoOptions>(args)
+                SimpleSkinToGltfOptions,
+                SkinnedModelToGltfOptions,
+                DumpSimpleSkinInfoOptions,
+                CreateSimpleSkinFromLegacyOptions,
+                ConvertMapGeometryToGltfOptions>(args)
                 .MapResult(
-                    (SimpleSkinOptions opts) => ConvertSimpleSkin(opts),
-                    (SkinnedModelOptions opts) => ConvertSkinnedModel(opts),
+                    (SimpleSkinToGltfOptions opts) => ConvertSimpleSkin(opts),
+                    (SkinnedModelToGltfOptions opts) => ConvertSkinnedModel(opts),
                     (DumpSimpleSkinInfoOptions opts) => DumpSimpleSkinInfo(opts),
                     (CreateSimpleSkinFromLegacyOptions opts) => CreateSimpleSkinFromLegacy(opts),
+                    (ConvertMapGeometryToGltfOptions opts) => ConvertMapGeometryToGltf(opts),
                     errors => 1
                 );
         }
 
         // ------------- COMMANDS ------------- \\
 
-        private static int ConvertSimpleSkin(SimpleSkinOptions opts)
+        private static int ConvertSimpleSkin(SimpleSkinToGltfOptions opts)
         {
             try
             {
@@ -53,7 +57,7 @@ namespace lol2gltf
             return 1;
         }
 
-        private static int ConvertSkinnedModel(SkinnedModelOptions opts)
+        private static int ConvertSkinnedModel(SkinnedModelToGltfOptions opts)
         {
             try
             {
@@ -113,6 +117,16 @@ namespace lol2gltf
             return 1;
         }
 
+        private static int ConvertMapGeometryToGltf(ConvertMapGeometryToGltfOptions opts)
+        {
+            MapGeometry mapGeometry = ReadMapGeometry(opts.MapGeometryPath);
+            ModelRoot gltf = mapGeometry.ToGLTF();
+
+            gltf.Save(opts.OutputPath);
+
+            return 1;
+        }
+
         // ------------- BACKING FUNCTIONS ------------- \\
 
         private static SimpleSkin ReadSimpleSkin(string location)
@@ -150,6 +164,17 @@ namespace lol2gltf
             }
 
             return animations;
+        }
+        private static MapGeometry ReadMapGeometry(string location)
+        {
+            try
+            {
+                return new MapGeometry(location);
+            }
+            catch(Exception exception)
+            {
+                throw new Exception("Error: Failed to read map geometry file", exception);
+            }
         }
 
         private static Dictionary<string, MagickImage> CreateMaterialTextureMap(IEnumerable<string> materials, IEnumerable<string> textures)

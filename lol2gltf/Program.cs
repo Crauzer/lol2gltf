@@ -43,7 +43,7 @@ namespace lol2gltf
             try
             {
                 SimpleSkin simpleSkin = ReadSimpleSkin(opts.SimpleSkinPath);
-                var materialTextureMap = CreateMaterialTextureMap(opts.TextureMaterialNames, opts.MaterialTexturePaths);
+                var materialTextureMap = CreateMaterialTextureMap(opts.MaterialTextures);
                 var gltf = simpleSkin.ToGltf(materialTextureMap);
 
                 gltf.Save(opts.OutputPath);
@@ -63,7 +63,7 @@ namespace lol2gltf
             {
                 SimpleSkin simpleSkin = ReadSimpleSkin(opts.SimpleSkinPath);
                 Skeleton skeleton = ReadSkeleton(opts.SkeletonPath);
-                var materialTextureMap = CreateMaterialTextureMap(opts.TextureMaterialNames, opts.MaterialTexturePaths);
+                var materialTextureMap = CreateMaterialTextureMap(opts.MaterialTextures);
 
                 List<(string, LeagueAnimation)> animations = null;
                 if (!string.IsNullOrEmpty(opts.AnimationsFolder))
@@ -127,6 +127,17 @@ namespace lol2gltf
             return 1;
         }
 
+        private static int ConvertGltfToSimpleSkin(ConvertGltfToSimpleSkinOptions opts)
+        {
+            ModelRoot gltf = ReadGltf(opts.GltfPath);
+            (SimpleSkin simpleSkin, Skeleton skeleton) = gltf.ToLeagueModel();
+
+            simpleSkin.Write(opts.SimpleSkinPath);
+            skeleton.Write(opts.SkeletonPath);
+
+            return 1;
+        }
+
         // ------------- BACKING FUNCTIONS ------------- \\
 
         private static SimpleSkin ReadSimpleSkin(string location)
@@ -176,36 +187,51 @@ namespace lol2gltf
                 throw new Exception("Error: Failed to read map geometry file", exception);
             }
         }
+        private static ModelRoot ReadGltf(string location)
+        {
+            try
+            {
+                return ModelRoot.Load(Path.GetFullPath(location));
+            }
+            catch(Exception exception)
+            {
+                throw new Exception("Failed to load glTF file", exception);
+            }
+        }
 
-        private static Dictionary<string, MagickImage> CreateMaterialTextureMap(IEnumerable<string> materials, IEnumerable<string> textures)
+        private static Dictionary<string, MagickImage> CreateMaterialTextureMap(IEnumerable<string> materialTextures)
         {
             var materialTextureMap = new Dictionary<string, MagickImage>();
 
-            int materialCount = materials.Count();
-            int texturesCount = textures.Count();
-            if (materialCount != texturesCount)
+            foreach(string materialTexture in materialTextures)
             {
-                Console.WriteLine("Warning: Detected mismatch of material and texture counts");
-            }
-
-            int i = 0;
-            foreach (string material in materials)
-            {
-                if (i < texturesCount)
+                if(!materialTexture.Contains(':'))
                 {
-                    MagickImage textureImage = null;
-                    string texture = textures.ElementAt(i);
-
-                    try { textureImage = new MagickImage(texture); }
-                    catch (Exception exception)
-                    {
-                        throw new Exception("Error: Failed to create an Image object for texture: " + texture, exception);
-                    }
-
-                    materialTextureMap.Add(material, textureImage);
+                    throw new Exception("Material Texture does not contain a separator (:) - " + materialTexture);
                 }
 
-                i++;
+                string[] materialTextureSplit = materialTexture.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
+                if(materialTextureSplit.Length != 2)
+                {
+                    throw new Exception("Invalid format for material texture: " + materialTexture);
+                }
+
+                string material = materialTextureSplit[0];
+                string texturePath = materialTextureSplit[1];
+
+                MagickImage textureImage = null;
+                try { textureImage = new MagickImage(texturePath); }
+                catch (Exception exception)
+                {
+                    throw new Exception("Error: Failed to create an Image object for texture: " + texturePath, exception);
+                }
+
+                if(materialTextureMap.ContainsKey(material))
+                {
+                    throw new Exception($"Material <{material}> has already been added");
+                }
+
+                materialTextureMap.Add(material, textureImage);
             }
 
             return materialTextureMap;

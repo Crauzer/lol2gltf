@@ -2,7 +2,7 @@
   "profiles": {
     "lol2gltf": {
       "commandName": "Project",
-      "commandLineArgs": "convert-map-geometry -m base_srx.mapgeo -o mapgeo.glb"
+      "commandLineArgs": "skn2gltf-rigged -m aatrox.skn -s aatrox.skl -o aatrox.glb -t \"Body:aatrox_base_tx_cm.dds\" \"Sword:aatrox_base_sword_tx_cm.dds\" --animations-folder animations"
     }
   }
 }

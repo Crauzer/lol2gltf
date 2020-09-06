@@ -12,14 +12,8 @@ namespace lol2gltf
         [Option('m', "skn", Required = true, HelpText = "Path to the SKN (Simple Skin) file")]
         public string SimpleSkinPath { get; set; }
 
-        [Option("material-names", Required = false,
-            HelpText =
-            "Names of the materials you want to assign a texture to using the texture-paths argument\n" +
-            "Textures will be applies to materials in sequential order specified by this argument")]
-        public IEnumerable<string> TextureMaterialNames { get; set; }
-
-        [Option("texture-paths", Required = false, HelpText = "Paths to the textures used by the material-names argument")]
-        public IEnumerable<string> MaterialTexturePaths { get; set; }
+        [Option('t', "material-textures", Required = false, HelpText = "Specifies what textures to assign to what materials. Example: Body:aatrox_base_tx_cm.dds")]
+        public IEnumerable<string> MaterialTextures { get; set; }
 
         [Option('o', "output-path", Required = true,
             HelpText = 
@@ -45,8 +39,7 @@ namespace lol2gltf
     public class SimpleSkinToGltfOptions : IBaseSimpleSkinToGltfOptions
     {
         public string SimpleSkinPath { get; set; }
-        public IEnumerable<string> TextureMaterialNames { get; set; }
-        public IEnumerable<string> MaterialTexturePaths { get; set; }
+        public IEnumerable<string> MaterialTextures { get; set; }
         public string OutputPath { get; set; }
     }
 
@@ -54,8 +47,7 @@ namespace lol2gltf
     public class SkinnedModelToGltfOptions : IBaseSimpleSkinToGltfOptions
     {
         public string SimpleSkinPath { get; set; }
-        public IEnumerable<string> TextureMaterialNames { get; set; }
-        public IEnumerable<string> MaterialTexturePaths { get; set; }
+        public IEnumerable<string> MaterialTextures { get; set; }
         public string OutputPath { get; set; }
 
         [Option('s', "skeleton", Required = true, HelpText = "Path to the SKL (Skeleton) file")]
@@ -88,10 +80,23 @@ namespace lol2gltf
         public string SimpleSkinPath { get; set; }
     }
 
-    [Verb("convert-map-geometry", HelpText = "Convertes a Map Geometry (mapgeo) to a glTF")]
+    [Verb("mapgeo2gltf", HelpText = "Convertes a Map Geometry (mapgeo) to a glTF")]
     public class ConvertMapGeometryToGltfOptions : IBaseMapGeometryToGltfOptions
     {
         public string MapGeometryPath { get; set; }
         public string OutputPath { get; set; }
+    }
+
+    [Verb("gltf2skn", HelpText = "Converts a glTF file to a League model (SKN + SKL)")]
+    public class ConvertGltfToSimpleSkinOptions
+    {
+        [Option('g', "gltf", Required = true, HelpText = "Path to a glTF file")]
+        public string GltfPath { get; set; }
+
+        [Option('m', "skn", Required = true, HelpText = "Where the created SKN should be saved to")]
+        public string SimpleSkinPath { get; set; }
+
+        [Option('s', "skl", Required = true, HelpText = "Where the created SKL should be saved to")]
+        public string SkeletonPath { get; set; }
     }
 }

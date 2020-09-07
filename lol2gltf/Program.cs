@@ -211,13 +211,20 @@ namespace lol2gltf
                 }
 
                 string[] materialTextureSplit = materialTexture.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
-                if(materialTextureSplit.Length != 2)
+                string material = materialTextureSplit[0];
+                string texturePath;
+                if(materialTextureSplit.Length == 2) // Material : Relative path
+                {
+                    texturePath = materialTextureSplit[1];
+                }
+                else if(materialTextureSplit.Length == 3) // Material : Absolute path C:/.......
+                {
+                    texturePath = materialTextureSplit[1] + ':' + materialTextureSplit[2];
+                }
+                else
                 {
                     throw new Exception("Invalid format for material texture: " + materialTexture);
                 }
-
-                string material = materialTextureSplit[0];
-                string texturePath = materialTextureSplit[1];
 
                 MagickImage textureImage = null;
                 try { textureImage = new MagickImage(texturePath); }

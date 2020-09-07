@@ -36,6 +36,9 @@
 * * Converting glTF back to SKN, SKL and ANM
 * * FBX -> SKN + SKL
 
+******
+![](https://www.khronos.org/assets/uploads/apis/2017-collada-gltf-positioning.png)
+
 <h1 align="center"> Preview </h1>
 
 <p align="center">

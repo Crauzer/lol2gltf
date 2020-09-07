@@ -48,7 +48,7 @@ namespace lol2gltf.Core.Tests
 
             SkinnedModelToGltf skinnedModelToGltf = new SkinnedModelToGltf()
             {
-                OutputPath = Path.Join(TESTFILES_SIMPLE_SKIN_DIR, modelName, modelName + ".glb"),
+                OutputPath = Path.Join(TESTFILES_SIMPLE_SKIN_DIR, modelName, modelName + "_skinned" + ".glb"),
                 MaterialTextures = materialTextureMap,
                 SimpleSkinPath = Path.Join(modelDirectoryPath, modelName + ".skn"),
                 Animations = CreateAnimations(modelName),
@@ -86,7 +86,7 @@ namespace lol2gltf.Core.Tests
             string animationsDirectoryPath = Path.Join(modelDirectoryPath, "animations");
 
             List<(string, Animation)> animations = new List<(string, Animation)>();
-            foreach(string animationFile in Directory.EnumerateFiles(animationsDirectoryPath, ".anm"))
+            foreach(string animationFile in Directory.EnumerateFiles(animationsDirectoryPath, "*.anm"))
             {
                 animations.Add((Path.GetFileNameWithoutExtension(animationFile), new Animation(animationFile)));
             }

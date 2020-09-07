@@ -4,6 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <Platforms>x64</Platforms>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <Configurations>Debug;Release;ReleasePortable</Configurations>
     <Authors>Crauzer</Authors>
     <Company>Crauzer</Company>

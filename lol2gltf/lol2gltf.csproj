@@ -36,6 +36,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\lol2gltf.Core\lol2gltf.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="SharpGLTF.Core.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

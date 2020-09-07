@@ -2,7 +2,7 @@
   "profiles": {
     "lol2gltf": {
       "commandName": "Project",
-      "commandLineArgs": "skn2gltf-rigged -m aatrox.skn -s aatrox.skl -o aatrox.glb -t \"Body:aatrox_base_tx_cm.dds\" \"Sword:C:\\dev\\lol2gltf\\lol2gltf\\bin\\x64\\Debug\\netcoreapp3.1\\aatrox_base_sword_tx_cm.dds\" --animations-folder animations"
+      "commandLineArgs": "skn2gltf-rigged -m ezreal_skin21.skn -s ezreal_skin21.skl -o ezreal_skin21.glb -t \"Body:ezreal_skin21_tx_cm.dds\" --animations-folder animations"
     }
   }
 }

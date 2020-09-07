@@ -1,18 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using CommandLine;
+﻿using CommandLine;
 using Fantome.Libraries.League.Helpers.Structures;
 using Fantome.Libraries.League.IO.MapGeometry;
 using Fantome.Libraries.League.IO.SimpleSkinFile;
 using Fantome.Libraries.League.IO.SkeletonFile;
-using Fantome.Libraries.League.IO.StaticObjectFile;
-using Fantome.Libraries.League.IO.WGT;
 using ImageMagick;
+using lol2gltf.Core.ConversionOptions;
 using SharpGLTF.Schema2;
+using System;
+using System.Collections.Generic;
+using System.IO;
 using LeagueAnimation = Fantome.Libraries.League.IO.AnimationFile.Animation;
+using LeagueConverter = lol2gltf.Core.Converter;
 
 namespace lol2gltf
 {
@@ -42,11 +40,14 @@ namespace lol2gltf
         {
             try
             {
-                SimpleSkin simpleSkin = ReadSimpleSkin(opts.SimpleSkinPath);
-                var materialTextureMap = CreateMaterialTextureMap(opts.MaterialTextures);
-                var gltf = simpleSkin.ToGltf(materialTextureMap);
+                SimpleSkinToGltf simpleSkinToGltf = new SimpleSkinToGltf()
+                {
+                    OutputPath = opts.OutputPath,
+                    SimpleSkinPath = opts.SimpleSkinPath,
+                    MaterialTextures = CreateMaterialTextureMap(opts.MaterialTextures)
+                };
 
-                gltf.Save(opts.OutputPath);
+                LeagueConverter.ConvertSimpleSkin(simpleSkinToGltf);
             }
             catch (Exception exception)
             {
@@ -61,9 +62,7 @@ namespace lol2gltf
         {
             try
             {
-                SimpleSkin simpleSkin = ReadSimpleSkin(opts.SimpleSkinPath);
                 Skeleton skeleton = ReadSkeleton(opts.SkeletonPath);
-                var materialTextureMap = CreateMaterialTextureMap(opts.MaterialTextures);
 
                 List<(string, LeagueAnimation)> animations = null;
                 if (!string.IsNullOrEmpty(opts.AnimationsFolder))
@@ -77,21 +76,28 @@ namespace lol2gltf
                 }
 
                 // Check animation compatibility
-                foreach(var animation in animations)
+                foreach (var animation in animations)
                 {
-                    if(!animation.Item2.IsCompatibleWithSkeleton(skeleton))
+                    if (!animation.Item2.IsCompatibleWithSkeleton(skeleton))
                     {
                         Console.WriteLine("Warning: Found an animation that's potentially not compatible with the provided skeleton - " + animation.Item1);
                     }
                 }
 
-                var gltf = simpleSkin.ToGltf(skeleton, materialTextureMap, animations);
+                SkinnedModelToGltf skinnedModelToGltf = new SkinnedModelToGltf()
+                {
+                    OutputPath = opts.OutputPath,
+                    Animations = animations,
+                    MaterialTextures = CreateMaterialTextureMap(opts.MaterialTextures),
+                    SimpleSkinPath = opts.SimpleSkinPath,
+                    SkeletonPath = opts.SkeletonPath
+                };
 
-                gltf.Save(opts.OutputPath);
+                LeagueConverter.ConvertSkinnedModel(skinnedModelToGltf);
             }
             catch (Exception exception)
             {
-                Console.WriteLine("Failed to convert Simple Skin to glTF");
+                Console.WriteLine("Failed to convert Skinned Model to glTF");
                 Console.WriteLine(exception);
             }
 
@@ -102,13 +108,17 @@ namespace lol2gltf
         {
             try
             {
-                StaticObject staticObject = StaticObject.ReadSCO(opts.StaticObjectPath);
-                WGTFile weightFile = new WGTFile(opts.WeightFilePath);
-                SimpleSkin simpleSkin = new SimpleSkin(staticObject, weightFile);
+                CreateSimpleSkinFromLegacy createSimpleSkinFromLegacy = new CreateSimpleSkinFromLegacy()
+                {
+                    SimpleSkinPath = opts.SimpleSkinPath,
+                    StaticObjectPath = opts.StaticObjectPath,
+                    WeightFilePath = opts.WeightFilePath
+                };
 
-                simpleSkin.Write(opts.SimpleSkinPath);
+                LeagueConverter.CreateSimpleSkinFromLegacy(createSimpleSkinFromLegacy);
+
             }
-            catch(Exception exception)
+            catch (Exception exception)
             {
                 Console.WriteLine("Failed to convert Simple Skin to glTF");
                 Console.WriteLine(exception);
@@ -119,10 +129,21 @@ namespace lol2gltf
 
         private static int ConvertMapGeometryToGltf(ConvertMapGeometryToGltfOptions opts)
         {
-            MapGeometry mapGeometry = ReadMapGeometry(opts.MapGeometryPath);
-            ModelRoot gltf = mapGeometry.ToGLTF();
+            try
+            {
+                ConvertMapGeometryToGltf convertMapGeometryToGltf = new ConvertMapGeometryToGltf()
+                {
+                    MapGeometryPath = opts.MapGeometryPath,
+                    OutputPath = opts.OutputPath
+                };
 
-            gltf.Save(opts.OutputPath);
+                LeagueConverter.ConvertMapGeometryToGltf(convertMapGeometryToGltf);
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine("Failed to convert Map Geometry to glTF");
+                Console.WriteLine(exception);
+            }
 
             return 1;
         }
@@ -182,7 +203,7 @@ namespace lol2gltf
             {
                 return new MapGeometry(location);
             }
-            catch(Exception exception)
+            catch (Exception exception)
             {
                 throw new Exception("Error: Failed to read map geometry file", exception);
             }
@@ -193,7 +214,7 @@ namespace lol2gltf
             {
                 return ModelRoot.Load(Path.GetFullPath(location));
             }
-            catch(Exception exception)
+            catch (Exception exception)
             {
                 throw new Exception("Failed to load glTF file", exception);
             }
@@ -203,9 +224,9 @@ namespace lol2gltf
         {
             var materialTextureMap = new Dictionary<string, MagickImage>();
 
-            foreach(string materialTexture in materialTextures)
+            foreach (string materialTexture in materialTextures)
             {
-                if(!materialTexture.Contains(':'))
+                if (!materialTexture.Contains(':'))
                 {
                     throw new Exception("Material Texture does not contain a separator (:) - " + materialTexture);
                 }
@@ -213,11 +234,11 @@ namespace lol2gltf
                 string[] materialTextureSplit = materialTexture.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
                 string material = materialTextureSplit[0];
                 string texturePath;
-                if(materialTextureSplit.Length == 2) // Material : Relative path
+                if (materialTextureSplit.Length == 2) // Material : Relative path
                 {
                     texturePath = materialTextureSplit[1];
                 }
-                else if(materialTextureSplit.Length == 3) // Material : Absolute path C:/.......
+                else if (materialTextureSplit.Length == 3) // Material : Absolute path C:/.......
                 {
                     texturePath = materialTextureSplit[1] + ':' + materialTextureSplit[2];
                 }
@@ -233,7 +254,7 @@ namespace lol2gltf
                     throw new Exception("Error: Failed to create an Image object for texture: " + texturePath, exception);
                 }
 
-                if(materialTextureMap.ContainsKey(material))
+                if (materialTextureMap.ContainsKey(material))
                 {
                     throw new Exception($"Material <{material}> has already been added");
                 }

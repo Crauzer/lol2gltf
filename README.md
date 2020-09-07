@@ -34,10 +34,10 @@
 * Upcoming features:
 * * Non-cmd Application with a good looking UI
 * * Converting glTF back to SKN, SKL and ANM
+* * FBX -> SKN + SKL
 
-* Known Issues:
-* * Version 1.0 has a bug where textures will not be exported to glTF if you also don't supply animations
-* * Version 1.0 exports the model flipped on the X axis
+******
+![](https://www.khronos.org/assets/uploads/apis/2017-collada-gltf-positioning.png)
 
 <h1 align="center"> Preview </h1>
 

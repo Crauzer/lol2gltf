@@ -1,0 +1,28 @@
+﻿<Window x:Class="lol2gltf.UI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:lol2gltf.UI"
+        xmlns:ui="http://schemas.modernwpf.com/2019" xmlns:mvvm="clr-namespace:lol2gltf.UI.MVVM"
+        ui:WindowHelper.UseModernWindowStyle="True"
+        mc:Ignorable="d"
+        Title="lol2gltf" Height="720" Width="1280">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <ListBox Grid.Column="0"
+                 DisplayMemberPath="Name"
+                 SelectedValuePath="PageUri"
+                 SelectedIndex="0"
+                 SelectionChanged="SelectedPageSelectionChanged">
+            <ListBox.ItemsSource>
+                <mvvm:CommandPages/>
+            </ListBox.ItemsSource>
+        </ListBox>
+        <ui:Frame x:Name="CommandFrame" Grid.Column="1" Loaded="OnCommandFrameLoaded"/>
+    </Grid>
+</Window>

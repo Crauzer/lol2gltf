@@ -1,14 +1,12 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UseWPF>true</UseWPF>
     <Platforms>x64</Platforms>
     <Configurations>Debug;Release;ReleasePortable</Configurations>
-    <Authors>Crauzer</Authors>
-    <Company>Crauzer</Company>
-    <Version>1.2.2</Version>
-    <AssemblyVersion>1.2.2.0</AssemblyVersion>
+    <LangVersion>preview</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -21,30 +19,19 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleasePortable|x64'">
     <WarningsAsErrors />
-    <SelfContained>true</SelfContained>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <PublishSingleFile>true</PublishSingleFile>
     <SatelliteResourceLanguages> en </SatelliteResourceLanguages>
-    <PublishReadyToRun>true</PublishReadyToRun>
-    <PublishReadyToRunShowWarnings>true</PublishReadyToRunShowWarnings>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommandLineParser" Version="2.9.0-preview1" />
     <PackageReference Include="Fantome.Libraries.League" Version="1.6.2" />
-    <PackageReference Include="SharpGLTF.Toolkit-optimized-buffers" Version="1.0.0" />
+    <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.4" />
+    <PackageReference Include="ModernWpfUI" Version="0.9.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\lol2gltf.Core\lol2gltf.Core.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <None Update="SharpGLTF.Core.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-  
 
 </Project>

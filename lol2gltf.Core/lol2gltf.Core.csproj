@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Fantome.Libraries.League" Version="1.5.2" />
+    <PackageReference Include="Fantome.Libraries.League" Version="1.6.2" />
   </ItemGroup>
 
 </Project>

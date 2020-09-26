@@ -7,8 +7,8 @@
     <Configurations>Debug;Release;ReleasePortable</Configurations>
     <Authors>Crauzer</Authors>
     <Company>Crauzer</Company>
-    <Version>1.2.2</Version>
-    <AssemblyVersion>1.2.2.0</AssemblyVersion>
+    <Version>2.0</Version>
+    <AssemblyVersion>2.0.0.0</AssemblyVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -38,13 +38,5 @@
   <ItemGroup>
     <ProjectReference Include="..\lol2gltf.Core\lol2gltf.Core.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <None Update="SharpGLTF.Core.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-  
 
 </Project>

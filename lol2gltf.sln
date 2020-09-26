@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "lol2gltf.Core.Tests", "lol2
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "lol2gltf.Core", "lol2gltf.Core\lol2gltf.Core.csproj", "{BD2671F2-D609-4C92-8839-FE3551CD7E94}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lol2gltf.UI", "lol2gltf.UI\lol2gltf.UI.csproj", "{536D9C1B-FB1A-4F82-BD26-F93F0C8053B1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "lol2gltf.UI", "lol2gltf.UI\lol2gltf.UI.csproj", "{536D9C1B-FB1A-4F82-BD26-F93F0C8053B1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,17 +27,21 @@ Global
 		{D78101A9-DA8C-452E-B4D2-B61E4084B672}.Debug|x64.ActiveCfg = Debug|x64
 		{D78101A9-DA8C-452E-B4D2-B61E4084B672}.Debug|x64.Build.0 = Debug|x64
 		{D78101A9-DA8C-452E-B4D2-B61E4084B672}.Release|x64.ActiveCfg = Release|x64
+		{D78101A9-DA8C-452E-B4D2-B61E4084B672}.Release|x64.Build.0 = Release|x64
 		{D78101A9-DA8C-452E-B4D2-B61E4084B672}.ReleasePortable|x64.ActiveCfg = Release|x64
+		{D78101A9-DA8C-452E-B4D2-B61E4084B672}.ReleasePortable|x64.Build.0 = Release|x64
 		{BD2671F2-D609-4C92-8839-FE3551CD7E94}.Debug|x64.ActiveCfg = Debug|x64
 		{BD2671F2-D609-4C92-8839-FE3551CD7E94}.Debug|x64.Build.0 = Debug|x64
 		{BD2671F2-D609-4C92-8839-FE3551CD7E94}.Release|x64.ActiveCfg = Release|x64
+		{BD2671F2-D609-4C92-8839-FE3551CD7E94}.Release|x64.Build.0 = Release|x64
 		{BD2671F2-D609-4C92-8839-FE3551CD7E94}.ReleasePortable|x64.ActiveCfg = Release|x64
+		{BD2671F2-D609-4C92-8839-FE3551CD7E94}.ReleasePortable|x64.Build.0 = Release|x64
 		{536D9C1B-FB1A-4F82-BD26-F93F0C8053B1}.Debug|x64.ActiveCfg = Debug|x64
 		{536D9C1B-FB1A-4F82-BD26-F93F0C8053B1}.Debug|x64.Build.0 = Debug|x64
-		{536D9C1B-FB1A-4F82-BD26-F93F0C8053B1}.Release|x64.ActiveCfg = Release|Any CPU
-		{536D9C1B-FB1A-4F82-BD26-F93F0C8053B1}.Release|x64.Build.0 = Release|Any CPU
-		{536D9C1B-FB1A-4F82-BD26-F93F0C8053B1}.ReleasePortable|x64.ActiveCfg = Release|Any CPU
-		{536D9C1B-FB1A-4F82-BD26-F93F0C8053B1}.ReleasePortable|x64.Build.0 = Release|Any CPU
+		{536D9C1B-FB1A-4F82-BD26-F93F0C8053B1}.Release|x64.ActiveCfg = Release|x64
+		{536D9C1B-FB1A-4F82-BD26-F93F0C8053B1}.Release|x64.Build.0 = Release|x64
+		{536D9C1B-FB1A-4F82-BD26-F93F0C8053B1}.ReleasePortable|x64.ActiveCfg = ReleasePortable|x64
+		{536D9C1B-FB1A-4F82-BD26-F93F0C8053B1}.ReleasePortable|x64.Build.0 = ReleasePortable|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

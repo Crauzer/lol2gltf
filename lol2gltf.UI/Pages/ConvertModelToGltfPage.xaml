@@ -8,24 +8,19 @@
       xmlns:modelViews="clr-namespace:lol2gltf.UI.MVVM.ModelViews"
       xmlns:converters="clr-namespace:lol2gltf.UI.MVVM.Converters"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
+      d:DesignHeight="800" d:DesignWidth="800"
       Title="ConvertModelPage">
     <Page.Resources>
         <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
         <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
     </Page.Resources>
-    <Grid Margin="16">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <Grid Grid.Row="0" IsEnabled="{Binding IsConverting, Converter={StaticResource InverseBoolConverter}, UpdateSourceTrigger=PropertyChanged}">
+    <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="16">
+        <Grid IsEnabled="{Binding IsConverting, Converter={StaticResource InverseBoolConverter}, UpdateSourceTrigger=PropertyChanged}" DockPanel.Dock="Top">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0" Orientation="Vertical">
@@ -43,7 +38,7 @@
                     IsEnabled="{Binding IsModelLoaded, UpdateSourceTrigger=PropertyChanged}">
                 <DataGrid ItemsSource="{Binding Submeshes}"
                       AutoGenerateColumns="False"
-                      MaxHeight="300">
+                      Height="260">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Material" Binding="{Binding Name}" IsReadOnly="True"/>
                         <DataGridTextColumn Header="Vertex Count" Binding="{Binding VertexCount}" IsReadOnly="True"/>
@@ -64,7 +59,7 @@
                 <TextBlock Text="Animations:"/>
                 <DataGrid ItemsSource="{Binding Animations, UpdateSourceTrigger=PropertyChanged}"
                       AutoGenerateColumns="False"
-                      MaxHeight="300">
+                      Height="260">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Name" Binding="{Binding Name}" IsReadOnly="True"/>
                         <DataGridTextColumn Header="FPS" Binding="{Binding FPS}" IsReadOnly="True"/>
@@ -72,18 +67,18 @@
                 </DataGrid>
                 <Button Content="Load Animations" HorizontalAlignment="Left" Command="{Binding LoadAnimationsCommand}"/>
             </StackPanel>
-
-            <Button Grid.Row="4"
-                Content="Convert"
-                HorizontalAlignment="Center" 
-                VerticalAlignment="Center"
-                IsEnabled="{Binding IsModelLoaded, UpdateSourceTrigger=PropertyChanged}"
-                Command="{Binding ConvertCommand}"/>
         </Grid>
-        <ui:ProgressBar Grid.Row="1"
+        <StackPanel Orientation="Vertical" DockPanel.Dock="Bottom" Margin="0,15,0,0" >
+            <Button HorizontalAlignment="Center"
+                        Content="Convert"
+                        DockPanel.Dock="Right"
+                        IsEnabled="{Binding IsModelLoaded, UpdateSourceTrigger=PropertyChanged}"
+                        Command="{Binding ConvertCommand}"/>
+            <ui:ProgressBar DockPanel.Dock="Bottom"
                         VerticalAlignment="Bottom"
                         IsEnabled="{Binding IsConverting, UpdateSourceTrigger=PropertyChanged}"
                         Visibility="{Binding IsConverting, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}"
-                        Height="15" IsIndeterminate="True"/>
-    </Grid>
+                        Height="15" IsIndeterminate="True" Margin="0,15,0,0"/>
+        </StackPanel>
+    </DockPanel>
 </Page>

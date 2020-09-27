@@ -7,7 +7,7 @@
         xmlns:ui="http://schemas.modernwpf.com/2019" xmlns:mvvm="clr-namespace:lol2gltf.UI.MVVM"
         ui:WindowHelper.UseModernWindowStyle="True"
         mc:Ignorable="d"
-        Title="lol2gltf" Height="720" Width="1280">
+        Title="lol2gltf" Height="850" Width="1280">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>

@@ -34,7 +34,6 @@
 * * Texture bundling (SKN)
 
 * Upcoming features:
-* * Non-cmd Application with a good looking UI
 * * Converting glTF back to SKN, SKL and ANM
 * * FBX -> SKN + SKL
 

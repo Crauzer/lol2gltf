@@ -12,6 +12,7 @@
       Title="ConvertModelPage">
     <Page.Resources>
         <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
+        <converters:IndexToRowNumberConverter x:Key="IndexToRowNumberConverter"/>
         <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
     </Page.Resources>
     <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="16">
@@ -38,15 +39,17 @@
                     IsEnabled="{Binding IsModelLoaded, UpdateSourceTrigger=PropertyChanged}">
                 <DataGrid ItemsSource="{Binding Submeshes}"
                       AutoGenerateColumns="False"
+                      AlternationCount="{Binding Submeshes.Count}"
                       Height="260">
                     <DataGrid.Columns>
+                        <DataGridTextColumn Header="Row" Binding="{Binding AlternationIndex, RelativeSource={RelativeSource AncestorType=DataGridRow}, Converter={StaticResource IndexToRowNumberConverter}}"/>
                         <DataGridTextColumn Header="Material" Binding="{Binding Name}" IsReadOnly="True"/>
                         <DataGridTextColumn Header="Vertex Count" Binding="{Binding VertexCount}" IsReadOnly="True"/>
                         <DataGridTextColumn Header="Face Count" Binding="{Binding FaceCount}" IsReadOnly="True"/>
                         <DataGridTemplateColumn Header="Texture"  IsReadOnly="True">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <modelViews:FileSelectionControl DataContext="{Binding TextureFileSelection}"/>
+                                    <modelViews:FileSelectionControl EnableClearButton="True" DataContext="{Binding TextureFileSelection}"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
@@ -59,13 +62,19 @@
                 <TextBlock Text="Animations:"/>
                 <DataGrid ItemsSource="{Binding Animations, UpdateSourceTrigger=PropertyChanged}"
                       AutoGenerateColumns="False"
+                      AlternationCount="{Binding Animations.Count}"
                       Height="260">
                     <DataGrid.Columns>
+                        <DataGridTextColumn Header="Row" Binding="{Binding AlternationIndex, RelativeSource={RelativeSource AncestorType=DataGridRow}, Converter={StaticResource IndexToRowNumberConverter}}"/>
                         <DataGridTextColumn Header="Name" Binding="{Binding Name}" IsReadOnly="True"/>
                         <DataGridTextColumn Header="FPS" Binding="{Binding FPS}" IsReadOnly="True"/>
+                        <DataGridCheckBoxColumn Header="Need" Binding="{Binding Need}"/>
                     </DataGrid.Columns>
                 </DataGrid>
-                <Button Content="Load Animations" HorizontalAlignment="Left" Command="{Binding LoadAnimationsCommand}"/>
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="Load Animations" Command="{Binding LoadAnimationsCommand}" Margin="0 0 10 0"/>
+                    <Button Content="Clear All Animations" Command="{Binding ClearAllAnimationsCommand}"></Button>
+                </StackPanel>
             </StackPanel>
         </Grid>
         <StackPanel Orientation="Vertical" DockPanel.Dock="Bottom" Margin="0,15,0,0" >

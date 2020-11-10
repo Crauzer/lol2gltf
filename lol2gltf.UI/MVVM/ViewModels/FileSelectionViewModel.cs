@@ -1,5 +1,6 @@
 ﻿using lol2gltf.UI.MVVM.Commands;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
@@ -27,6 +28,8 @@ namespace lol2gltf.UI.MVVM.ViewModels
         private SelectionChanged _onSelectionChanged;
 
         public ICommand SelectFileCommand => new RelayCommand(SelectFile);
+
+        public ICommand ClearFileCommand => new RelayCommand(_=> { this.FilePath = string.Empty; });
 
         public delegate void SelectionChanged(string filePath);
 

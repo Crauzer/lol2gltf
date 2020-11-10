@@ -6,15 +6,23 @@
              xmlns:local="clr-namespace:lol2gltf.UI.MVVM.ModelViews"
              xmlns:ui="http://schemas.modernwpf.com/2019"
              mc:Ignorable="d">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibility"/>
+    </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
         <TextBox Grid.Column="0" MinWidth="550" IsReadOnly="True" Text="{Binding FilePath, UpdateSourceTrigger=PropertyChanged}"/>
-        <Button Grid.Column="1" Margin="10,0,0,0" Command="{Binding SelectFileCommand}">
-            <ui:FontIcon Glyph="&#xE8E5;"/>
-        </Button>
+        <StackPanel Orientation="Horizontal" Grid.Column="1" Margin="10,0,0,0">
+            <Button Margin="0 0 10 0" Command="{Binding ClearFileCommand}" Visibility="{Binding Path=EnableClearButton,RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=UserControl},Converter={StaticResource BooleanToVisibility},FallbackValue=Collapsed}">
+                <ui:FontIcon Glyph="&#xE894;"/>
+            </Button>
+            <Button Command="{Binding SelectFileCommand}">
+                <ui:FontIcon Glyph="&#xE8E5;"/>
+            </Button>
+        </StackPanel>
 
     </Grid>
 </UserControl>

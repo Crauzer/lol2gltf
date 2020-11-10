@@ -1,15 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace lol2gltf.UI.MVVM.ModelViews
 {
@@ -22,5 +12,17 @@ namespace lol2gltf.UI.MVVM.ModelViews
         {
             InitializeComponent();
         }
+
+        public bool EnableClearButton
+        {
+            get { return (bool)GetValue(EnableClearButtonProperty); }
+            set { SetValue(EnableClearButtonProperty, value); }
+        }
+
+        public static readonly DependencyProperty EnableClearButtonProperty = DependencyProperty.Register(
+            "EnableClearButton", 
+            typeof(bool), 
+            typeof(FileSelectionControl), 
+            new PropertyMetadata(default(bool)));
     }
 }

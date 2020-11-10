@@ -8,6 +8,7 @@ using SharpGLTF.Schema2;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -82,6 +83,7 @@ namespace lol2gltf.UI.Pages
         private bool _isConverting;
 
         public ICommand LoadAnimationsCommand => new RelayCommand(LoadAnimations);
+        public ICommand ClearAllAnimationsCommand => new RelayCommand(_ => { this.Animations.Clear(); });
         public ICommand ConvertCommand => new RelayCommand(Convert);
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -174,7 +176,7 @@ namespace lol2gltf.UI.Pages
             {
                 // Create Animation list
                 var animationList = new List<(string, LeagueAnimation)>();
-                foreach (var animation in this.Animations)
+                foreach (var animation in this.Animations.Where(x=>x.Need))
                 {
                     animationList.Add((animation.Name, animation.Animation));
                 }

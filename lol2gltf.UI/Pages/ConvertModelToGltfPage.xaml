@@ -42,7 +42,7 @@
                       AlternationCount="{Binding Submeshes.Count}"
                       Height="260">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Row" Binding="{Binding AlternationIndex, RelativeSource={RelativeSource AncestorType=DataGridRow}, Converter={StaticResource IndexToRowNumberConverter}}"/>
+                        <DataGridTextColumn Header="Row" Binding="{Binding AlternationIndex, RelativeSource={RelativeSource AncestorType=DataGridRow}, Converter={StaticResource IndexToRowNumberConverter}}" IsReadOnly="True"/>
                         <DataGridTextColumn Header="Material" Binding="{Binding Name}" IsReadOnly="True"/>
                         <DataGridTextColumn Header="Vertex Count" Binding="{Binding VertexCount}" IsReadOnly="True"/>
                         <DataGridTextColumn Header="Face Count" Binding="{Binding FaceCount}" IsReadOnly="True"/>
@@ -65,7 +65,7 @@
                       AlternationCount="{Binding Animations.Count}"
                       Height="260">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Row" Binding="{Binding AlternationIndex, RelativeSource={RelativeSource AncestorType=DataGridRow}, Converter={StaticResource IndexToRowNumberConverter}}"/>
+                        <DataGridTextColumn Header="Row" Binding="{Binding AlternationIndex, RelativeSource={RelativeSource AncestorType=DataGridRow}, Converter={StaticResource IndexToRowNumberConverter}}" IsReadOnly="True"/>
                         <DataGridTextColumn Header="Name" Binding="{Binding Name}" IsReadOnly="True"/>
                         <DataGridTextColumn Header="FPS" Binding="{Binding FPS}" IsReadOnly="True"/>
                         <DataGridCheckBoxColumn Header="Need" Binding="{Binding Need}"/>

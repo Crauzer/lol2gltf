@@ -13,7 +13,7 @@ using LeagueAnimation = LeagueToolkit.IO.AnimationFile.Animation;
 using LeagueToolkit.Core.Primitives;
 using LeagueToolkit.IO.SimpleSkinFile;
 
-namespace lol2gltf
+namespace lol2gltf.CLI
 {
     class Program
     {

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CommandLine;
 
-namespace lol2gltf
+namespace lol2gltf.CLI
 {
     public interface IBaseSimpleSkinToGltfOptions
     {

@@ -1,4 +1,4 @@
-﻿using Fantome.Libraries.League.IO.AnimationFile;
+﻿using LeagueToolkit.IO.AnimationFile;
 using System.IO;
 
 namespace lol2gltf.UI.MVVM.ViewModels

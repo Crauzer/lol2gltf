@@ -1,15 +1,13 @@
-﻿using Fantome.Libraries.League.IO.MapGeometry;
-using Fantome.Libraries.League.IO.SimpleSkinFile;
-using Fantome.Libraries.League.IO.SkeletonFile;
-using Fantome.Libraries.League.IO.StaticObjectFile;
-using Fantome.Libraries.League.IO.WGT;
-using ImageMagick;
+﻿using LeagueToolkit.Core.Mesh;
+using LeagueToolkit.IO.MapGeometryFile;
+using LeagueToolkit.IO.SimpleSkinFile;
+using LeagueToolkit.IO.SkeletonFile;
 using lol2gltf.Core.ConversionOptions;
 using SharpGLTF.Schema2;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using LeagueAnimation = Fantome.Libraries.League.IO.AnimationFile.Animation;
+using LeagueAnimation = LeagueToolkit.IO.AnimationFile.Animation;
 
 namespace lol2gltf.Core
 {
@@ -19,7 +17,7 @@ namespace lol2gltf.Core
 
         public static void ConvertSimpleSkin(SimpleSkinToGltf opts)
         {
-            SimpleSkin simpleSkin = ReadSimpleSkin(opts.SimpleSkinPath);
+            SkinnedMesh simpleSkin = ReadSimpleSkin(opts.SimpleSkinPath);
             var gltf = simpleSkin.ToGltf(opts.MaterialTextures);
 
             gltf.Save(opts.OutputPath);
@@ -27,21 +25,12 @@ namespace lol2gltf.Core
 
         public static void ConvertSkinnedModel(SkinnedModelToGltf opts)
         {
-            SimpleSkin simpleSkin = ReadSimpleSkin(opts.SimpleSkinPath);
+            SkinnedMesh simpleSkin = ReadSimpleSkin(opts.SimpleSkinPath);
             Skeleton skeleton = ReadSkeleton(opts.SkeletonPath);
 
             var gltf = simpleSkin.ToGltf(skeleton, opts.MaterialTextures, opts.Animations);
 
             gltf.Save(opts.OutputPath);
-        }
-
-        public static void CreateSimpleSkinFromLegacy(CreateSimpleSkinFromLegacy opts)
-        {
-            StaticObject staticObject = StaticObject.ReadSCO(opts.StaticObjectPath);
-            WGTFile weightFile = new WGTFile(opts.WeightFilePath);
-            SimpleSkin simpleSkin = new SimpleSkin(staticObject, weightFile);
-
-            simpleSkin.Write(opts.SimpleSkinPath);
         }
 
         public static void ConvertMapGeometryToGltf(ConvertMapGeometryToGltf opts)
@@ -54,11 +43,11 @@ namespace lol2gltf.Core
 
         // ------------- BACKING FUNCTIONS ------------- \\
 
-        private static SimpleSkin ReadSimpleSkin(string location)
+        private static SkinnedMesh ReadSimpleSkin(string location)
         {
             try
             {
-                return new SimpleSkin(location);
+                return SkinnedMesh.ReadFromSimpleSkin(location);
             }
             catch (Exception exception)
             {

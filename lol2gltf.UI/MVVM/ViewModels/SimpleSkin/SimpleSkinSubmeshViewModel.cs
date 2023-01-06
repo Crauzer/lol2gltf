@@ -1,9 +1,7 @@
-﻿using Fantome.Libraries.League.IO.SimpleSkinFile;
-using ImageMagick;
+﻿using LeagueToolkit.Core.Mesh;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.IO;
 
 namespace lol2gltf.UI.MVVM.ViewModels
 {
@@ -22,15 +20,15 @@ namespace lol2gltf.UI.MVVM.ViewModels
                 NotifyPropertyChanged();
             }
         }
-        public MagickImage Texture { get; private set; }
+        public ReadOnlyMemory<byte> Texture { get; private set; }
 
         private FileSelectionViewModel _textureFileSelection;
 
-        public SimpleSkinSubmeshViewModel(SimpleSkinSubmesh submesh)
+        public SimpleSkinSubmeshViewModel(SkinnedMeshRange submesh)
         {
-            this.Name = submesh.Name;
-            this.VertexCount = submesh.Vertices.Count;
-            this.FaceCount = submesh.Indices.Count / 3;
+            this.Name = submesh.Material;
+            this.VertexCount = submesh.VertexCount;
+            this.FaceCount = submesh.VertexCount / 3;
 
             this.TextureFileSelection = new FileSelectionViewModel(
                 "Select a DDS texture",
@@ -40,7 +38,7 @@ namespace lol2gltf.UI.MVVM.ViewModels
 
         private void OnSelectedTextureChanged(string filePath)
         {
-            this.Texture = new MagickImage(filePath);
+            this.Texture = File.ReadAllBytes(filePath);
         }
     }
 }

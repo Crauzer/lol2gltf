@@ -1,17 +1,18 @@
-﻿using Fantome.Libraries.League.IO.SimpleSkinFile;
-using Fantome.Libraries.League.IO.SkeletonFile;
-using ImageMagick;
+﻿using LeagueToolkit.Core.Mesh;
+using LeagueToolkit.IO.SimpleSkinFile;
+using LeagueToolkit.IO.SkeletonFile;
 using lol2gltf.UI.MVVM.Commands;
 using lol2gltf.UI.MVVM.ViewModels;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using SharpGLTF.Schema2;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Controls;
 using System.Windows.Input;
-using LeagueAnimation = Fantome.Libraries.League.IO.AnimationFile.Animation;
+using LeagueAnimation = LeagueToolkit.IO.AnimationFile.Animation;
 
 namespace lol2gltf.UI.Pages
 {
@@ -105,7 +106,7 @@ namespace lol2gltf.UI.Pages
 
         public void OnSimpleSkinSelectionChanged(string filePath)
         {
-            this.SimpleSkinInfo = new SimpleSkinViewModel(new SimpleSkin(filePath));
+            this.SimpleSkinInfo = new SimpleSkinViewModel(SkinnedMesh.ReadFromSimpleSkin(filePath));
         }
         public void OnSkeletonSelectionChanged(string filePath)
         {
@@ -156,14 +157,9 @@ namespace lol2gltf.UI.Pages
             this.IsConverting = true;
 
             // Create material texture map
-            var materialTextureMap = new Dictionary<string, MagickImage>();
+            var materialTextureMap = new Dictionary<string, ReadOnlyMemory<byte>>();
             foreach (var submesh in this.SimpleSkinInfo.Submeshes)
-            {
-                if (submesh.Texture != null)
-                {
-                    materialTextureMap.Add(submesh.Name, submesh.Texture);
-                }
-            }
+                materialTextureMap.Add(submesh.Name, submesh.Texture);
 
             ModelRoot gltf = null;
             if (this.Skeleton is null)
@@ -173,10 +169,10 @@ namespace lol2gltf.UI.Pages
             else
             {
                 // Create Animation list
-                var animationList = new List<(string, LeagueAnimation)>();
+                var animationList = new List<(string name, LeagueAnimation animation)>();
                 foreach (var animation in this.Animations)
                 {
-                    animationList.Add((animation.Name, animation.Animation));
+                    animationList.Add(new(animation.Name, animation.Animation));
                 }
 
                 gltf = this.SimpleSkinInfo.SimpleSkin.ToGltf(this.Skeleton, materialTextureMap, animationList);

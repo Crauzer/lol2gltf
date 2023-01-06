@@ -1,10 +1,8 @@
-using Fantome.Libraries.League.IO.AnimationFile;
-using ImageMagick;
-using lol2gltf.Core;
+using LeagueToolkit.IO.AnimationFile;
 using lol2gltf.Core.ConversionOptions;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
 
@@ -60,32 +58,28 @@ namespace lol2gltf.Core.Tests
             Assert.Pass("Successfully converted skinned model <{0}> to glTF", modelName);
         }
 
-        private Dictionary<string, MagickImage> CreateMaterialTextureMap(string modelName)
+        private Dictionary<string, ReadOnlyMemory<byte>> CreateMaterialTextureMap(string modelName)
         {
             string simpleSkinDirectoryPath = Path.Join(TESTFILES_SIMPLE_SKIN_DIR, modelName);
             string materialTexturePathMapPath = Path.Join(simpleSkinDirectoryPath, modelName + ".materialmap.json");
             var materialTexturePathMap = JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(materialTexturePathMapPath));
 
             // Create material texture map
-            var materialTextureMap = new Dictionary<string, MagickImage>();
+            Dictionary<string, ReadOnlyMemory<byte>> materialTextureMap = new();
             foreach (var materialTexturePath in materialTexturePathMap)
             {
-                MagickImage texture = null;
-                string texturePath = Path.Join(simpleSkinDirectoryPath, materialTexturePath.Value);
-
-                Assert.DoesNotThrow(() => texture = new MagickImage(texturePath), "Failed to load texture {0}", materialTexturePath.Value);
-
+                ReadOnlyMemory<byte> texture = File.ReadAllBytes(Path.Join(simpleSkinDirectoryPath, materialTexturePath.Value));
                 materialTextureMap.Add(materialTexturePath.Key, texture);
             }
 
             return materialTextureMap;
         }
-        private List<(string, Animation)> CreateAnimations(string modelName)
+        private List<(string name, Animation animation)> CreateAnimations(string modelName)
         {
             string modelDirectoryPath = Path.Join(TESTFILES_SIMPLE_SKIN_DIR, modelName);
             string animationsDirectoryPath = Path.Join(modelDirectoryPath, "animations");
 
-            List<(string, Animation)> animations = new List<(string, Animation)>();
+            List<(string, Animation)> animations = new();
             foreach(string animationFile in Directory.EnumerateFiles(animationsDirectoryPath, "*.anm"))
             {
                 animations.Add((Path.GetFileNameWithoutExtension(animationFile), new Animation(animationFile)));

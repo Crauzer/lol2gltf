@@ -1,16 +1,17 @@
 ﻿using CommandLine;
-using Fantome.Libraries.League.Helpers.Structures;
-using Fantome.Libraries.League.IO.MapGeometry;
-using Fantome.Libraries.League.IO.SimpleSkinFile;
-using Fantome.Libraries.League.IO.SkeletonFile;
-using ImageMagick;
+using LeagueToolkit.Core.Mesh;
+using LeagueToolkit.IO.AnimationFile;
+using LeagueToolkit.IO.MapGeometryFile;
+using LeagueToolkit.IO.SkeletonFile;
 using lol2gltf.Core.ConversionOptions;
 using SharpGLTF.Schema2;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using LeagueAnimation = Fantome.Libraries.League.IO.AnimationFile.Animation;
 using LeagueConverter = lol2gltf.Core.Converter;
+using LeagueAnimation = LeagueToolkit.IO.AnimationFile.Animation;
+using LeagueToolkit.Core.Primitives;
+using LeagueToolkit.IO.SimpleSkinFile;
 
 namespace lol2gltf
 {
@@ -22,13 +23,11 @@ namespace lol2gltf
                 SimpleSkinToGltfOptions,
                 SkinnedModelToGltfOptions,
                 DumpSimpleSkinInfoOptions,
-                CreateSimpleSkinFromLegacyOptions,
                 ConvertMapGeometryToGltfOptions>(args)
                 .MapResult(
                     (SimpleSkinToGltfOptions opts) => ConvertSimpleSkin(opts),
                     (SkinnedModelToGltfOptions opts) => ConvertSkinnedModel(opts),
                     (DumpSimpleSkinInfoOptions opts) => DumpSimpleSkinInfo(opts),
-                    (CreateSimpleSkinFromLegacyOptions opts) => CreateSimpleSkinFromLegacy(opts),
                     (ConvertMapGeometryToGltfOptions opts) => ConvertMapGeometryToGltf(opts),
                     errors => 1
                 );
@@ -40,7 +39,7 @@ namespace lol2gltf
         {
             try
             {
-                SimpleSkinToGltf simpleSkinToGltf = new SimpleSkinToGltf()
+                SimpleSkinToGltf simpleSkinToGltf = new()
                 {
                     OutputPath = opts.OutputPath,
                     SimpleSkinPath = opts.SimpleSkinPath,
@@ -64,7 +63,7 @@ namespace lol2gltf
             {
                 Skeleton skeleton = ReadSkeleton(opts.SkeletonPath);
 
-                List<(string, LeagueAnimation)> animations = null;
+                List<(string name, LeagueAnimation animation)> animations = null;
                 if (!string.IsNullOrEmpty(opts.AnimationsFolder))
                 {
                     string[] animationFiles = Directory.GetFiles(opts.AnimationsFolder, "*.anm");
@@ -84,7 +83,7 @@ namespace lol2gltf
                     }
                 }
 
-                SkinnedModelToGltf skinnedModelToGltf = new SkinnedModelToGltf()
+                SkinnedModelToGltf skinnedModelToGltf = new()
                 {
                     OutputPath = opts.OutputPath,
                     Animations = animations,
@@ -98,29 +97,6 @@ namespace lol2gltf
             catch (Exception exception)
             {
                 Console.WriteLine("Failed to convert Skinned Model to glTF");
-                Console.WriteLine(exception);
-            }
-
-            return 1;
-        }
-
-        private static int CreateSimpleSkinFromLegacy(CreateSimpleSkinFromLegacyOptions opts)
-        {
-            try
-            {
-                CreateSimpleSkinFromLegacy createSimpleSkinFromLegacy = new CreateSimpleSkinFromLegacy()
-                {
-                    SimpleSkinPath = opts.SimpleSkinPath,
-                    StaticObjectPath = opts.StaticObjectPath,
-                    WeightFilePath = opts.WeightFilePath
-                };
-
-                LeagueConverter.CreateSimpleSkinFromLegacy(createSimpleSkinFromLegacy);
-
-            }
-            catch (Exception exception)
-            {
-                Console.WriteLine("Failed to convert Simple Skin to glTF");
                 Console.WriteLine(exception);
             }
 
@@ -151,9 +127,9 @@ namespace lol2gltf
         private static int ConvertGltfToSimpleSkin(ConvertGltfToSimpleSkinOptions opts)
         {
             ModelRoot gltf = ReadGltf(opts.GltfPath);
-            (SimpleSkin simpleSkin, Skeleton skeleton) = gltf.ToLeagueModel();
+            (SkinnedMesh simpleSkin, Skeleton skeleton) = gltf.ToRiggedMesh();
 
-            simpleSkin.Write(opts.SimpleSkinPath);
+            simpleSkin.WriteSimpleSkin(opts.SimpleSkinPath);
             skeleton.Write(opts.SkeletonPath);
 
             return 1;
@@ -161,11 +137,11 @@ namespace lol2gltf
 
         // ------------- BACKING FUNCTIONS ------------- \\
 
-        private static SimpleSkin ReadSimpleSkin(string location)
+        private static SkinnedMesh ReadSimpleSkin(string location)
         {
             try
             {
-                return new SimpleSkin(location);
+                return SkinnedMesh.ReadFromSimpleSkin(location);
             }
             catch (Exception exception)
             {
@@ -183,14 +159,14 @@ namespace lol2gltf
                 throw new Exception("Error: Failed to read specified SKL file", exception);
             }
         }
-        private static List<(string, LeagueAnimation)> ReadAnimations(IEnumerable<string> animationPaths)
+        private static List<(string name, LeagueAnimation animation)> ReadAnimations(IEnumerable<string> animationPaths)
         {
-            var animations = new List<(string, LeagueAnimation)>();
+            var animations = new List<(string name, LeagueAnimation animation)>();
 
             foreach (string animationPath in animationPaths)
             {
                 string animationName = Path.GetFileNameWithoutExtension(animationPath);
-                LeagueAnimation animation = new LeagueAnimation(animationPath);
+                LeagueAnimation animation = new(animationPath);
 
                 animations.Add((animationName, animation));
             }
@@ -220,9 +196,9 @@ namespace lol2gltf
             }
         }
 
-        private static Dictionary<string, MagickImage> CreateMaterialTextureMap(IEnumerable<string> materialTextures)
+        private static Dictionary<string, ReadOnlyMemory<byte>> CreateMaterialTextureMap(IEnumerable<string> materialTextures)
         {
-            var materialTextureMap = new Dictionary<string, MagickImage>();
+            var materialTextureMap = new Dictionary<string, ReadOnlyMemory<byte>>();
 
             foreach (string materialTexture in materialTextures)
             {
@@ -247,12 +223,7 @@ namespace lol2gltf
                     throw new Exception("Invalid format for material texture: " + materialTexture);
                 }
 
-                MagickImage textureImage = null;
-                try { textureImage = new MagickImage(texturePath); }
-                catch (Exception exception)
-                {
-                    throw new Exception("Error: Failed to create an Image object for texture: " + texturePath, exception);
-                }
+                ReadOnlyMemory<byte> textureImage = File.ReadAllBytes(texturePath);
 
                 if (materialTextureMap.ContainsKey(material))
                 {
@@ -267,7 +238,7 @@ namespace lol2gltf
 
         private static int DumpSimpleSkinInfo(DumpSimpleSkinInfoOptions opts)
         {
-            SimpleSkin simpleSkin = ReadSimpleSkin(opts.SimpleSkinPath);
+            SkinnedMesh simpleSkin = ReadSimpleSkin(opts.SimpleSkinPath);
             if (simpleSkin != null)
             {
                 DumpSimpleSkinInfo(simpleSkin);
@@ -275,24 +246,22 @@ namespace lol2gltf
 
             return 1;
         }
-        private static void DumpSimpleSkinInfo(SimpleSkin simpleSkin)
+        private static void DumpSimpleSkinInfo(SkinnedMesh simpleSkin)
         {
             Console.WriteLine("----------SIMPLE SKIN INFO----------");
-
-            R3DBox boundingBox = simpleSkin.GetBoundingBox();
             Console.WriteLine("Bounding Box:");
-            Console.WriteLine("\t Min: " + boundingBox.Min.ToString());
-            Console.WriteLine("\t Max: " + boundingBox.Max.ToString());
+            Console.WriteLine("\t Min: " + simpleSkin.AABB.Min.ToString());
+            Console.WriteLine("\t Max: " + simpleSkin.AABB.Max.ToString());
 
-            Console.WriteLine("Submesh Count: " + simpleSkin.Submeshes.Count);
+            Console.WriteLine("Submesh Count: " + simpleSkin.Ranges.Count);
 
-            foreach (SimpleSkinSubmesh submesh in simpleSkin.Submeshes)
+            foreach (SkinnedMeshRange range in simpleSkin.Ranges)
             {
                 Console.WriteLine("--- SUBMESH ---");
-                Console.WriteLine("Material: " + submesh.Name);
-                Console.WriteLine("Vertex Count: " + submesh.Vertices.Count);
-                Console.WriteLine("Index Count: " + submesh.Indices.Count);
-                Console.WriteLine("Face Count: " + submesh.Indices.Count / 3);
+                Console.WriteLine("Material: " + range.Material);
+                Console.WriteLine("Vertex Count: " + range.VertexCount);
+                Console.WriteLine("Index Count: " + range.IndexCount);
+                Console.WriteLine("Face Count: " + range.IndexCount/ 3);
                 Console.WriteLine();
             }
         }

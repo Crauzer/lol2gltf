@@ -5,16 +5,15 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:ui="using:FluentAvalonia.UI.Controls"
+        xmlns:local="using:lol2gltf"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         Width="1280"
         Height="720"
         x:Class="lol2gltf.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
-        Title="lol2gltf">
-
-    <Design.DataContext>
-        <vm:MainWindowViewModel/>
-    </Design.DataContext>
+        Title="lol2gltf"
+        d:DataContext="{x:Static local:App.MainWindow}"
+        x:DataType="vm:MainWindowViewModel">
     <views:MainView DataContext="{Binding MainViewModel}"/>
   
 </Window>

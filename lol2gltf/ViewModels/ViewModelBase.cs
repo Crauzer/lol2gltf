@@ -5,7 +5,5 @@ using ReactiveUI;
 
 namespace lol2gltf.ViewModels
 {
-    public class ViewModelBase : ReactiveObject
-    {
-    }
+    public class ViewModelBase : ReactiveObject { }
 }

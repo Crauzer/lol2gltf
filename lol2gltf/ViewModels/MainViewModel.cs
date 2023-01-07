@@ -1,7 +1,9 @@
 ﻿using Avalonia.Controls;
 using FluentAvalonia.UI.Controls;
+using HanumanInstitute.MvvmDialogs;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+using Splat;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,11 +17,16 @@ namespace lol2gltf.ViewModels
         [Reactive]
         public PageViewModel CurrentPage { get; set; }
 
-        public List<PageViewModel> Pages { get; } =
-            new() { new SkinnedMeshToGltfViewModel(), new MapGeometryToGltfViewModel() };
+        public List<PageViewModel> Pages { get; }
 
-        public MainViewModel()
+        private IDialogService _dialogService;
+
+        public MainViewModel(IDialogService dialogService = null)
         {
+            this._dialogService = dialogService ?? Locator.Current.GetService<IDialogService>();
+
+            this.Pages = new() { new SkinnedMeshToGltfViewModel(), new MapGeometryToGltfViewModel() };
+
             this.CurrentPage = this.Pages[0];
         }
     }

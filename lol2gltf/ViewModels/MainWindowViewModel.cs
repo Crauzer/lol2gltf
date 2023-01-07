@@ -1,3 +1,6 @@
+using HanumanInstitute.MvvmDialogs;
+using ReactiveUI.Fody.Helpers;
+using Splat;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -6,10 +9,15 @@ namespace lol2gltf.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
-        public MainViewModel MainViewModel { get; }
+        [Reactive]
+        public MainViewModel MainViewModel { get; set; }
 
-        public MainWindowViewModel()
+        private IDialogService _dialogService;
+
+        public MainWindowViewModel(IDialogService dialogService)
         {
+            this._dialogService = dialogService;
+
             this.MainViewModel = new();
         }
     }

@@ -2,6 +2,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:ui="using:FluentAvalonia.UI.Controls"
+             xmlns:uip="using:FluentAvalonia.UI.Controls.Primitives"
              xmlns:vm="using:lol2gltf.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="lol2gltf.Views.SkinnedMeshToGltfView"
@@ -10,5 +12,14 @@
   <Design.DataContext>
     <vm:SkinnedMeshToGltfViewModel/>
   </Design.DataContext>
-  Skinnedmesh
+  <Grid>
+    <StackPanel>
+      <StackPanel Orientation="Horizontal">
+        <TextBox IsReadOnly="True" MinWidth="500" Watermark="Select a Simple Skin (.skn) file" />
+        <Button Margin="16 0 0 0" Command="{Binding OnSelectSimpleSkinCommand}">
+          <ui:SymbolIcon Symbol="Open" FontSize="18" />
+        </Button>
+      </StackPanel>
+    </StackPanel>
+  </Grid>
 </UserControl>

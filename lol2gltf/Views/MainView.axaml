@@ -1,0 +1,23 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:ui="using:FluentAvalonia.UI.Controls"
+             xmlns:uip="using:FluentAvalonia.UI.Controls.Primitives"
+             xmlns:vm="using:lol2gltf.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="lol2gltf.Views.MainView"
+             x:DataType="vm:MainViewModel">
+  <Design.DataContext>
+    <vm:MainViewModel/>
+  </Design.DataContext>
+  <Grid>
+    <ui:NavigationView PaneDisplayMode="Left" MenuItems="{Binding Pages}" Content="{Binding CurrentPage}" SelectedItem="{Binding CurrentPage}">
+      <ui:NavigationView.MenuItemTemplate>
+        <DataTemplate DataType="{x:Type vm:PageViewModel}">
+          <ui:NavigationViewItem Content="{Binding Name}" Icon="{Binding Icon}" ToolTip.Tip="{Binding Tooltip}" />
+        </DataTemplate>
+      </ui:NavigationView.MenuItemTemplate>
+    </ui:NavigationView>
+  </Grid>
+</UserControl>

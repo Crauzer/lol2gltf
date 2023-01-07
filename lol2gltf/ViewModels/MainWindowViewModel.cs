@@ -6,6 +6,11 @@ namespace lol2gltf.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
-        public string Greeting => "Welcome to Avalonia!";
+        public MainViewModel MainViewModel { get; }
+
+        public MainWindowViewModel()
+        {
+            this.MainViewModel = new();
+        }
     }
 }

@@ -28,7 +28,7 @@
               </Button>
             </Grid>
           </StackPanel>
-          <StackPanel Orientation="Vertical" Grid.Row="1" Grid.Column="0" Margin="0 16 0 0">
+          <StackPanel IsEnabled="{Binding IsSkinnedMeshLoaded}" Orientation="Vertical" Grid.Row="1" Grid.Column="0" Margin="0 16 0 0">
             <Label>Skeleton:</Label>
             <Grid ColumnDefinitions="*, Auto">
               <TextBox Grid.Column="0"
@@ -59,8 +59,8 @@
     <Border Padding="8">
       <DockPanel VerticalAlignment="Bottom" HorizontalAlignment="Right">
         <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-          <Button Command="{Binding OnExportGltfCommand}" CommandParameter=".glb">Export to GLB</Button>
-          <Button Margin="8 0 0 0" Command="{Binding OnExportGltfCommand}" CommandParameter=".gltf">Export to GLTF</Button>
+          <Button IsEnabled="{Binding IsSkinnedMeshLoaded}" Command="{Binding OnExportGltfCommand}" CommandParameter=".glb">Export to GLB</Button>
+          <Button IsEnabled="{Binding IsSkinnedMeshLoaded}" Margin="8 0 0 0" Command="{Binding OnExportGltfCommand}" CommandParameter=".gltf">Export to GLTF</Button>
         </StackPanel>
       </DockPanel>
     </Border>

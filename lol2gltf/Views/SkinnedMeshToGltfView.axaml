@@ -6,20 +6,63 @@
              xmlns:uip="using:FluentAvalonia.UI.Controls.Primitives"
              xmlns:vm="using:lol2gltf.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="lol2gltf.Views.SkinnedMeshToGltfView"
-             x:CompileBindings="True"
-             x:DataType="vm:SkinnedMeshToGltfViewModel">
+             x:Class="lol2gltf.Views.SkinnedMeshToGltfView">
   <Design.DataContext>
     <vm:SkinnedMeshToGltfViewModel/>
   </Design.DataContext>
   <Grid>
-    <StackPanel>
-      <StackPanel Orientation="Horizontal">
-        <TextBox IsReadOnly="True" MinWidth="500" Watermark="Select a Simple Skin (.skn) file" />
-        <Button Margin="16 0 0 0" Command="{Binding OnSelectSimpleSkinCommand}">
-          <ui:SymbolIcon Symbol="Open" FontSize="18" />
-        </Button>
-      </StackPanel>
-    </StackPanel>
+    <Grid ColumnDefinitions="*" RowDefinitions="Auto,Auto,Auto">
+      <Border Padding="24">
+        <StackPanel>
+          <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="0">
+            <Label>Simple Skin:</Label>
+            <Grid ColumnDefinitions="*, Auto">
+              <TextBox Grid.Column="0"
+                       IsReadOnly="True"
+                       Classes.clearButton="True"
+                       HorizontalAlignment="Stretch"
+                       Watermark="Select a Simple Skin (.skn) file"
+                       Text="{Binding SimpleSkinPath}"/>
+              <Button Grid.Column="1" Margin="16 0 0 0" Command="{Binding OnSelectSimpleSkinCommand}">
+                <ui:SymbolIcon Symbol="Open" FontSize="18" />
+              </Button>
+            </Grid>
+          </StackPanel>
+          <StackPanel Orientation="Vertical" Grid.Row="1" Grid.Column="0" Margin="0 16 0 0">
+            <Label>Skeleton:</Label>
+            <Grid ColumnDefinitions="*, Auto">
+              <TextBox Grid.Column="0"
+                       IsReadOnly="True"
+                       HorizontalAlignment="Stretch"
+                       Watermark="Select a Skeleton (.skl) file"
+                       Text="{Binding SkeletonPath}"/>
+              <Button Grid.Column="1" Margin="16 0 0 0" Command="{Binding OnSelectSkeletonCommand}">
+                <ui:SymbolIcon Symbol="Open" FontSize="18" />
+              </Button>
+            </Grid>
+          </StackPanel>
+          <DataGrid Name="SkinnedMeshPrimitives"
+                    Grid.Row="2"
+                    Margin="0 16 0 0"
+                    Items="{Binding SkinnedMeshPrimitives}" AutoGenerateColumns="False"
+                    VerticalAlignment="Stretch">
+            <DataGrid.Columns>
+              <DataGridTextColumn Header="Material" Binding="{Binding Material}"/>
+              <DataGridTextColumn Header="Vertices" Binding="{Binding VertexCount}"/>
+              <DataGridTextColumn Header="Faces" Binding="{Binding FaceCount}"/>
+            </DataGrid.Columns>
+          </DataGrid>
+
+        </StackPanel>
+      </Border>
+    </Grid>
+    <Border Padding="8">
+      <DockPanel VerticalAlignment="Bottom" HorizontalAlignment="Right">
+        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+          <Button Command="{Binding OnExportGltfCommand}" CommandParameter=".glb">Export to GLB</Button>
+          <Button Margin="8 0 0 0" Command="{Binding OnExportGltfCommand}" CommandParameter=".gltf">Export to GLTF</Button>
+        </StackPanel>
+      </DockPanel>
+    </Border>
   </Grid>
 </UserControl>

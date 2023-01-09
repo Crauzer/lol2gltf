@@ -13,7 +13,23 @@
         Icon="/Assets/avalonia-logo.ico"
         Title="lol2gltf"
         d:DataContext="{x:Static local:App.MainWindow}"
-        x:DataType="vm:MainWindowViewModel">
-    <views:MainView DataContext="{Binding MainViewModel}"/>
-  
+        x:DataType="vm:MainWindowViewModel"
+        TransparencyLevelHint="AcrylicBlur"
+        >
+  <Panel>
+    <ExperimentalAcrylicBorder IsHitTestVisible="False">
+      <ExperimentalAcrylicBorder.Material>
+        <ExperimentalAcrylicMaterial
+            BackgroundSource="Digger"
+            TintColor="Black"
+            TintOpacity="1"
+            MaterialOpacity="0.65" />
+      </ExperimentalAcrylicBorder.Material>
+    </ExperimentalAcrylicBorder>
+
+    <Panel Margin="20">
+      <views:MainView DataContext="{Binding MainViewModel}"/>
+    </Panel>
+  </Panel>
+
 </Window>

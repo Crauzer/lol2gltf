@@ -1,32 +1,23 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
+using DynamicData;
+using DynamicData.Binding;
 using FluentAvalonia.UI.Controls;
-using HanumanInstitute.MvvmDialogs;
 using LeagueToolkit.Core.Mesh;
+using LeagueToolkit.IO.SimpleSkinFile;
+using LeagueToolkit.IO.SkeletonFile;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+using SharpGLTF.Schema2;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
-using System.Text;
-using System.Threading.Tasks;
-using lol2gltf.Utilities;
-using lol2gltf.Views;
-using Splat;
-using Avalonia;
-using System.Windows;
 using System.Reactive.Linq;
-using LeagueToolkit.IO.SkeletonFile;
-using System.Collections.ObjectModel;
-using Avalonia.Collections;
-using DynamicData.Binding;
-using LeagueToolkit.IO.SimpleSkinFile;
-using CommunityToolkit.Diagnostics;
-using SharpGLTF.Schema2;
-
+using System.Threading.Tasks;
 using LeagueAnimation = LeagueToolkit.IO.AnimationFile.Animation;
-using DynamicData;
-using Avalonia.Controls.ApplicationLifetimes;
 
 namespace lol2gltf.ViewModels
 {

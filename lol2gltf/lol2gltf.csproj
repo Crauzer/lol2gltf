@@ -40,6 +40,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="SixLabors.ImageSharp.Textures" Version="0.0.0-alpha.0.136" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Views\MainWindow.axaml.cs">

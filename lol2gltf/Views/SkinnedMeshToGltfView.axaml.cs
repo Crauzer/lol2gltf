@@ -23,6 +23,7 @@ namespace lol2gltf.Views
             {
                 d.Invoke(this.ViewModel.ShowLoadSimpleSkinDialog.RegisterHandler(DoShowLoadSimpleSkinDialogAsync));
                 d.Invoke(this.ViewModel.ShowLoadSkeletonDialog.RegisterHandler(DoShowLoadSkeletonDialogAsync));
+                d.Invoke(this.ViewModel.ShowAddAnimationsDialog.RegisterHandler(DoShowAddAnimationsDialogAsync));
                 d.Invoke(this.ViewModel.ShowExportGltfDialog.RegisterHandler(DoShowExportGltfDialogAsync));
             });
         }
@@ -33,12 +34,12 @@ namespace lol2gltf.Views
                 new()
                 {
                     AllowMultiple = false,
-                    Title = "aaa",
+                    Title = "Select Simple Skin (.skn) files",
                     Filters = new()
                     {
                         new()
                         {
-                            Name = "Simple Skin files (.skn)",
+                            Name = "Simple Skin files",
                             Extensions = new() { "skn" }
                         }
                     }
@@ -57,12 +58,12 @@ namespace lol2gltf.Views
                 new()
                 {
                     AllowMultiple = false,
-                    Title = "aaa",
+                    Title = "Select Skeleton (.skl) files",
                     Filters = new()
                     {
                         new()
                         {
-                            Name = "Skeleton files (.skl)",
+                            Name = "Skeleton files",
                             Extensions = new() { "skl" }
                         }
                     }
@@ -73,6 +74,30 @@ namespace lol2gltf.Views
             );
 
             interaction.SetOutput(files?.FirstOrDefault());
+        }
+
+        private async Task DoShowAddAnimationsDialogAsync(InteractionContext<Unit, string[]> interaction)
+        {
+            OpenFileDialog dialog =
+                new()
+                {
+                    AllowMultiple = true,
+                    Title = "Select Animation files",
+                    Filters = new()
+                    {
+                        new()
+                        {
+                            Name = "Animation files",
+                            Extensions = new() { "anm" }
+                        }
+                    }
+                };
+
+            string[] files = await dialog.ShowAsync(
+                ((ClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).MainWindow
+            );
+
+            interaction.SetOutput(files);
         }
 
         private async Task DoShowExportGltfDialogAsync(InteractionContext<string, string> interaction)

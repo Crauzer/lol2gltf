@@ -26,6 +26,7 @@ using SharpGLTF.Schema2;
 
 using LeagueAnimation = LeagueToolkit.IO.AnimationFile.Animation;
 using DynamicData;
+using Avalonia.Controls.ApplicationLifetimes;
 
 namespace lol2gltf.ViewModels
 {
@@ -156,10 +157,49 @@ namespace lol2gltf.ViewModels
         }
     }
 
-    public class SkinnedMeshPrimitiveViewModel
+    public class SkinnedMeshPrimitiveViewModel : ViewModelBase
     {
         public string Material { get; set; }
         public int VertexCount { get; set; }
         public int FaceCount { get; set; }
+
+        [Reactive]
+        public string TexturePath { get; set; }
+
+        public ReactiveCommand<Unit, Unit> OnSelectTextureCommand { get; }
+
+        public SkinnedMeshPrimitiveViewModel()
+        {
+            this.OnSelectTextureCommand = ReactiveCommand.CreateFromTask(SelectTextureAsync);
+        }
+
+        private async Task SelectTextureAsync()
+        {
+            OpenFileDialog dialog =
+                new()
+                {
+                    AllowMultiple = false,
+                    Title = "Select a Texture file",
+                    Filters = new()
+                    {
+                        new()
+                        {
+                            Name = "PNG files",
+                            Extensions = new() { "png" }
+                        },
+                        new()
+                        {
+                            Name = "DDS files",
+                            Extensions = new() { "dds" }
+                        }
+                    }
+                };
+
+            string[] files = await dialog.ShowAsync(
+                ((ClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).MainWindow
+            );
+
+            this.TexturePath = files?.FirstOrDefault();
+        }
     }
 }

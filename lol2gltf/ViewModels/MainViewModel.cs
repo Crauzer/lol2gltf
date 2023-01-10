@@ -19,12 +19,8 @@ namespace lol2gltf.ViewModels
 
         public List<PageViewModel> Pages { get; }
 
-        private IDialogService _dialogService;
-
-        public MainViewModel(IDialogService dialogService = null)
+        public MainViewModel()
         {
-            this._dialogService = dialogService ?? Locator.Current.GetService<IDialogService>();
-
             this.Pages = new() { new SkinnedMeshToGltfViewModel(), new MapGeometryToGltfViewModel() };
 
             this.CurrentPage = this.Pages[0];

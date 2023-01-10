@@ -14,22 +14,22 @@
         Title="lol2gltf"
         d:DataContext="{x:Static local:App.MainWindow}"
         x:DataType="vm:MainWindowViewModel"
-        TransparencyLevelHint="AcrylicBlur"
-        >
+        Background="Transparent"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="PreferSystemChrome"
+        TransparencyLevelHint="Mica"
+        WindowStartupLocation="CenterScreen">
   <Panel>
-    <ExperimentalAcrylicBorder IsHitTestVisible="False">
+    <ExperimentalAcrylicBorder CornerRadius="8">
       <ExperimentalAcrylicBorder.Material>
-        <ExperimentalAcrylicMaterial
-            BackgroundSource="Digger"
-            TintColor="Black"
-            TintOpacity="1"
-            MaterialOpacity="0.65" />
+        <ExperimentalAcrylicMaterial BackgroundSource="Digger" 
+                                     TintColor="#002611"
+                                     FallbackColor="{DynamicResource SolidBackgroundFillColorBase}"
+                                     TintOpacity="1" MaterialOpacity="0.5"/>
       </ExperimentalAcrylicBorder.Material>
     </ExperimentalAcrylicBorder>
-
-    <Panel Margin="20">
+    <Panel Margin="0 12 12 12">
       <views:MainView DataContext="{Binding MainViewModel}"/>
     </Panel>
   </Panel>
-
 </Window>

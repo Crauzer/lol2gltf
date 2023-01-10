@@ -10,59 +10,95 @@
   <Design.DataContext>
     <vm:SkinnedMeshToGltfViewModel/>
   </Design.DataContext>
-  <Grid>
-    <Grid ColumnDefinitions="*" RowDefinitions="Auto,Auto,Auto">
-      <Border Padding="24">
-        <StackPanel>
-          <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="0">
-            <Label>Simple Skin:</Label>
-            <Grid ColumnDefinitions="*, Auto">
-              <TextBox Grid.Column="0"
-                       IsReadOnly="True"
-                       Classes.clearButton="True"
-                       HorizontalAlignment="Stretch"
-                       Watermark="Select a Simple Skin (.skn) file"
-                       Text="{Binding SimpleSkinPath}"/>
-              <Button Grid.Column="1" Margin="16 0 0 0" Command="{Binding OnSelectSimpleSkinCommand}">
-                <ui:SymbolIcon Symbol="Open" FontSize="18" />
-              </Button>
-            </Grid>
-          </StackPanel>
-          <StackPanel IsEnabled="{Binding IsSkinnedMeshLoaded}" Orientation="Vertical" Grid.Row="1" Grid.Column="0" Margin="0 16 0 0">
-            <Label>Skeleton:</Label>
-            <Grid ColumnDefinitions="*, Auto">
-              <TextBox Grid.Column="0"
-                       IsReadOnly="True"
-                       HorizontalAlignment="Stretch"
-                       Watermark="Select a Skeleton (.skl) file"
-                       Text="{Binding SkeletonPath}"/>
-              <Button Grid.Column="1" Margin="16 0 0 0" Command="{Binding OnSelectSkeletonCommand}">
-                <ui:SymbolIcon Symbol="Open" FontSize="18" />
-              </Button>
-            </Grid>
-          </StackPanel>
-          <DataGrid Name="SkinnedMeshPrimitives"
-                    Grid.Row="2"
-                    Margin="0 16 0 0"
-                    Items="{Binding SkinnedMeshPrimitives}" AutoGenerateColumns="False"
-                    VerticalAlignment="Stretch">
-            <DataGrid.Columns>
-              <DataGridTextColumn Header="Material" Binding="{Binding Material}"/>
-              <DataGridTextColumn Header="Vertices" Binding="{Binding VertexCount}"/>
-              <DataGridTextColumn Header="Faces" Binding="{Binding FaceCount}"/>
-            </DataGrid.Columns>
-          </DataGrid>
+  <Panel>
+    <ExperimentalAcrylicBorder IsHitTestVisible="True" CornerRadius="8">
+      <ExperimentalAcrylicBorder.Material>
+        <ExperimentalAcrylicMaterial BackgroundSource="Digger" TintColor="Black" TintOpacity="1" MaterialOpacity="0.5"/>
+      </ExperimentalAcrylicBorder.Material>
+    </ExperimentalAcrylicBorder>
+    <Grid>
+      <Grid ColumnDefinitions="*" RowDefinitions="Auto,Auto,Auto">
+        <Border Padding="24">
+          <StackPanel>
+            <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="0">
+              <Label>Simple Skin:</Label>
+              <Grid ColumnDefinitions="*, Auto">
+                <TextBox Grid.Column="0"
+                         IsReadOnly="True"
+                         Classes.clearButton="True"
+                         HorizontalAlignment="Stretch"
+                         Watermark="Select a Simple Skin (.skn) file"
+                         Text="{Binding SimpleSkinPath}"/>
+                <Button Grid.Column="1" Margin="16 0 0 0"
+                        Background="{DynamicResource }"
+                        Command="{Binding OnSelectSimpleSkinCommand}">
+                  <ui:SymbolIcon Symbol="Open" FontSize="18" />
+                </Button>
+              </Grid>
+            </StackPanel>
+            <StackPanel IsEnabled="{Binding IsSkinnedMeshLoaded}" Orientation="Vertical" Grid.Row="1" Grid.Column="0" Margin="0 16 0 0">
+              <Label>Skeleton:</Label>
+              <Grid ColumnDefinitions="*, Auto">
+                <TextBox Grid.Column="0"
+                         IsReadOnly="True"
+                         HorizontalAlignment="Stretch"
+                         Watermark="Select a Skeleton (.skl) file"
+                         Text="{Binding SkeletonPath}"/>
+                <Button Grid.Column="1" Margin="16 0 0 0" Command="{Binding OnSelectSkeletonCommand}">
+                  <ui:SymbolIcon Symbol="Open" FontSize="18" />
+                </Button>
+              </Grid>
+            </StackPanel>
+            <StackPanel Grid.Row="2" Margin="0 16 0 0">
+              <Label>Mesh Primitives:</Label>
+              <DataGrid Name="SkinnedMeshPrimitives"
+                        Items="{Binding SkinnedMeshPrimitives}" AutoGenerateColumns="False"
+                        VerticalAlignment="Stretch">
+                <DataGrid.Columns>
+                  <DataGridTextColumn Header="Material" Binding="{Binding Material}" IsReadOnly="True"/>
+                  <DataGridTextColumn Header="Vertices" Binding="{Binding VertexCount}" IsReadOnly="True"/>
+                  <DataGridTextColumn Header="Faces" Binding="{Binding FaceCount}" IsReadOnly="True"/>
+                  <DataGridTemplateColumn Header="Texture">
+                    <DataGridTemplateColumn.CellTemplate>
+                      <DataTemplate DataType="vm:SkinnedMeshPrimitiveViewModel">
+                        <Panel>
+                          <Button Margin="4"
+                                  IsVisible="{Binding TexturePath, Converter={x:Static ObjectConverters.IsNull}}"
+                                  Command="{Binding OnSelectTextureCommand}">
+                            <StackPanel Orientation="Horizontal">
+                              <TextBlock>Select Texture</TextBlock>
+                              <ui:SymbolIcon Margin="8 0 0 0" Symbol="ImageEdit" FontSize="16" />
+                            </StackPanel>
+                          </Button>
+                          <Grid IsVisible="{Binding TexturePath, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                RowDefinitions="*" ColumnDefinitions="*, Auto">
+                            <Button Grid.Column="0">
+                              <ui:SymbolIcon Symbol="Cancel" FontSize="16" />
+                            </Button>
+                            <TextBlock Grid.Column="1" Margin="8 0 0 0"
+                                       HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                                       Text="{Binding TexturePath}"/>
+                          </Grid>
+                        </Panel>
+                      </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                  </DataGridTemplateColumn>
+                </DataGrid.Columns>
+              </DataGrid>
+            </StackPanel>
 
-        </StackPanel>
+          </StackPanel>
+        </Border>
+      </Grid>
+      <Border Padding="8">
+        <DockPanel VerticalAlignment="Bottom" HorizontalAlignment="Right">
+          <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+            <Button IsEnabled="{Binding IsSkinnedMeshLoaded}" Command="{Binding OnExportGltfCommand}" CommandParameter=".glb">Export to GLB</Button>
+            <Button IsEnabled="{Binding IsSkinnedMeshLoaded}" Margin="8 0 0 0" Command="{Binding OnExportGltfCommand}" CommandParameter=".gltf">Export to GLTF</Button>
+          </StackPanel>
+        </DockPanel>
       </Border>
     </Grid>
-    <Border Padding="8">
-      <DockPanel VerticalAlignment="Bottom" HorizontalAlignment="Right">
-        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-          <Button IsEnabled="{Binding IsSkinnedMeshLoaded}" Command="{Binding OnExportGltfCommand}" CommandParameter=".glb">Export to GLB</Button>
-          <Button IsEnabled="{Binding IsSkinnedMeshLoaded}" Margin="8 0 0 0" Command="{Binding OnExportGltfCommand}" CommandParameter=".gltf">Export to GLTF</Button>
-        </StackPanel>
-      </DockPanel>
-    </Border>
-  </Grid>
+  </Panel>
+  
 </UserControl>

@@ -41,8 +41,8 @@ namespace lol2gltf.ViewModels
         [Reactive]
         public bool IsSkinnedMeshLoaded { get; set; }
 
-        public SkinnedMesh SkinnedMesh => this._skinnedMesh.Value;
-        public Skeleton Skeleton => this._skeleton.Value;
+        public SkinnedMesh SkinnedMesh => this._skinnedMesh?.Value;
+        public Skeleton Skeleton => this._skeleton?.Value;
 
         [Reactive]
         public ObservableCollection<SkinnedMeshPrimitiveViewModel> SkinnedMeshPrimitives { get; set; } = new();
@@ -112,7 +112,7 @@ namespace lol2gltf.ViewModels
                 this.WhenValueChanged(x => x.SkinnedMesh)
                     .Subscribe(skinnedMesh =>
                     {
-                        // Clear mesh primitives, skeleton and animation when mesh is changed
+                        // Reset mesh primitives, skeleton and animations when mesh is changed
                         this.SkeletonPath = null;
                         this.SkinnedMeshPrimitives.Clear();
                         this.Animations.Clear();
@@ -145,14 +145,16 @@ namespace lol2gltf.ViewModels
         {
             string path = await this.ShowLoadSimpleSkinDialog.Handle(new());
 
-            this.SimpleSkinPath = path;
+            if (path is not null)
+                this.SimpleSkinPath = path;
         }
 
         private async Task LoadSkeletonAsync()
         {
             string path = await this.ShowLoadSkeletonDialog.Handle(new());
 
-            this.SkeletonPath = path;
+            if (path is not null)
+                this.SkeletonPath = path;
         }
 
         private async Task AddAnimationsAsync()

@@ -16,7 +16,7 @@ namespace lol2gltf.Utilities
             Guard.IsNotNull(dialogService, nameof(dialogService));
             Guard.IsNotNull(ownerViewModel, nameof(ownerViewModel));
 
-            string? result = await dialogService.ShowOpenFileDialogAsync(
+            string result = await dialogService.ShowOpenFileDialogAsync(
                 ownerViewModel,
                 new()
                 {

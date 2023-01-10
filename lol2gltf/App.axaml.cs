@@ -19,7 +19,7 @@ namespace lol2gltf
         {
             AvaloniaXamlLoader.Load(this);
 
-            ILoggerFactory? loggerFactory = LoggerFactory.Create(
+            ILoggerFactory loggerFactory = LoggerFactory.Create(
                 builder => builder.AddFilter(logLevel => true).AddDebug()
             );
 

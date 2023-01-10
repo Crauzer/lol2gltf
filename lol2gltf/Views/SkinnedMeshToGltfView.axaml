@@ -40,7 +40,7 @@
                 </Grid>
               </StackPanel>
               <StackPanel Grid.Row="1" Grid.Column="0" Margin="0 16 0 0"
-                          IsEnabled="{Binding IsSkinnedMeshLoaded}"
+                          IsEnabled="{Binding SimpleSkinPath, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                           Orientation="Vertical">
                 <Label>Skeleton:</Label>
                 <Grid ColumnDefinitions="*, Auto">
@@ -107,8 +107,8 @@
                         Command="{Binding OnAddAnimationsCommand}">
                   <Button.IsEnabled>
                     <MultiBinding Converter="{x:Static BoolConverters.And}">
-                      <Binding Path="SimpleSkinPath" Converter="{x:Static ObjectConverters.IsNotNull}"/>
-                      <Binding Path="SkeletonPath" Converter="{x:Static ObjectConverters.IsNotNull}"/>
+                      <Binding Path="SimpleSkinPath" Converter="{x:Static StringConverters.IsNotNullOrEmpty}"/>
+                      <Binding Path="SkeletonPath" Converter="{x:Static StringConverters.IsNotNullOrEmpty}"/>
                     </MultiBinding>
                   </Button.IsEnabled>
                   <StackPanel Orientation="Horizontal">

@@ -38,9 +38,6 @@ namespace lol2gltf.ViewModels
         [Reactive]
         public string SkeletonPath { get; set; }
 
-        [Reactive]
-        public bool IsSkinnedMeshLoaded { get; set; }
-
         public SkinnedMesh SkinnedMesh => this._skinnedMesh?.Value;
         public Skeleton Skeleton => this._skeleton?.Value;
 
@@ -118,13 +115,9 @@ namespace lol2gltf.ViewModels
                         this.Animations.Clear();
 
                         if (skinnedMesh is null)
-                        {
-                            this.IsSkinnedMeshLoaded = false;
                             return;
-                        }
 
                         // If skinnedMesh is not null we create primitives datagrid items and enable conversion
-                        this.IsSkinnedMeshLoaded = true;
                         this.SkinnedMeshPrimitives.AddRange(
                             skinnedMesh.Ranges.Select(
                                 range =>

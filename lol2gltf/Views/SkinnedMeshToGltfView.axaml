@@ -105,6 +105,12 @@
                 <Button Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right"
                         Classes="accent"
                         Command="{Binding OnAddAnimationsCommand}">
+                  <Button.IsEnabled>
+                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                      <Binding Path="SimpleSkinPath" Converter="{x:Static ObjectConverters.IsNotNull}"/>
+                      <Binding Path="SkeletonPath" Converter="{x:Static ObjectConverters.IsNotNull}"/>
+                    </MultiBinding>
+                  </Button.IsEnabled>
                   <StackPanel Orientation="Horizontal">
                     <i:Icon Value="fa-person-walking-dashed-line-arrow-right" FontSize="16"/>
                     <TextBlock Margin="4 0 0 0">Add</TextBlock>

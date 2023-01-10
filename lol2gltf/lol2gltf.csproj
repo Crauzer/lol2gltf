@@ -6,6 +6,7 @@
     <TrimMode>copyused</TrimMode>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <RuntimeIdentifier>win10-x64</RuntimeIdentifier>
+    <Platforms>x64</Platforms>
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="Models\" />

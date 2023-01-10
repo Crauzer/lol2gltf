@@ -112,7 +112,10 @@ namespace lol2gltf.ViewModels
                 this.WhenValueChanged(x => x.SkinnedMesh)
                     .Subscribe(skinnedMesh =>
                     {
+                        // Clear mesh primitives, skeleton and animation when mesh is changed
+                        this.SkeletonPath = null;
                         this.SkinnedMeshPrimitives.Clear();
+                        this.Animations.Clear();
 
                         if (skinnedMesh is null)
                         {

@@ -80,12 +80,12 @@
                               </StackPanel>
                             </Button>
                             <Grid IsVisible="{Binding TexturePath, Converter={x:Static ObjectConverters.IsNotNull}}"
-                                  RowDefinitions="*" ColumnDefinitions="*, Auto">
+                                  RowDefinitions="*" ColumnDefinitions="Auto, *">
                               <Button Grid.Column="0">
                                 <ui:SymbolIcon Symbol="Cancel" FontSize="16" />
                               </Button>
                               <TextBlock Grid.Column="1" Margin="8 0 0 0"
-                                         HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                                         HorizontalAlignment="Left" VerticalAlignment="Center"
                                          Text="{Binding TexturePath}"/>
                             </Grid>
                           </Panel>

@@ -71,9 +71,7 @@ namespace lol2gltf.ViewModels
             this.OnAddAnimationsCommand = ReactiveCommand.CreateFromTask(AddAnimationsAsync);
             this.OnExportGltfCommand = ReactiveCommand.CreateFromTask<string>(ExportGltfAsync);
 
-            this.OnRemoveSelectedAnimationsCommand = ReactiveCommand.CreateFromTask<IList>(
-                RemoveSelectedAnimationsAsync
-            );
+            this.OnRemoveSelectedAnimationsCommand = ReactiveCommand.Create<IList>(RemoveSelectedAnimations);
 
             this.ShowLoadSimpleSkinDialog = new();
             this.ShowLoadSkeletonDialog = new();
@@ -157,7 +155,11 @@ namespace lol2gltf.ViewModels
             if (paths is null)
                 return;
 
-            foreach (string path in paths)
+            // Filter out existing animations
+            IEnumerable<string> uniqueNewPaths = paths.Where(
+                x => !this.Animations.Any(animation => animation.Name == Path.GetFileNameWithoutExtension(x))
+            );
+            foreach (string path in uniqueNewPaths)
             {
                 LeagueAnimation animation = new(path);
 
@@ -165,13 +167,11 @@ namespace lol2gltf.ViewModels
             }
         }
 
-        private async Task RemoveSelectedAnimationsAsync(IList selectedItems)
+        private void RemoveSelectedAnimations(IList selectedItems)
         {
             List<AnimationViewModel> selectedAnimations = new(selectedItems.Cast<AnimationViewModel>());
 
             this.Animations.RemoveMany(selectedAnimations);
-
-            await Task.CompletedTask;
         }
 
         private async Task ExportGltfAsync(string extension)
@@ -187,7 +187,11 @@ namespace lol2gltf.ViewModels
                 this.SkinnedMeshPrimitives
             );
             List<(string name, LeagueAnimation animation)> animations =
-                new(this.Animations.Select(animation => (animation.Name, animation.Animation)));
+                new(
+                    this.Animations
+                        .Select(animation => (animation.Name, animation.Animation))
+                        .DistinctBy(animation => animation.Name)
+                );
 
             ModelRoot gltfAsset = this.Skeleton switch
             {

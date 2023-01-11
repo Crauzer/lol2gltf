@@ -58,10 +58,11 @@
               </StackPanel>
               <Grid Grid.Row="2" Grid.Column="0"
                       Margin="0 16 0 0"
-                      RowDefinitions="Auto, *" ColumnDefinitions="*, Auto">
+                      RowDefinitions="Auto, Auto" ColumnDefinitions="*, Auto">
                 <Label Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">Mesh Primitives:</Label>
                 <i:Icon Grid.Row="0" Grid.Column="1" Value="fa-cube" FontSize="16" Margin="11"/>
                 <DataGrid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                          MaxHeight="450"
                           Items="{Binding SkinnedMeshPrimitives}" AutoGenerateColumns="False">
                   <DataGrid.Columns>
                     <DataGridTextColumn Header="Material" Binding="{Binding Material}" IsReadOnly="True"/>
@@ -97,7 +98,7 @@
               </Grid>
               <Grid Grid.Row="3" Grid.Column="0"
                     Margin="0 16 0 0"
-                    RowDefinitions="Auto, *" ColumnDefinitions="*, Auto">
+                    RowDefinitions="Auto, Auto" ColumnDefinitions="*, Auto">
                 <Label Grid.Row="0" Grid.Column="0"
                        HorizontalAlignment="Left" VerticalAlignment="Bottom">
                   Animations:
@@ -120,7 +121,7 @@
                           Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
                           Margin="0 8 0 0" VerticalAlignment="Stretch"
                           Items="{Binding Animations}" AutoGenerateColumns="False"
-                          MaxHeight="500">
+                          MaxHeight="450">
                   <DataGrid.KeyBindings>
                     <KeyBinding Gesture="Delete"
                                 CommandParameter="{Binding ElementName=AnimationsDataGrid, Path=SelectedItems}"

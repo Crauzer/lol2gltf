@@ -19,22 +19,6 @@ namespace lol2gltf
         {
             AvaloniaXamlLoader.Load(this);
 
-            ILoggerFactory loggerFactory = LoggerFactory.Create(
-                builder => builder.AddFilter(logLevel => true).AddDebug()
-            );
-
-            Locator.CurrentMutable.RegisterLazySingleton(
-                () =>
-                    (IDialogService)
-                        new DialogService(
-                            new DialogManager(
-                                viewLocator: new ViewLocator(),
-                                logger: loggerFactory.CreateLogger<DialogManager>()
-                            ),
-                            viewModelFactory: x => Locator.Current.GetService(x)
-                        )
-            );
-
             SplatRegistrations.Register<MainWindowViewModel>();
             SplatRegistrations.SetupIOC();
         }

@@ -1,21 +1,32 @@
-using System;
-using System.Reflection;
-using System.Windows.Markup;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
-using HanumanInstitute.MvvmDialogs;
-using HanumanInstitute.MvvmDialogs.Avalonia;
 using lol2gltf.ViewModels;
+using System;
 
 namespace lol2gltf
 {
-    /// <summary>
-    /// Maps view models to views.
-    /// </summary>
-    public class ViewLocator : ViewLocatorBase
+    public class ViewLocator : IDataTemplate
     {
-        /// <inheritdoc />
-        protected override string GetViewName(object viewModel) =>
-            viewModel.GetType().FullName!.Replace("ViewModel", "View");
+        public static bool SupportsRecycling => false;
+
+        public IControl Build(object data)
+        {
+            string name = data.GetType().FullName.Replace("ViewModel", "View");
+            Type type = Type.GetType(name);
+
+            if (type != null)
+            {
+                return (Control)Activator.CreateInstance(type);
+            }
+            else
+            {
+                return new TextBlock { Text = "Not Found: " + name };
+            }
+        }
+
+        public bool Match(object data)
+        {
+            return data is ViewModelBase;
+        }
     }
 }

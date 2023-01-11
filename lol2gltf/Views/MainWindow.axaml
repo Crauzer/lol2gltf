@@ -1,0 +1,35 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:lol2gltf.ViewModels"
+        xmlns:views="using:lol2gltf.Views"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ui="using:FluentAvalonia.UI.Controls"
+        xmlns:local="using:lol2gltf"
+        mc:Ignorable="d" d:DesignWidth="1366" d:DesignHeight="900"
+        Width="1366"
+        Height="900"
+        x:Class="lol2gltf.Views.MainWindow"
+        Icon="/Assets/icon.ico"
+        Title="lol2gltf"
+        d:DataContext="{x:Static local:App.MainWindow}"
+        x:DataType="vm:MainWindowViewModel"
+        Background="Transparent"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="PreferSystemChrome"
+        TransparencyLevelHint="Mica"
+        WindowStartupLocation="CenterScreen">
+  <Panel>
+    <ExperimentalAcrylicBorder CornerRadius="8">
+      <ExperimentalAcrylicBorder.Material>
+        <ExperimentalAcrylicMaterial BackgroundSource="Digger" 
+                                     TintColor="#002611"
+                                     FallbackColor="{DynamicResource SolidBackgroundFillColorBase}"
+                                     TintOpacity="1" MaterialOpacity="0.5"/>
+      </ExperimentalAcrylicBorder.Material>
+    </ExperimentalAcrylicBorder>
+    <Panel Margin="0 12 12 12">
+      <views:MainView DataContext="{Binding MainViewModel}"/>
+    </Panel>
+  </Panel>
+</Window>

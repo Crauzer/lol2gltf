@@ -1,13 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
-    <LangVersion>8.0</LangVersion>
+    <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>11</LangVersion>
     <Platforms>x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Fantome.Libraries.League" Version="1.6.3" />
+    <PackageReference Include="LeagueToolkit" Version="4.0.0-beta.3" />
+    <PackageReference Include="LeagueToolkit.IO.Extensions" Version="4.0.0-beta.3" />
   </ItemGroup>
 
 </Project>

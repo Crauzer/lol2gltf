@@ -1,0 +1,13 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:lol2gltf"
+             xmlns:sty="using:FluentAvalonia.Styling"
+             x:Class="lol2gltf.App">
+    <Application.DataTemplates>
+        <local:ViewLocator/>
+    </Application.DataTemplates>
+
+    <Application.Styles>
+        <sty:FluentAvaloniaTheme UseSystemThemeOnWindows="True" UseUserAccentColorOnWindows="True"/>
+    </Application.Styles>
+</Application>

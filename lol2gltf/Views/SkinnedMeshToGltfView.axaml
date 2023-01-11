@@ -1,0 +1,165 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:ui="using:FluentAvalonia.UI.Controls"
+             xmlns:uip="using:FluentAvalonia.UI.Controls.Primitives"
+             xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+             xmlns:vm="using:lol2gltf.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="lol2gltf.Views.SkinnedMeshToGltfView">
+  <Design.DataContext>
+    <vm:SkinnedMeshToGltfViewModel/>
+  </Design.DataContext>
+  <Panel>
+    <ExperimentalAcrylicBorder IsHitTestVisible="True" CornerRadius="8">
+      <ExperimentalAcrylicBorder.Material>
+        <ExperimentalAcrylicMaterial BackgroundSource="Digger" TintColor="Black" TintOpacity="1" MaterialOpacity="0.5"/>
+      </ExperimentalAcrylicBorder.Material>
+    </ExperimentalAcrylicBorder>
+    <Grid RowDefinitions="*, Auto" ColumnDefinitions="*">
+      <ScrollViewer>
+        <Grid Grid.Row="0" Grid.Column="0" ColumnDefinitions="*" RowDefinitions="Auto,Auto,Auto,Auto">
+          <Border Padding="24">
+            <StackPanel>
+              <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Vertical">
+                <Label>Simple Skin:</Label>
+                <Grid ColumnDefinitions="*, Auto">
+                  <TextBox Grid.Column="0"
+                           IsReadOnly="True"
+                           Classes.clearButton="True"
+                           HorizontalAlignment="Stretch"
+                           Watermark="Select a Simple Skin (.skn) file"
+                           Text="{Binding SimpleSkinPath}"/>
+                  <Button Grid.Column="1" Margin="16 0 0 0"
+                          Background="{DynamicResource }"
+                          Command="{Binding OnSelectSimpleSkinCommand}"
+                          Classes="accent">
+                    <ui:SymbolIcon Symbol="Open" FontSize="18" />
+                  </Button>
+                </Grid>
+              </StackPanel>
+              <StackPanel Grid.Row="1" Grid.Column="0" Margin="0 16 0 0"
+                          IsEnabled="{Binding SimpleSkinPath, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                          Orientation="Vertical">
+                <Label>Skeleton:</Label>
+                <Grid ColumnDefinitions="*, Auto">
+                  <TextBox Grid.Column="0"
+                           IsReadOnly="True"
+                           HorizontalAlignment="Stretch"
+                           Watermark="Select a Skeleton (.skl) file"
+                           Text="{Binding SkeletonPath}"/>
+                  <Button Grid.Column="1" Margin="16 0 0 0"
+                          Command="{Binding OnSelectSkeletonCommand}"
+                          Classes="accent">
+                    <ui:SymbolIcon Symbol="Open" FontSize="18" />
+                  </Button>
+                </Grid>
+              </StackPanel>
+              <Grid Grid.Row="2" Grid.Column="0"
+                      Margin="0 16 0 0"
+                      RowDefinitions="Auto, *" ColumnDefinitions="*, Auto">
+                <Label Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">Mesh Primitives:</Label>
+                <i:Icon Grid.Row="0" Grid.Column="1" Value="fa-cube" FontSize="16" Margin="11"/>
+                <DataGrid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                          Items="{Binding SkinnedMeshPrimitives}" AutoGenerateColumns="False">
+                  <DataGrid.Columns>
+                    <DataGridTextColumn Header="Material" Binding="{Binding Material}" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Vertices" Binding="{Binding VertexCount}" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Faces" Binding="{Binding FaceCount}" IsReadOnly="True"/>
+                    <DataGridTemplateColumn Header="Texture">
+                      <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate DataType="vm:SkinnedMeshPrimitiveViewModel">
+                          <Panel>
+                            <Button Margin="4"
+                                    IsVisible="{Binding TexturePath, Converter={x:Static ObjectConverters.IsNull}}"
+                                    Command="{Binding OnSelectTextureCommand}">
+                              <StackPanel Orientation="Horizontal">
+                                <TextBlock>Select Texture</TextBlock>
+                                <ui:SymbolIcon Margin="8 0 0 0" Symbol="ImageEdit" FontSize="16" />
+                              </StackPanel>
+                            </Button>
+                            <Grid IsVisible="{Binding TexturePath, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                  RowDefinitions="*" ColumnDefinitions="*, Auto">
+                              <Button Grid.Column="0">
+                                <ui:SymbolIcon Symbol="Cancel" FontSize="16" />
+                              </Button>
+                              <TextBlock Grid.Column="1" Margin="8 0 0 0"
+                                         HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                                         Text="{Binding TexturePath}"/>
+                            </Grid>
+                          </Panel>
+                        </DataTemplate>
+                      </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                  </DataGrid.Columns>
+                </DataGrid>
+              </Grid>
+              <Grid Grid.Row="3" Grid.Column="0"
+                    Margin="0 16 0 0"
+                    RowDefinitions="Auto, *" ColumnDefinitions="*, Auto">
+                <Label Grid.Row="0" Grid.Column="0"
+                       HorizontalAlignment="Left" VerticalAlignment="Bottom">
+                  Animations:
+                </Label>
+                <Button Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right"
+                        Classes="accent"
+                        Command="{Binding OnAddAnimationsCommand}">
+                  <Button.IsEnabled>
+                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                      <Binding Path="SimpleSkinPath" Converter="{x:Static StringConverters.IsNotNullOrEmpty}"/>
+                      <Binding Path="SkeletonPath" Converter="{x:Static StringConverters.IsNotNullOrEmpty}"/>
+                    </MultiBinding>
+                  </Button.IsEnabled>
+                  <StackPanel Orientation="Horizontal">
+                    <i:Icon Value="fa-person-walking-dashed-line-arrow-right" FontSize="16"/>
+                    <TextBlock Margin="4 0 0 0">Add</TextBlock>
+                  </StackPanel>
+                </Button>
+                <DataGrid Name="AnimationsDataGrid"
+                          Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                          Margin="0 8 0 0" VerticalAlignment="Stretch"
+                          Items="{Binding Animations}" AutoGenerateColumns="False"
+                          MaxHeight="500">
+                  <DataGrid.KeyBindings>
+                    <KeyBinding Gesture="Delete"
+                                CommandParameter="{Binding ElementName=AnimationsDataGrid, Path=SelectedItems}"
+                                Command="{Binding OnRemoveSelectedAnimationsCommand}"/>
+                  </DataGrid.KeyBindings>
+                  <DataGrid.Columns>
+                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="FPS" Binding="{Binding FPS}" IsReadOnly="True"/>
+                  </DataGrid.Columns>
+                </DataGrid>
+              </Grid>
+            </StackPanel>
+          </Border>
+        </Grid>
+      </ScrollViewer>
+      <Border Grid.Row="1" Grid.Column="0" Padding="8">
+        <DockPanel VerticalAlignment="Bottom" HorizontalAlignment="Right">
+          <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+            <Button IsEnabled="{Binding SimpleSkinPath, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" 
+                    Command="{Binding OnExportGltfCommand}" CommandParameter=".glb"
+                    Classes="accent">
+              <StackPanel Orientation="Horizontal">
+                <i:Icon Value="fa-duotone fa-file-export" FontSize="16"/>
+                <TextBlock Margin="4 0 0 0">Export to GLB</TextBlock>
+              </StackPanel>
+            </Button>
+            <Button Margin="8 0 0 0"
+                    IsEnabled="{Binding SimpleSkinPath, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                    Command="{Binding OnExportGltfCommand}" CommandParameter=".gltf"
+                    Classes="accent">
+              <StackPanel Orientation="Horizontal">
+                <i:Icon Value="fa-duotone fa-file-export" FontSize="16"/>
+                <TextBlock Margin="4 0 0 0">Export to glTF</TextBlock>
+              </StackPanel>
+            </Button>
+          </StackPanel>
+        </DockPanel>
+      </Border>
+    </Grid>
+  </Panel>
+  
+</UserControl>

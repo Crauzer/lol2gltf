@@ -12,9 +12,6 @@
     <Folder Include="Models\" />
     <AvaloniaResource Include="Assets\**" />
     <Folder Include="Services\" />
-    <None Remove=".gitignore" />
-    <None Remove="Assets\icon.ico" />
-    <None Remove="Views\MapGeometryToGltf.axaml~RF789d9ba9.TMP" />
   </ItemGroup>
   <ItemGroup>
     <!--This helps with theme dll-s trimming.

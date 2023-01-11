@@ -21,7 +21,7 @@ namespace lol2gltf.ViewModels
 
         public MainViewModel()
         {
-            this.Pages = new() { new SkinnedMeshToGltfViewModel(), new MapGeometryToGltfViewModel() };
+            this.Pages = new() { new SkinnedMeshToGltfViewModel() };
 
             this.CurrentPage = this.Pages[0];
         }

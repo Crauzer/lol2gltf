@@ -81,7 +81,7 @@
                             </Button>
                             <Grid IsVisible="{Binding TexturePath, Converter={x:Static ObjectConverters.IsNotNull}}"
                                   RowDefinitions="*" ColumnDefinitions="Auto, *">
-                              <Button Grid.Column="0">
+                              <Button Grid.Column="0" Command="{Binding OnRemoveTextureCommand}">
                                 <ui:SymbolIcon Symbol="Cancel" FontSize="16" />
                               </Button>
                               <TextBlock Grid.Column="1" Margin="8 0 0 0"

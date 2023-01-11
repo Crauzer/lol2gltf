@@ -230,8 +230,10 @@ namespace lol2gltf.ViewModels
         }
     }
 
-    public class SkinnedMeshPrimitiveViewModel : ViewModelBase
+    public class SkinnedMeshPrimitiveViewModel : ViewModelBase, IActivatableViewModel
     {
+        public ViewModelActivator Activator { get; } = new();
+
         public string Material { get; set; }
         public int VertexCount { get; set; }
         public int FaceCount { get; set; }
@@ -240,10 +242,15 @@ namespace lol2gltf.ViewModels
         public string TexturePath { get; set; }
 
         public ReactiveCommand<Unit, Unit> OnSelectTextureCommand { get; }
+        public ReactiveCommand<Unit, Unit> OnRemoveTextureCommand { get; }
 
         public SkinnedMeshPrimitiveViewModel()
         {
             this.OnSelectTextureCommand = ReactiveCommand.CreateFromTask(SelectTextureAsync);
+            this.OnRemoveTextureCommand = ReactiveCommand.Create(() =>
+            {
+                this.TexturePath = null;
+            });
         }
 
         private async Task SelectTextureAsync()

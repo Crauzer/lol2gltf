@@ -12,7 +12,11 @@
     <vm:MainViewModel/>
   </Design.DataContext>
   <Grid>
-    <ui:NavigationView PaneDisplayMode="Left" MenuItems="{Binding Pages}" Content="{Binding CurrentPage}" SelectedItem="{Binding CurrentPage}">
+    <ui:NavigationView PaneDisplayMode="Left"
+                       IsSettingsVisible="False"
+                       MenuItems="{Binding Pages}" 
+                       Content="{Binding CurrentPage}" 
+                       SelectedItem="{Binding CurrentPage}">
       <ui:NavigationView.MenuItemTemplate>
         <DataTemplate DataType="{x:Type vm:PageViewModel}">
           <ui:NavigationViewItem Content="{Binding Name}" Icon="{Binding Icon}" ToolTip.Tip="{Binding Tooltip}" />

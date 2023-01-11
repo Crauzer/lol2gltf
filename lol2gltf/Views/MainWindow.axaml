@@ -10,7 +10,7 @@
         Width="1366"
         Height="900"
         x:Class="lol2gltf.Views.MainWindow"
-        Icon="/Assets/avalonia-logo.ico"
+        Icon="/Assets/icon.ico"
         Title="lol2gltf"
         d:DataContext="{x:Static local:App.MainWindow}"
         x:DataType="vm:MainWindowViewModel"

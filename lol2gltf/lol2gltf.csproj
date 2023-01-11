@@ -13,6 +13,7 @@
     <AvaloniaResource Include="Assets\**" />
     <Folder Include="Services\" />
     <None Remove=".gitignore" />
+    <None Remove="Assets\icon.ico" />
     <None Remove="Views\MapGeometryToGltf.axaml~RF789d9ba9.TMP" />
   </ItemGroup>
   <ItemGroup>

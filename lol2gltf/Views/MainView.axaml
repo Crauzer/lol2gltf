@@ -16,7 +16,8 @@
                        IsSettingsVisible="False"
                        MenuItems="{Binding Pages}" 
                        Content="{Binding CurrentPage}" 
-                       SelectedItem="{Binding CurrentPage}">
+                       SelectedItem="{Binding CurrentPage}"
+                       IsPaneOpen="False">
       <ui:NavigationView.MenuItemTemplate>
         <DataTemplate DataType="{x:Type vm:PageViewModel}">
           <ui:NavigationViewItem Content="{Binding Name}" Icon="{Binding Icon}" ToolTip.Tip="{Binding Tooltip}" />

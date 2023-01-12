@@ -176,7 +176,7 @@ namespace lol2gltf.ViewModels
 
         private async Task ExportGltfAsync(string extension)
         {
-            if (extension is not ".glb" and not ".gltf")
+            if (extension is not "glb" and not "gltf")
                 throw new ArgumentException($"Invalid extension: {extension}", nameof(extension));
 
             string path = await this.ShowExportGltfDialog.Handle(extension);

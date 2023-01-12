@@ -141,7 +141,7 @@
         <DockPanel VerticalAlignment="Bottom" HorizontalAlignment="Right">
           <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
             <Button IsEnabled="{Binding SimpleSkinPath, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" 
-                    Command="{Binding OnExportGltfCommand}" CommandParameter=".glb"
+                    Command="{Binding OnExportGltfCommand}" CommandParameter="glb"
                     Classes="accent">
               <StackPanel Orientation="Horizontal">
                 <i:Icon Value="fa-duotone fa-file-export" FontSize="16"/>
@@ -150,7 +150,7 @@
             </Button>
             <Button Margin="8 0 0 0"
                     IsEnabled="{Binding SimpleSkinPath, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-                    Command="{Binding OnExportGltfCommand}" CommandParameter=".gltf"
+                    Command="{Binding OnExportGltfCommand}" CommandParameter="gltf"
                     Classes="accent">
               <StackPanel Orientation="Horizontal">
                 <i:Icon Value="fa-duotone fa-file-export" FontSize="16"/>

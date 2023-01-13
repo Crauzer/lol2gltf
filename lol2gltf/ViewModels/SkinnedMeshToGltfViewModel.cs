@@ -62,7 +62,8 @@ namespace lol2gltf.ViewModels
         public Interaction<Unit, string[]> ShowAddAnimationsDialog { get; }
         public Interaction<string, string> ShowExportGltfDialog { get; }
 
-        public SkinnedMeshToGltfViewModel() : this("Skinned Mesh to glTf", "", Symbol.OpenFile) { }
+        public SkinnedMeshToGltfViewModel()
+            : this("Skinned Mesh to glTf", "Convert Skinned Meshes to glTF", Symbol.OpenFile) { }
 
         public SkinnedMeshToGltfViewModel(string name, string tooltip, Symbol icon) : base(name, tooltip, icon)
         {

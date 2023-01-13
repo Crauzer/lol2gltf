@@ -2,11 +2,67 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:ui="using:FluentAvalonia.UI.Controls"
+             xmlns:uip="using:FluentAvalonia.UI.Controls.Primitives"
+             xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
              xmlns:vm="using:lol2gltf.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="lol2gltf.Views.MapGeometryToGltfView">
   <Design.DataContext>
     <vm:MapGeometryToGltfViewModel/>
   </Design.DataContext>
-  Mapgeo
+  <Panel>
+    <ExperimentalAcrylicBorder IsHitTestVisible="True" CornerRadius="8">
+      <ExperimentalAcrylicBorder.Material>
+        <ExperimentalAcrylicMaterial BackgroundSource="Digger" TintColor="Black" TintOpacity="1" MaterialOpacity="0.5"/>
+      </ExperimentalAcrylicBorder.Material>
+    </ExperimentalAcrylicBorder>
+    <Grid RowDefinitions="*, Auto" ColumnDefinitions="*">
+      <ScrollViewer>
+        <Grid RowDefinitions="Auto" ColumnDefinitions="*">
+          <Border Padding="24">
+            <Grid RowDefinitions="*" ColumnDefinitions="*, Auto">
+              <Grid RowDefinitions="Auto, *" ColumnDefinitions="*, Auto">
+                <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
+                  Map Geometry:
+                </Label>
+                <TextBox Grid.Row="1" Grid.Column="0"
+                         IsReadOnly="True"
+                         Text="{Binding MapGeometryPath}"/>
+                <Button Grid.Row="1" Grid.Column="1" Margin="16 0 0 0"
+                        Command="{Binding LoadMapGeometryCommand}">
+                  <i:Icon Value="fa-solid fa-file-import" FontSize="16"/>
+                </Button>
+              </Grid>
+            </Grid>
+          </Border>
+        </Grid>
+      </ScrollViewer>
+      <Border Grid.Row="1" Grid.Column="0" Padding="8">
+        <DockPanel VerticalAlignment="Bottom" HorizontalAlignment="Right">
+          <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+            <Button Name="ExportGlbButton"
+                    IsEnabled="{Binding MapGeometryPath, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                    CommandParameter="glb"
+                    Classes="accent">
+              <StackPanel Orientation="Horizontal">
+                <i:Icon Value="fa-duotone fa-file-export" FontSize="16"/>
+                <TextBlock Margin="4 0 0 0">Export to GLB</TextBlock>
+              </StackPanel>
+            </Button>
+            <Button Name="ExportGltfButton"
+                    Margin="8 0 0 0"
+                    IsEnabled="{Binding MapGeometryPath, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                    CommandParameter="gltf"
+                    Classes="accent">
+              <StackPanel Orientation="Horizontal">
+                <i:Icon Value="fa-duotone fa-file-export" FontSize="16"/>
+                <TextBlock Margin="4 0 0 0">Export to glTF</TextBlock>
+              </StackPanel>
+            </Button>
+          </StackPanel>
+        </DockPanel>
+      </Border>
+    </Grid>
+  </Panel>
 </UserControl>

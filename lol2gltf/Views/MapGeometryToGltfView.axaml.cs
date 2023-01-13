@@ -9,6 +9,7 @@ using LeagueToolkit.IO.MapGeometryFile;
 using lol2gltf.ViewModels;
 using ReactiveUI;
 using SharpGLTF.Schema2;
+using System;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
@@ -25,13 +26,20 @@ namespace lol2gltf.Views
 
             this.WhenActivated(disposables =>
             {
-                this.ViewModel.ShowSelectMapGeometryDialog
-                    .RegisterHandler(ShowSelectMapGeometryDialogAsync)
+                this.BindInteraction(
+                        this.ViewModel,
+                        vm => vm.ShowSelectMapGeometryDialog,
+                        ShowSelectMapGeometryDialogAsync
+                    )
                     .DisposeWith(disposables);
-                this.ViewModel.ShowSelectExportedGltfDialog
-                    .RegisterHandler(ShowSelectExportedGltfDialogAsync)
+                this.BindInteraction(
+                        this.ViewModel,
+                        vm => vm.ShowSelectExportedGltfDialog,
+                        ShowSelectExportedGltfDialogAsync
+                    )
                     .DisposeWith(disposables);
-                this.ViewModel.ShowExportGltfDialog.RegisterHandler(ShowExportGltfDialogAsync).DisposeWith(disposables);
+                this.BindInteraction(this.ViewModel, vm => vm.ShowExportGltfDialog, ShowExportGltfDialogAsync)
+                    .DisposeWith(disposables);
 
                 this.BindCommand(
                         this.ViewModel,
@@ -105,54 +113,60 @@ namespace lol2gltf.Views
             interaction.SetOutput(file);
         }
 
-        private async Task ShowExportGltfDialogAsync(InteractionContext<string, Unit> interaction)
+        private IObservable<Unit> ShowExportGltfDialogAsync(InteractionContext<string, Unit> interaction)
         {
-            Guard.IsNotNull(interaction, nameof(interaction));
-
-            string path = interaction.Input;
-            if (string.IsNullOrEmpty(path))
-                ThrowHelper.ThrowInvalidOperationException($"{nameof(path)} must be set");
-
-            TaskDialog dialog =
-                new()
+            return Observable
+                .Start(() => interaction.Input, RxApp.MainThreadScheduler)
+                .SelectMany(path =>
                 {
-                    Title = "Exporting to glTF",
-                    Content = "Exporting...",
-                    ShowProgressBar = true,
-                    XamlRoot = this.VisualRoot
-                };
+                    if (string.IsNullOrEmpty(path))
+                        ThrowHelper.ThrowInvalidOperationException($"{nameof(path)} must be set");
 
-            MapGeometry mapGeometry = this.ViewModel.MapGeometry;
+                    TaskDialog dialog =
+                        new()
+                        {
+                            Title = "Exporting to glTF",
+                            ShowProgressBar = true,
+                            XamlRoot = this.VisualRoot
+                        };
 
-            dialog.Opened += async (dialog, e) =>
-            {
-                await Task.Run(() =>
-                {
-                    // Convert to glTF
-                    dialog.SetProgressBarState(100, TaskDialogProgressState.Indeterminate);
-                    Dispatcher.UIThread.Post(() =>
+                    dialog.SetProgressBarState(
+                        50,
+                        TaskDialogProgressState.Normal | TaskDialogProgressState.Indeterminate
+                    );
+
+                    MapGeometry mapGeometry = this.ViewModel.MapGeometry;
+
+                    dialog.Opened += async (dialog, e) =>
                     {
-                        dialog.Content = "Converting to glTF...";
-                    });
-                    ModelRoot gltfAsset = mapGeometry.ToGLTF();
+                        await Task.Run(() =>
+                        {
+                            // Convert to glTF
+                            Dispatcher.UIThread.Post(() =>
+                            {
+                                dialog.Content = "Converting to glTF...";
+                            });
+                            ModelRoot gltfAsset = mapGeometry.ToGLTF();
 
-                    // Save glTF asset
-                    dialog.SetProgressBarState(100, TaskDialogProgressState.Indeterminate);
-                    Dispatcher.UIThread.Post(() =>
-                    {
-                        dialog.Content = "Exporting glTF...";
-                    });
-                    gltfAsset.Save(path);
+                            // Save glTF asset
+                            Dispatcher.UIThread.Post(() =>
+                            {
+                                dialog.Content = "Exporting glTF...";
+                            });
+                            gltfAsset.Save(path);
 
-                    // Finish
-                    Dispatcher.UIThread.Post(() =>
-                    {
-                        dialog.Hide(TaskDialogStandardResult.OK);
-                    });
-                });
-            };
+                            // Finish
+                            Dispatcher.UIThread.Post(() =>
+                            {
+                                dialog.Hide(TaskDialogStandardResult.OK);
+                            });
+                        });
+                    };
 
-            object result = await dialog.ShowAsync(true);
+                    return dialog.ShowAsync(true);
+                })
+                .Do(_ => interaction.SetOutput(new()))
+                .Select(_ => Unit.Default);
         }
     }
 }

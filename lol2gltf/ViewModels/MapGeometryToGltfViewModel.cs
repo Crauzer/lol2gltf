@@ -5,6 +5,7 @@ using LeagueToolkit.IO.SkeletonFile;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using SharpGLTF.Schema2;
+using Splat;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,7 +46,10 @@ namespace lol2gltf.ViewModels
             Guard.IsNotNullOrEmpty(tooltip, nameof(tooltip));
 
             this.LoadMapGeometryCommand = ReactiveCommand.CreateFromTask(LoadMapGeometryAsync);
-            this.ExportGltfCommand = ReactiveCommand.CreateFromObservable<string, Unit>(ExportGltfAsync);
+            this.ExportGltfCommand = ReactiveCommand.CreateFromObservable<string, Unit>(
+                ExportGltfAsync,
+                outputScheduler: RxApp.MainThreadScheduler
+            );
 
             this.ShowSelectMapGeometryDialog = new();
             this.ShowSelectExportedGltfDialog = new();
@@ -57,6 +61,8 @@ namespace lol2gltf.ViewModels
                     .WhereNotNull()
                     .ToProperty(this, nameof(this.MapGeometry), scheduler: RxApp.MainThreadScheduler)
                     .DisposeWith(disposables);
+
+                this.ExportGltfCommand.ThrownExceptions.Subscribe(ex => this.Log().Error(ex));
             });
         }
 
@@ -74,13 +80,13 @@ namespace lol2gltf.ViewModels
 
         public IObservable<Unit> ExportGltfAsync(string extension)
         {
-            Guard.IsNotNullOrEmpty(extension, nameof(extension));
-
-            if (extension is not "glb" and not "gltf")
-                throw new ArgumentException($"Invalid extension: {extension}", nameof(extension));
-
-            return Observable.StartAsync(async () =>
+            return Observable.StartAsync(async cancellationToken =>
             {
+                Guard.IsNotNullOrEmpty(extension, nameof(extension));
+
+                if (extension is not "glb" and not "gltf")
+                    throw new ArgumentException($"Invalid extension: {extension}", nameof(extension));
+
                 string path = await this.ShowSelectExportedGltfDialog.Handle(extension);
                 if (string.IsNullOrEmpty(path))
                     return;

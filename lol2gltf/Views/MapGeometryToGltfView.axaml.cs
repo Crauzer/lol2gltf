@@ -12,6 +12,7 @@ using SharpGLTF.Schema2;
 using System;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -119,50 +120,54 @@ namespace lol2gltf.Views
                 .Start(() => interaction.Input, RxApp.MainThreadScheduler)
                 .SelectMany(path =>
                 {
+                    TaskDialogProgressState progressState =
+                        TaskDialogProgressState.Normal | TaskDialogProgressState.Indeterminate;
+
                     if (string.IsNullOrEmpty(path))
                         ThrowHelper.ThrowInvalidOperationException($"{nameof(path)} must be set");
 
+                    MapGeometry mapGeometry = this.ViewModel.MapGeometry;
                     TaskDialog dialog =
                         new()
                         {
-                            Title = "Exporting to glTF",
-                            ShowProgressBar = true,
-                            XamlRoot = this.VisualRoot
+                            Title = "Map Geometry to glTF",
+                            IconSource = new SymbolIconSource { Symbol = Symbol.SaveAsFilled },
+                            ShowProgressBar = true
                         };
-
-                    dialog.SetProgressBarState(
-                        50,
-                        TaskDialogProgressState.Normal | TaskDialogProgressState.Indeterminate
-                    );
-
-                    MapGeometry mapGeometry = this.ViewModel.MapGeometry;
 
                     dialog.Opened += async (dialog, e) =>
                     {
                         await Task.Run(() =>
                         {
+                            // For some reason when "showHosted" is true, the progress bar
+                            // doesn't update properly, if it's false, it does
+                            dialog.SetProgressBarState(50, progressState);
+
                             // Convert to glTF
-                            Dispatcher.UIThread.Post(() =>
+                            RxApp.MainThreadScheduler.Schedule(() =>
                             {
                                 dialog.Content = "Converting to glTF...";
                             });
+
                             ModelRoot gltfAsset = mapGeometry.ToGLTF();
 
                             // Save glTF asset
-                            Dispatcher.UIThread.Post(() =>
+                            RxApp.MainThreadScheduler.Schedule(() =>
                             {
-                                dialog.Content = "Exporting glTF...";
+                                dialog.Content = "Saving glTF...";
                             });
+
                             gltfAsset.Save(path);
 
                             // Finish
-                            Dispatcher.UIThread.Post(() =>
+                            RxApp.MainThreadScheduler.Schedule(() =>
                             {
                                 dialog.Hide(TaskDialogStandardResult.OK);
                             });
                         });
                     };
 
+                    dialog.XamlRoot = this.VisualRoot;
                     return dialog.ShowAsync(true);
                 })
                 .Do(_ => interaction.SetOutput(new()))

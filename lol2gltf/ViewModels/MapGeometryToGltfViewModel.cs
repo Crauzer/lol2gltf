@@ -80,7 +80,7 @@ namespace lol2gltf.ViewModels
 
         public IObservable<Unit> ExportGltfAsync(string extension)
         {
-            return Observable.StartAsync(async cancellationToken =>
+            return Observable.StartAsync(async _ =>
             {
                 Guard.IsNotNullOrEmpty(extension, nameof(extension));
 

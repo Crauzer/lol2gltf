@@ -35,7 +35,7 @@
                           Background="{DynamicResource }"
                           Command="{Binding OnSelectSimpleSkinCommand}"
                           Classes="accent">
-                    <ui:SymbolIcon Symbol="Open" FontSize="18" />
+                    <i:Icon Value="fa-solid fa-file-import" FontSize="16"/>
                   </Button>
                 </Grid>
               </StackPanel>
@@ -52,7 +52,7 @@
                   <Button Grid.Column="1" Margin="16 0 0 0"
                           Command="{Binding OnSelectSkeletonCommand}"
                           Classes="accent">
-                    <ui:SymbolIcon Symbol="Open" FontSize="18" />
+                    <i:Icon Value="fa-solid fa-file-import" FontSize="16"/>
                   </Button>
                 </Grid>
               </StackPanel>

@@ -30,6 +30,7 @@
                          IsReadOnly="True"
                          Text="{Binding MapGeometryPath}"/>
                 <Button Grid.Row="1" Grid.Column="1" Margin="16 0 0 0"
+                        Classes="accent"
                         Command="{Binding LoadMapGeometryCommand}">
                   <i:Icon Value="fa-solid fa-file-import" FontSize="16"/>
                 </Button>

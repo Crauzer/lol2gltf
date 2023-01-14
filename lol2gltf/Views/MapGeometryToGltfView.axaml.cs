@@ -27,21 +27,7 @@ namespace lol2gltf.Views
 
             this.WhenActivated(disposables =>
             {
-                this.BindInteraction(
-                        this.ViewModel,
-                        vm => vm.ShowSelectMapGeometryDialog,
-                        ShowSelectMapGeometryDialogAsync
-                    )
-                    .DisposeWith(disposables);
-                this.BindInteraction(
-                        this.ViewModel,
-                        vm => vm.ShowSelectExportedGltfDialog,
-                        ShowSelectExportedGltfDialogAsync
-                    )
-                    .DisposeWith(disposables);
-                this.BindInteraction(this.ViewModel, vm => vm.ShowSaveGltfDialog, ShowSaveGltfDialogAsync)
-                    .DisposeWith(disposables);
-
+                this.BindCommand(this.ViewModel, vm => vm.LoadMapGeometryCommand, v => v.LoadMapGeometryButton);
                 this.BindCommand(
                         this.ViewModel,
                         vm => vm.ExportGltfCommand,
@@ -55,6 +41,21 @@ namespace lol2gltf.Views
                         v => v.ExportGltfButton,
                         vm => vm.GltfExtension
                     )
+                    .DisposeWith(disposables);
+
+                this.BindInteraction(
+                        this.ViewModel,
+                        vm => vm.ShowSelectMapGeometryDialog,
+                        ShowSelectMapGeometryDialogAsync
+                    )
+                    .DisposeWith(disposables);
+                this.BindInteraction(
+                        this.ViewModel,
+                        vm => vm.ShowSelectExportedGltfDialog,
+                        ShowSelectExportedGltfDialogAsync
+                    )
+                    .DisposeWith(disposables);
+                this.BindInteraction(this.ViewModel, vm => vm.ShowSaveGltfDialog, ShowSaveGltfDialogAsync)
                     .DisposeWith(disposables);
             });
         }

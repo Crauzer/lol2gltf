@@ -35,7 +35,7 @@ namespace lol2gltf.ViewModels
         public Interaction<string, Unit> ShowSaveGltfDialog { get; }
 
         public string GlbExtension = "glb";
-        public string GltfExtension = "glb";
+        public string GltfExtension = "gltf";
 
         public MapGeometryToGltfViewModel() : this("Map Geometry to glTf", "Convert .mapgeo files to glTF", Symbol.Map)
         { }

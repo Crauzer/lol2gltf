@@ -66,7 +66,7 @@ namespace lol2gltf.ViewModels
         public Interaction<string, Unit> ShowSaveGltfDialog { get; }
 
         public string GlbExtension = "glb";
-        public string GltfExtension = "glb";
+        public string GltfExtension = "gltf";
 
         public SkinnedMeshToGltfViewModel()
             : this("Skinned Mesh to glTf", "Convert Skinned Meshes to glTF", Symbol.OpenFile) { }

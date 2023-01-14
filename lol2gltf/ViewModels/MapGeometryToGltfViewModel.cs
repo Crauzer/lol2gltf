@@ -32,7 +32,7 @@ namespace lol2gltf.ViewModels
 
         public Interaction<Unit, string> ShowSelectMapGeometryDialog { get; }
         public Interaction<string, string> ShowSelectExportedGltfDialog { get; }
-        public Interaction<string, Unit> ShowExportGltfDialog { get; }
+        public Interaction<string, Unit> ShowSaveGltfDialog { get; }
 
         public string GlbExtension = "glb";
         public string GltfExtension = "glb";
@@ -53,7 +53,7 @@ namespace lol2gltf.ViewModels
 
             this.ShowSelectMapGeometryDialog = new();
             this.ShowSelectExportedGltfDialog = new();
-            this.ShowExportGltfDialog = new();
+            this.ShowSaveGltfDialog = new();
 
             this.WhenActivated(disposables =>
             {
@@ -62,6 +62,7 @@ namespace lol2gltf.ViewModels
                     .ToProperty(this, nameof(this.MapGeometry), scheduler: RxApp.MainThreadScheduler)
                     .DisposeWith(disposables);
 
+                this.LoadMapGeometryCommand.ThrownExceptions.Subscribe(ex => this.Log().Error(ex));
                 this.ExportGltfCommand.ThrownExceptions.Subscribe(ex => this.Log().Error(ex));
             });
         }
@@ -91,7 +92,7 @@ namespace lol2gltf.ViewModels
                 if (string.IsNullOrEmpty(path))
                     return;
 
-                await this.ShowExportGltfDialog.Handle(path);
+                await this.ShowSaveGltfDialog.Handle(path);
             });
         }
     }

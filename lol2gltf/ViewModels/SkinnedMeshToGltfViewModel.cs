@@ -2,6 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Mixins;
+using CommunityToolkit.Diagnostics;
 using DynamicData;
 using DynamicData.Binding;
 using FluentAvalonia.UI.Controls;
@@ -13,6 +14,7 @@ using ReactiveUI.Fody.Helpers;
 using SharpGLTF.Schema2;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Textures.TextureFormats;
+using Splat;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -38,7 +40,7 @@ namespace lol2gltf.ViewModels
         [Reactive]
         public string SkeletonPath { get; set; }
 
-        public SkinnedMesh SkinnedMesh => this._skinnedMesh?.Value;
+        public SkinnedMesh SimpleSkin => this._simpleSkin?.Value;
         public Skeleton Skeleton => this._skeleton?.Value;
 
         [Reactive]
@@ -47,106 +49,110 @@ namespace lol2gltf.ViewModels
         [Reactive]
         public ObservableCollection<AnimationViewModel> Animations { get; set; } = new();
 
-        private ObservableAsPropertyHelper<SkinnedMesh> _skinnedMesh;
+        private ObservableAsPropertyHelper<SkinnedMesh> _simpleSkin;
         private ObservableAsPropertyHelper<Skeleton> _skeleton;
 
-        public ReactiveCommand<Unit, Unit> OnSelectSimpleSkinCommand { get; }
-        public ReactiveCommand<Unit, Unit> OnSelectSkeletonCommand { get; }
-        public ReactiveCommand<Unit, Unit> OnAddAnimationsCommand { get; }
-        public ReactiveCommand<string, Unit> OnExportGltfCommand { get; }
+        public ReactiveCommand<Unit, SkinnedMesh> LoadSimpleSkinCommand { get; }
+        public ReactiveCommand<Unit, Skeleton> LoadSkeletonCommand { get; }
+        public ReactiveCommand<Unit, Unit> AddAnimationsCommand { get; }
+        public ReactiveCommand<string, Unit> ExportGltfCommand { get; }
 
-        public ReactiveCommand<IList, Unit> OnRemoveSelectedAnimationsCommand { get; }
+        public ReactiveCommand<IList, Unit> RemoveSelectedAnimationsCommand { get; }
 
-        public Interaction<Unit, string> ShowLoadSimpleSkinDialog { get; }
-        public Interaction<Unit, string> ShowLoadSkeletonDialog { get; }
+        public Interaction<Unit, string> ShowSelectSimpleSkinDialog { get; }
+        public Interaction<Unit, string> ShowSelectSkeletonDialog { get; }
         public Interaction<Unit, string[]> ShowAddAnimationsDialog { get; }
-        public Interaction<string, string> ShowExportGltfDialog { get; }
+        public Interaction<string, string> ShowSelectSavedGltfDialog { get; }
+        public Interaction<string, Unit> ShowSaveGltfDialog { get; }
+
+        public string GlbExtension = "glb";
+        public string GltfExtension = "glb";
 
         public SkinnedMeshToGltfViewModel()
             : this("Skinned Mesh to glTf", "Convert Skinned Meshes to glTF", Symbol.OpenFile) { }
 
         public SkinnedMeshToGltfViewModel(string name, string tooltip, Symbol icon) : base(name, tooltip, icon)
         {
-            this.OnSelectSimpleSkinCommand = ReactiveCommand.CreateFromTask(LoadSimpleSkinAsync);
-            this.OnSelectSkeletonCommand = ReactiveCommand.CreateFromTask(LoadSkeletonAsync);
-            this.OnAddAnimationsCommand = ReactiveCommand.CreateFromTask(AddAnimationsAsync);
-            this.OnExportGltfCommand = ReactiveCommand.CreateFromTask<string>(ExportGltfAsync);
+            Guard.IsNotNullOrEmpty(name, nameof(name));
+            Guard.IsNotNullOrEmpty(tooltip, nameof(tooltip));
 
-            this.OnRemoveSelectedAnimationsCommand = ReactiveCommand.Create<IList>(RemoveSelectedAnimations);
+            this.LoadSimpleSkinCommand = ReactiveCommand.CreateFromTask(LoadSimpleSkinAsync);
+            this.LoadSkeletonCommand = ReactiveCommand.CreateFromTask(LoadSkeletonAsync);
+            this.AddAnimationsCommand = ReactiveCommand.CreateFromTask(AddAnimationsAsync);
+            this.ExportGltfCommand = ReactiveCommand.CreateFromObservable<string, Unit>(
+                ExportGltfAsync,
+                outputScheduler: RxApp.MainThreadScheduler
+            );
 
-            this.ShowLoadSimpleSkinDialog = new();
-            this.ShowLoadSkeletonDialog = new();
+            this.RemoveSelectedAnimationsCommand = ReactiveCommand.Create<IList>(RemoveSelectedAnimations);
+
+            this.ShowSelectSimpleSkinDialog = new();
+            this.ShowSelectSkeletonDialog = new();
             this.ShowAddAnimationsDialog = new();
-            this.ShowExportGltfDialog = new();
+            this.ShowSelectSavedGltfDialog = new();
+            this.ShowSaveGltfDialog = new();
 
             this.WhenActivated(disposables =>
             {
-                this._skinnedMesh = this.WhenAnyValue(x => x.SimpleSkinPath)
-                    .Select(
-                        x =>
-                            x switch
-                            {
-                                null => null,
-                                string simpleSkinPath => SkinnedMesh.ReadFromSimpleSkin(simpleSkinPath)
-                            }
-                    )
-                    .ToProperty(this, nameof(this.SkinnedMesh))
+                this._simpleSkin = this.LoadSimpleSkinCommand
+                    .WhereNotNull()
+                    .ToProperty(this, nameof(this.SimpleSkin), scheduler: RxApp.MainThreadScheduler)
                     .DisposeWith(disposables);
 
-                this._skeleton = this.WhenAnyValue(x => x.SkeletonPath)
-                    .Select(
-                        x =>
-                            x switch
-                            {
-                                null => null,
-                                string skeletonPath => new Skeleton(skeletonPath)
-                            }
-                    )
-                    .ToProperty(this, nameof(this.Skeleton))
+                this._skeleton = this.LoadSkeletonCommand
+                    .WhereNotNull()
+                    .ToProperty(this, nameof(this.Skeleton), scheduler: RxApp.MainThreadScheduler)
                     .DisposeWith(disposables);
 
-                this.WhenValueChanged(x => x.SkinnedMesh)
-                    .Subscribe(skinnedMesh =>
-                    {
-                        // Reset mesh primitives, skeleton and animations when mesh is changed
-                        this.SkeletonPath = null;
-                        this.SkinnedMeshPrimitives.Clear();
-                        this.Animations.Clear();
-
-                        if (skinnedMesh is null)
-                            return;
-
-                        // If skinnedMesh is not null we create primitives datagrid items and enable conversion
-                        this.SkinnedMeshPrimitives.AddRange(
-                            skinnedMesh.Ranges.Select(
-                                range =>
-                                    new SkinnedMeshPrimitiveViewModel()
-                                    {
-                                        Material = range.Material,
-                                        VertexCount = range.VertexCount,
-                                        FaceCount = range.IndexCount / 3
-                                    }
-                            )
-                        );
-                    })
-                    .DisposeWith(disposables);
+                this.LoadSimpleSkinCommand.ThrownExceptions.Subscribe(ex => this.Log().Error(ex));
+                this.LoadSkeletonCommand.ThrownExceptions.Subscribe(ex => this.Log().Error(ex));
+                this.AddAnimationsCommand.ThrownExceptions.Subscribe(ex => this.Log().Error(ex));
+                this.ExportGltfCommand.ThrownExceptions.Subscribe(ex => this.Log().Error(ex));
+                this.RemoveSelectedAnimationsCommand.ThrownExceptions.Subscribe(ex => this.Log().Error(ex));
             });
         }
 
-        private async Task LoadSimpleSkinAsync()
+        private async Task<SkinnedMesh> LoadSimpleSkinAsync()
         {
-            string path = await this.ShowLoadSimpleSkinDialog.Handle(new());
+            string path = await this.ShowSelectSimpleSkinDialog.Handle(new());
 
-            if (path is not null)
-                this.SimpleSkinPath = path;
+            if (string.IsNullOrEmpty(path))
+                return null;
+
+            this.SimpleSkinPath = path;
+
+            SkinnedMesh simpleSkin = SkinnedMesh.ReadFromSimpleSkin(path);
+
+            // Reset mesh primitives, skeleton and animations when mesh gets loaded
+            this.SkeletonPath = null;
+            this.SkinnedMeshPrimitives.Clear();
+            this.Animations.Clear();
+
+            this.SkinnedMeshPrimitives.AddRange(
+                simpleSkin.Ranges.Select(
+                    range =>
+                        new SkinnedMeshPrimitiveViewModel()
+                        {
+                            Material = range.Material,
+                            VertexCount = range.VertexCount,
+                            FaceCount = range.IndexCount / 3
+                        }
+                )
+            );
+
+            return simpleSkin;
         }
 
-        private async Task LoadSkeletonAsync()
+        private async Task<Skeleton> LoadSkeletonAsync()
         {
-            string path = await this.ShowLoadSkeletonDialog.Handle(new());
+            string path = await this.ShowSelectSkeletonDialog.Handle(new());
 
-            if (path is not null)
-                this.SkeletonPath = path;
+            if (string.IsNullOrEmpty(path))
+                return null;
+
+            this.SkeletonPath = path;
+
+            return new(path);
         }
 
         private async Task AddAnimationsAsync()
@@ -170,64 +176,29 @@ namespace lol2gltf.ViewModels
 
         private void RemoveSelectedAnimations(IList selectedItems)
         {
+            if (selectedItems is null)
+                return;
+
             List<AnimationViewModel> selectedAnimations = new(selectedItems.Cast<AnimationViewModel>());
 
             this.Animations.RemoveMany(selectedAnimations);
         }
 
-        private async Task ExportGltfAsync(string extension)
+        public IObservable<Unit> ExportGltfAsync(string extension)
         {
-            if (extension is not "glb" and not "gltf")
-                throw new ArgumentException($"Invalid extension: {extension}", nameof(extension));
-
-            string path = await this.ShowExportGltfDialog.Handle(extension);
-            if (string.IsNullOrEmpty(path))
-                return; // User canceled
-
-            Dictionary<string, ReadOnlyMemory<byte>> materialTextures = await CreateMaterialTexturesAsync(
-                this.SkinnedMeshPrimitives
-            );
-            List<(string name, LeagueAnimation animation)> animations =
-                new(
-                    this.Animations
-                        .Select(animation => (animation.Name, animation.Animation))
-                        .DistinctBy(animation => animation.Name)
-                );
-
-            ModelRoot gltfAsset = this.Skeleton switch
+            return Observable.StartAsync(async _ =>
             {
-                null => this.SkinnedMesh.ToGltf(materialTextures),
-                Skeleton skeleton => this.SkinnedMesh.ToGltf(skeleton, materialTextures, animations)
-            };
+                Guard.IsNotNullOrEmpty(extension, nameof(extension));
 
-            gltfAsset.Save(path);
-        }
+                if (extension is not "glb" and not "gltf")
+                    throw new ArgumentException($"Invalid extension: {extension}", nameof(extension));
 
-        private static async Task<Dictionary<string, ReadOnlyMemory<byte>>> CreateMaterialTexturesAsync(
-            IEnumerable<SkinnedMeshPrimitiveViewModel> primitives
-        )
-        {
-            Dictionary<string, ReadOnlyMemory<byte>> materialTextures = new();
+                string path = await this.ShowSelectSavedGltfDialog.Handle(extension);
+                if (string.IsNullOrEmpty(path))
+                    return;
 
-            IEnumerable<SkinnedMeshPrimitiveViewModel> texturedPrimitives = primitives.Where(
-                x => string.IsNullOrEmpty(x.TexturePath) is false
-            );
-            foreach (SkinnedMeshPrimitiveViewModel primitive in texturedPrimitives)
-            {
-                using ImageSharpTexture texture = ImageSharpTexture.Load(primitive.TexturePath);
-
-                if (texture is FlatTexture flatTexture)
-                {
-                    using MemoryStream imageStream = new();
-                    using ImageSharpImage img = flatTexture.MipMaps[0].GetImage();
-
-                    await img.SaveAsPngAsync(imageStream);
-
-                    materialTextures.Add(primitive.Material, imageStream.ToArray());
-                }
-            }
-
-            return materialTextures;
+                await this.ShowSaveGltfDialog.Handle(path);
+            });
         }
     }
 

@@ -39,7 +39,7 @@ namespace lol2gltf.Views
                         ShowSelectExportedGltfDialogAsync
                     )
                     .DisposeWith(disposables);
-                this.BindInteraction(this.ViewModel, vm => vm.ShowExportGltfDialog, ShowExportGltfDialogAsync)
+                this.BindInteraction(this.ViewModel, vm => vm.ShowSaveGltfDialog, ShowSaveGltfDialogAsync)
                     .DisposeWith(disposables);
 
                 this.BindCommand(
@@ -96,7 +96,7 @@ namespace lol2gltf.Views
             SaveFileDialog dialog =
                 new()
                 {
-                    DefaultExtension = interaction.Input,
+                    DefaultExtension = extension,
                     Filters = new()
                     {
                         new()
@@ -114,17 +114,17 @@ namespace lol2gltf.Views
             interaction.SetOutput(file);
         }
 
-        private IObservable<Unit> ShowExportGltfDialogAsync(InteractionContext<string, Unit> interaction)
+        private IObservable<Unit> ShowSaveGltfDialogAsync(InteractionContext<string, Unit> interaction)
         {
             return Observable
                 .Start(() => interaction.Input, RxApp.MainThreadScheduler)
                 .SelectMany(path =>
                 {
-                    TaskDialogProgressState progressState =
-                        TaskDialogProgressState.Normal | TaskDialogProgressState.Indeterminate;
-
                     if (string.IsNullOrEmpty(path))
                         ThrowHelper.ThrowInvalidOperationException($"{nameof(path)} must be set");
+
+                    TaskDialogProgressState progressState =
+                        TaskDialogProgressState.Normal | TaskDialogProgressState.Indeterminate;
 
                     MapGeometry mapGeometry = this.ViewModel.MapGeometry;
                     TaskDialog dialog =

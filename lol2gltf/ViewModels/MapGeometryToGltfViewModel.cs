@@ -32,6 +32,20 @@ namespace lol2gltf.ViewModels
         [Reactive]
         public string GameDataPath { get; set; }
 
+        [Reactive]
+        public MapGeometryGltfTextureQuality SelectedTextureQuality { get; set; } = MapGeometryGltfTextureQuality.Low;
+        public IReadOnlyList<MapGeometryGltfTextureQuality> TextureQualities { get; } =
+            Enum.GetValues<MapGeometryGltfTextureQuality>();
+
+        [Reactive]
+        public MapGeometryGltfLayerGroupingPolicy SelectedLayerGroupingPolicy { get; set; } =
+            MapGeometryGltfLayerGroupingPolicy.Default;
+        public IReadOnlyList<MapGeometryGltfLayerGroupingPolicy> LayerGroupingPolicies { get; } =
+            Enum.GetValues<MapGeometryGltfLayerGroupingPolicy>();
+
+        [Reactive]
+        public bool FlipAcrossX { get; set; } = true;
+
         public MapGeometry MapGeometry => this._mapGeometry?.Value;
         private ObservableAsPropertyHelper<MapGeometry> _mapGeometry;
 

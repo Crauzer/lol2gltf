@@ -19,63 +19,86 @@
     </ExperimentalAcrylicBorder>
     <Grid RowDefinitions="*, Auto" ColumnDefinitions="*">
       <ScrollViewer>
-        <Grid RowDefinitions="Auto" ColumnDefinitions="*">
-          <Border Padding="24">
-            <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*">
-              <!-- Select Map Geometry -->
-              <Grid Grid.Row="0" Grid.Column="0"
-                    RowDefinitions="Auto, *" ColumnDefinitions="*, Auto">
-                <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
-                  Map Geometry:
-                </Label>
-                <TextBox Grid.Row="1" Grid.Column="0"
-                         IsReadOnly="True"
-                         Text="{Binding MapGeometryPath}"/>
-                <Button Name="LoadMapGeometryButton"
-                        Grid.Row="1" Grid.Column="1" Margin="16 0 0 0"
-                        Classes="accent">
-                  <i:Icon Value="fa-solid fa-file-import" FontSize="16"/>
-                </Button>
-              </Grid>
-
-              <!-- Select Materials Bin -->
-              <Grid Grid.Row="1" Grid.Column="0"
-                    Margin="0 16 0 0"
-                    RowDefinitions="Auto, *" ColumnDefinitions="*, Auto">
-                <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
-                  Materials Bin:
-                </Label>
-                <TextBox Grid.Row="1" Grid.Column="0"
-                         IsReadOnly="True"
-                         Text="{Binding MaterialsBinPath}"/>
-                <Button Name="LoadMaterialsBinButton"
-                        Grid.Row="1" Grid.Column="1" Margin="16 0 0 0"
-                        Classes="accent"
-                        IsEnabled="{Binding MapGeometryPath, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-                  <i:Icon Value="fa-solid fa-file-import" FontSize="16"/>
-                </Button>
-              </Grid>
-
-              <!-- Select Game Data -->
-              <Grid Grid.Row="2" Grid.Column="0"
-                    Margin="0 16 0 0"
-                    RowDefinitions="Auto, *" ColumnDefinitions="*, Auto">
-                <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
-                  Game Data:
-                </Label>
-                <TextBox Grid.Row="1" Grid.Column="0"
-                         IsReadOnly="True"
-                         Text="{Binding GameDataPath}"/>
-                <Button Name="SelectGameDataPathButton"
-                        Grid.Row="1" Grid.Column="1" Margin="16 0 0 0"
-                        Classes="accent"
-                        IsEnabled="{Binding MaterialsBinPath, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-                  <i:Icon Value="fa-regular fa-folder-open" FontSize="16"/>
-                </Button>
-              </Grid>
+        <Border Padding="24">
+          <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="*">
+            <!-- Select Map Geometry -->
+            <Grid Grid.Row="0" Grid.Column="0"
+                  RowDefinitions="Auto, *" ColumnDefinitions="*, Auto">
+              <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
+                Map Geometry:
+              </Label>
+              <TextBox Grid.Row="1" Grid.Column="0"
+                       IsReadOnly="True"
+                       Text="{Binding MapGeometryPath}"/>
+              <Button Name="LoadMapGeometryButton"
+                      Grid.Row="1" Grid.Column="1" Margin="16 0 0 0"
+                      Classes="accent">
+                <i:Icon Value="fa-solid fa-file-import" FontSize="16"/>
+              </Button>
             </Grid>
-          </Border>
-        </Grid>
+
+            <!-- Select Materials Bin -->
+            <Grid Grid.Row="1" Grid.Column="0"
+                  Margin="0 16 0 0"
+                  RowDefinitions="Auto, *" ColumnDefinitions="*, Auto"
+                  IsEnabled="{Binding MapGeometryPath, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+              <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
+                Materials Bin:
+              </Label>
+              <TextBox Grid.Row="1" Grid.Column="0"
+                       IsReadOnly="True"
+                       Text="{Binding MaterialsBinPath}"/>
+              <Button Name="LoadMaterialsBinButton"
+                      Grid.Row="1" Grid.Column="1" Margin="16 0 0 0"
+                      Classes="accent">
+                <i:Icon Value="fa-solid fa-file-import" FontSize="16"/>
+              </Button>
+            </Grid>
+
+            <!-- Select Game Data -->
+            <Grid Grid.Row="2" Grid.Column="0"
+                  Margin="0 16 0 0"
+                  RowDefinitions="Auto, *" ColumnDefinitions="*, Auto"
+                  IsEnabled="{Binding MaterialsBinPath, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+              <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
+                Game Data:
+              </Label>
+              <TextBox Grid.Row="1" Grid.Column="0"
+                       IsReadOnly="True"
+                       Text="{Binding GameDataPath}"/>
+              <Button Name="SelectGameDataPathButton"
+                      Grid.Row="1" Grid.Column="1" Margin="16 0 0 0"
+                      Classes="accent">
+                <i:Icon Value="fa-regular fa-folder-open" FontSize="16"/>
+              </Button>
+            </Grid>
+
+            <!-- Settings -->
+            <Grid Grid.Row="3" Grid.Column="0"
+                  Margin="0 16 0 0"
+                  RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="Auto">
+              <StackPanel Grid.Row="0" Grid.Column="0"
+                          Orientation="Horizontal">
+                <Label>Texture Quality:</Label>
+                <ui:ComboBox MinWidth="120" Margin="8 0 0 0"
+                             SelectedItem="{Binding SelectedTextureQuality}" Items="{Binding TextureQualities}"/>
+              </StackPanel>
+              <StackPanel Grid.Row="1" Grid.Column="0"
+                          Orientation="Horizontal"
+                          Margin="0 8 0 0">
+                <Label>Visibility Grouping Policy:</Label>
+                <ui:ComboBox MinWidth="120"
+                             Margin="8 0 0 0"
+                             SelectedItem="{Binding SelectedLayerGroupingPolicy}" Items="{Binding LayerGroupingPolicies}"/>
+              </StackPanel>
+              <CheckBox Grid.Row="2" Grid.Column="0"
+                        Margin="0 8 0 0"
+                        IsChecked="{Binding FlipAcrossX}">
+                Flip X
+              </CheckBox>
+            </Grid>
+          </Grid>
+        </Border>
       </ScrollViewer>
       <Border Grid.Row="1" Grid.Column="0" Padding="8">
         <DockPanel VerticalAlignment="Bottom" HorizontalAlignment="Right">

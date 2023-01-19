@@ -187,10 +187,20 @@ namespace lol2gltf.Views
 
                     MapGeometry mapGeometry = this.ViewModel.MapGeometry;
                     BinTree materialsBin = this.ViewModel.MaterialsBin;
-                    string gameDataPath = this.ViewModel.GameDataPath;
-                    MetaEnvironment metaEnvironment = MetaEnvironment.Create(
-                        Assembly.Load("LeagueToolkit.Meta.Classes").GetExportedTypes().Where(x => x.IsClass)
-                    );
+
+                    MapGeometryGltfConversionContext conversionContext =
+                        new(
+                            MetaEnvironment.Create(
+                                Assembly.Load("LeagueToolkit.Meta.Classes").GetExportedTypes().Where(x => x.IsClass)
+                            ),
+                            new()
+                            {
+                                FlipAcrossX = this.ViewModel.FlipAcrossX,
+                                GameDataPath = this.ViewModel.GameDataPath,
+                                LayerGroupingPolicy = this.ViewModel.SelectedLayerGroupingPolicy,
+                                TextureQuality = this.ViewModel.SelectedTextureQuality
+                            }
+                        );
 
                     TaskDialog dialog =
                         new()
@@ -214,19 +224,7 @@ namespace lol2gltf.Views
                                 dialog.Content = "Converting to glTF...";
                             });
 
-                            ModelRoot gltfAsset = mapGeometry.ToGltf(
-                                materialsBin,
-                                new(
-                                    metaEnvironment,
-                                    new()
-                                    {
-                                        FlipAcrossX = true,
-                                        GameDataPath = gameDataPath,
-                                        LayerGroupingPolicy = MapGeometryGltfLayerGroupingPolicy.Default,
-                                        TextureQuality = MapGeometryGltfTextureQuality.Low
-                                    }
-                                )
-                            );
+                            ModelRoot gltfAsset = mapGeometry.ToGltf(materialsBin, conversionContext);
 
                             // Save glTF asset
                             RxApp.MainThreadScheduler.Schedule(() =>

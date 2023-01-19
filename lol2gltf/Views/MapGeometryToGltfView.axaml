@@ -21,8 +21,10 @@
       <ScrollViewer>
         <Grid RowDefinitions="Auto" ColumnDefinitions="*">
           <Border Padding="24">
-            <Grid RowDefinitions="*" ColumnDefinitions="*, Auto">
-              <Grid RowDefinitions="Auto, *" ColumnDefinitions="*, Auto">
+            <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*">
+              <!-- Select Map Geometry -->
+              <Grid Grid.Row="0" Grid.Column="0"
+                    RowDefinitions="Auto, *" ColumnDefinitions="*, Auto">
                 <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
                   Map Geometry:
                 </Label>
@@ -35,6 +37,42 @@
                   <i:Icon Value="fa-solid fa-file-import" FontSize="16"/>
                 </Button>
               </Grid>
+
+              <!-- Select Materials Bin -->
+              <Grid Grid.Row="1" Grid.Column="0"
+                    Margin="0 16 0 0"
+                    RowDefinitions="Auto, *" ColumnDefinitions="*, Auto">
+                <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
+                  Materials Bin:
+                </Label>
+                <TextBox Grid.Row="1" Grid.Column="0"
+                         IsReadOnly="True"
+                         Text="{Binding MaterialsBinPath}"/>
+                <Button Name="LoadMaterialsBinButton"
+                        Grid.Row="1" Grid.Column="1" Margin="16 0 0 0"
+                        Classes="accent"
+                        IsEnabled="{Binding MapGeometryPath, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                  <i:Icon Value="fa-solid fa-file-import" FontSize="16"/>
+                </Button>
+              </Grid>
+
+              <!-- Select Game Data -->
+              <Grid Grid.Row="2" Grid.Column="0"
+                    Margin="0 16 0 0"
+                    RowDefinitions="Auto, *" ColumnDefinitions="*, Auto">
+                <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
+                  Game Data:
+                </Label>
+                <TextBox Grid.Row="1" Grid.Column="0"
+                         IsReadOnly="True"
+                         Text="{Binding GameDataPath}"/>
+                <Button Name="SelectGameDataPathButton"
+                        Grid.Row="1" Grid.Column="1" Margin="16 0 0 0"
+                        Classes="accent"
+                        IsEnabled="{Binding MaterialsBinPath, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                  <i:Icon Value="fa-regular fa-folder-open" FontSize="16"/>
+                </Button>
+              </Grid>
             </Grid>
           </Border>
         </Grid>
@@ -42,8 +80,15 @@
       <Border Grid.Row="1" Grid.Column="0" Padding="8">
         <DockPanel VerticalAlignment="Bottom" HorizontalAlignment="Right">
           <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+            <StackPanel.IsEnabled>
+              <MultiBinding Converter="{x:Static BoolConverters.And}">
+                <Binding Path="MapGeometryPath" Converter="{x:Static StringConverters.IsNotNullOrEmpty}"/>
+                <Binding Path="MaterialsBinPath" Converter="{x:Static StringConverters.IsNotNullOrEmpty}"/>
+                <Binding Path="GameDataPath" Converter="{x:Static StringConverters.IsNotNullOrEmpty}"/>
+              </MultiBinding>
+            </StackPanel.IsEnabled>
+            
             <Button Name="ExportGlbButton"
-                    IsEnabled="{Binding MapGeometryPath, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                     CommandParameter="glb"
                     Classes="accent">
               <StackPanel Orientation="Horizontal">
@@ -51,9 +96,9 @@
                 <TextBlock Margin="4 0 0 0">Export to GLB</TextBlock>
               </StackPanel>
             </Button>
+            
             <Button Name="ExportGltfButton"
                     Margin="8 0 0 0"
-                    IsEnabled="{Binding MapGeometryPath, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                     CommandParameter="gltf"
                     Classes="accent">
               <StackPanel Orientation="Horizontal">

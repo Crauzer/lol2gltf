@@ -10,7 +10,6 @@
     <Version>3.0.0-beta.2</Version>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="Models\" />
     <AvaloniaResource Include="Assets\**" />
     <Folder Include="Services\" />
   </ItemGroup>

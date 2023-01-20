@@ -31,9 +31,12 @@ namespace lol2gltf.Views
             this.WhenActivated(disposables =>
             {
                 // Bind Commands
-                this.BindCommand(this.ViewModel, vm => vm.SelectMapGeometryPathCommand, v => v.LoadMapGeometryButton);
-                this.BindCommand(this.ViewModel, vm => vm.SelectMaterialsBinPathCommand, v => v.LoadMaterialsBinButton);
-                this.BindCommand(this.ViewModel, vm => vm.SelectGameDataPathCommand, v => v.SelectGameDataPathButton);
+                this.BindCommand(this.ViewModel, vm => vm.SelectMapGeometryPathCommand, v => v.LoadMapGeometryButton)
+                    .DisposeWith(disposables);
+                this.BindCommand(this.ViewModel, vm => vm.SelectMaterialsBinPathCommand, v => v.LoadMaterialsBinButton)
+                    .DisposeWith(disposables);
+                this.BindCommand(this.ViewModel, vm => vm.SelectGameDataPathCommand, v => v.SelectGameDataPathButton)
+                    .DisposeWith(disposables);
                 this.BindCommand(
                         this.ViewModel,
                         vm => vm.ExportGltfCommand,

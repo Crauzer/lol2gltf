@@ -4,17 +4,12 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Mixins;
 using CommunityToolkit.Diagnostics;
 using DynamicData;
-using DynamicData.Binding;
 using FluentAvalonia.UI.Controls;
 using LeagueToolkit.Core.Mesh;
-using LeagueToolkit.IO.SimpleSkinFile;
 using LeagueToolkit.IO.SkeletonFile;
 using lol2gltf.Models;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using SharpGLTF.Schema2;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Textures.TextureFormats;
 using Splat;
 using System;
 using System.Collections;
@@ -25,8 +20,6 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using ImageSharpImage = SixLabors.ImageSharp.Image;
-using ImageSharpTexture = SixLabors.ImageSharp.Textures.Texture;
 using LeagueAnimation = LeagueToolkit.IO.AnimationFile.Animation;
 
 namespace lol2gltf.ViewModels

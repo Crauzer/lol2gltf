@@ -2,31 +2,31 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.ReactiveUI;
+using BCnEncoder.Shared;
+using CommunityToolkit.Diagnostics;
+using CommunityToolkit.HighPerformance;
+using FluentAvalonia.UI.Controls;
 using LeagueToolkit.Core.Mesh;
+using LeagueToolkit.IO.MapGeometryFile;
+using LeagueToolkit.IO.SimpleSkinFile;
 using LeagueToolkit.IO.SkeletonFile;
+using LeagueToolkit.Toolkit;
 using lol2gltf.ViewModels;
 using ReactiveUI;
 using SharpGLTF.Schema2;
-using System.Collections.Generic;
+using SixLabors.ImageSharp;
 using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using SixLabors.ImageSharp.Textures.TextureFormats;
-using System.IO;
 using ImageSharpImage = SixLabors.ImageSharp.Image;
-using ImageSharpTexture = SixLabors.ImageSharp.Textures.Texture;
 using LeagueAnimation = LeagueToolkit.IO.AnimationFile.Animation;
-using CommunityToolkit.Diagnostics;
-using FluentAvalonia.UI.Controls;
-using SixLabors.ImageSharp;
-using Avalonia.Controls.Shapes;
-using LeagueToolkit.IO.SimpleSkinFile;
-using LeagueToolkit.IO.MapGeometryFile;
-using System.Reactive.Concurrency;
+using LeagueTexture = LeagueToolkit.Core.Renderer.Texture;
 
 namespace lol2gltf.Views
 {
@@ -264,17 +264,16 @@ namespace lol2gltf.Views
             );
             foreach (SkinnedMeshPrimitiveViewModel primitive in texturedPrimitives)
             {
-                using ImageSharpTexture texture = ImageSharpTexture.Load(primitive.TexturePath);
+                using FileStream textureFileStream = File.OpenRead(primitive.TexturePath);
+                LeagueTexture texture = LeagueTexture.Load(textureFileStream);
 
-                if (texture is FlatTexture flatTexture)
-                {
-                    using MemoryStream imageStream = new();
-                    using ImageSharpImage img = flatTexture.MipMaps[0].GetImage();
+                ReadOnlyMemory2D<ColorRgba32> mipMap = texture.Mips[0];
+                using ImageSharpImage image = mipMap.ToImage();
 
-                    await img.SaveAsPngAsync(imageStream);
+                using MemoryStream imageStream = new();
+                await image.SaveAsPngAsync(imageStream);
 
-                    materialTextures.Add(primitive.Material, imageStream.ToArray());
-                }
+                materialTextures.Add(primitive.Material, imageStream.ToArray());
             }
 
             return materialTextures;

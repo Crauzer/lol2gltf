@@ -6,7 +6,7 @@
              xmlns:uip="using:FluentAvalonia.UI.Controls.Primitives"
              xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
              xmlns:vm="using:lol2gltf.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
              x:Class="lol2gltf.Views.SkinnedMeshToGltfView">
   <Design.DataContext>
     <vm:SkinnedMeshToGltfViewModel/>
@@ -21,7 +21,14 @@
       <ScrollViewer>
         <Grid Grid.Row="0" Grid.Column="0" ColumnDefinitions="*" RowDefinitions="Auto,Auto,Auto,Auto">
           <Border Padding="24">
-            <StackPanel>
+            <StackPanel Orientation="Vertical">
+              <!-- Error Bar -->
+              <ui:InfoBar IsOpen="{Binding LocalError, Converter={x:Static ObjectConverters.IsNotNull}}"
+                          IsVisible="{Binding LocalError, Converter={x:Static ObjectConverters.IsNotNull}}"
+                          CloseButtonCommand="{Binding CloseErrorCommand}"
+                          Severity="Error" IsClosable="True" IsIconVisible="True"
+                          Title="{Binding LocalError.Title}" Message="{Binding LocalError.Message}"
+                          Margin="0 0 0 16"/>
               <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Vertical">
                 <Label>Simple Skin:</Label>
                 <Grid ColumnDefinitions="*, Auto">

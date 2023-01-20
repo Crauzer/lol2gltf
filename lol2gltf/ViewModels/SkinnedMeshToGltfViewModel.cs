@@ -9,6 +9,7 @@ using FluentAvalonia.UI.Controls;
 using LeagueToolkit.Core.Mesh;
 using LeagueToolkit.IO.SimpleSkinFile;
 using LeagueToolkit.IO.SkeletonFile;
+using lol2gltf.Models;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using SharpGLTF.Schema2;
@@ -35,13 +36,13 @@ namespace lol2gltf.ViewModels
         public ViewModelActivator Activator { get; } = new();
 
         [Reactive]
+        public Error LocalError { get; set; }
+
+        [Reactive]
         public string SimpleSkinPath { get; set; }
 
         [Reactive]
         public string SkeletonPath { get; set; }
-
-        public SkinnedMesh SimpleSkin => this._simpleSkin?.Value;
-        public Skeleton Skeleton => this._skeleton?.Value;
 
         [Reactive]
         public ObservableCollection<SkinnedMeshPrimitiveViewModel> SkinnedMeshPrimitives { get; set; } = new();
@@ -49,15 +50,24 @@ namespace lol2gltf.ViewModels
         [Reactive]
         public ObservableCollection<AnimationViewModel> Animations { get; set; } = new();
 
+        public SkinnedMesh SimpleSkin => this._simpleSkin?.Value;
         private ObservableAsPropertyHelper<SkinnedMesh> _simpleSkin;
+
+        public Skeleton Skeleton => this._skeleton?.Value;
         private ObservableAsPropertyHelper<Skeleton> _skeleton;
 
-        public ReactiveCommand<Unit, SkinnedMesh> LoadSimpleSkinCommand { get; }
-        public ReactiveCommand<Unit, Skeleton> LoadSkeletonCommand { get; }
-        public ReactiveCommand<Unit, Unit> AddAnimationsCommand { get; }
-        public ReactiveCommand<string, Unit> ExportGltfCommand { get; }
+        public ReactiveCommand<Unit, Unit> CloseErrorCommand { get; }
 
+        public ReactiveCommand<Unit, string> SelectSimpleSkinPathCommand { get; }
+        public ReactiveCommand<Unit, string> SelectSkeletonPathCommand { get; }
+
+        public ReactiveCommand<string, SkinnedMesh> LoadSimpleSkinCommand { get; }
+        public ReactiveCommand<string, Skeleton> LoadSkeletonCommand { get; }
+
+        public ReactiveCommand<Unit, Unit> AddAnimationsCommand { get; }
         public ReactiveCommand<IList, Unit> RemoveSelectedAnimationsCommand { get; }
+
+        public ReactiveCommand<string, Unit> ExportGltfCommand { get; }
 
         public Interaction<Unit, string> ShowSelectSimpleSkinDialog { get; }
         public Interaction<Unit, string> ShowSelectSkeletonDialog { get; }
@@ -76,15 +86,24 @@ namespace lol2gltf.ViewModels
             Guard.IsNotNullOrEmpty(name, nameof(name));
             Guard.IsNotNullOrEmpty(tooltip, nameof(tooltip));
 
-            this.LoadSimpleSkinCommand = ReactiveCommand.CreateFromTask(LoadSimpleSkinAsync);
-            this.LoadSkeletonCommand = ReactiveCommand.CreateFromTask(LoadSkeletonAsync);
+            this.CloseErrorCommand = ReactiveCommand.Create(() =>
+            {
+                this.LocalError = null;
+            });
+
+            this.SelectSimpleSkinPathCommand = ReactiveCommand.CreateFromTask(SelectSimpleSkinPathAsync);
+            this.SelectSkeletonPathCommand = ReactiveCommand.CreateFromTask(SelectSkeletonPathAsync);
+
+            this.LoadSimpleSkinCommand = ReactiveCommand.Create<string, SkinnedMesh>(LoadSimpleSkin);
+            this.LoadSkeletonCommand = ReactiveCommand.Create<string, Skeleton>(LoadSkeleton);
+
             this.AddAnimationsCommand = ReactiveCommand.CreateFromTask(AddAnimationsAsync);
+            this.RemoveSelectedAnimationsCommand = ReactiveCommand.Create<IList>(RemoveSelectedAnimations);
+
             this.ExportGltfCommand = ReactiveCommand.CreateFromObservable<string, Unit>(
                 ExportGltfAsync,
                 outputScheduler: RxApp.MainThreadScheduler
             );
-
-            this.RemoveSelectedAnimationsCommand = ReactiveCommand.Create<IList>(RemoveSelectedAnimations);
 
             this.ShowSelectSimpleSkinDialog = new();
             this.ShowSelectSkeletonDialog = new();
@@ -94,71 +113,125 @@ namespace lol2gltf.ViewModels
 
             this.WhenActivated(disposables =>
             {
+                // Handle path selection
+                this.SelectSimpleSkinPathCommand.WhereNotNull().Subscribe(x => this.SimpleSkinPath = x);
+                this.SelectSkeletonPathCommand.WhereNotNull().Subscribe(x => this.SkeletonPath = x);
+
+                // Handle loading
                 this._simpleSkin = this.LoadSimpleSkinCommand
-                    .WhereNotNull()
-                    .ToProperty(this, nameof(this.SimpleSkin), scheduler: RxApp.MainThreadScheduler)
+                    .ToProperty(this, nameof(this.SimpleSkin))
                     .DisposeWith(disposables);
-
                 this._skeleton = this.LoadSkeletonCommand
-                    .WhereNotNull()
-                    .ToProperty(this, nameof(this.Skeleton), scheduler: RxApp.MainThreadScheduler)
+                    .ToProperty(this, nameof(this.Skeleton))
                     .DisposeWith(disposables);
 
-                this.LoadSimpleSkinCommand.ThrownExceptions.Subscribe(ex => this.Log().Error(ex));
-                this.LoadSkeletonCommand.ThrownExceptions.Subscribe(ex => this.Log().Error(ex));
-                this.AddAnimationsCommand.ThrownExceptions.Subscribe(ex => this.Log().Error(ex));
-                this.ExportGltfCommand.ThrownExceptions.Subscribe(ex => this.Log().Error(ex));
-                this.RemoveSelectedAnimationsCommand.ThrownExceptions.Subscribe(ex => this.Log().Error(ex));
+                // When paths change, re-load files
+                this.WhenAnyValue(x => x.SimpleSkinPath).InvokeCommand(LoadSimpleSkinCommand);
+                this.WhenAnyValue(x => x.SkeletonPath).InvokeCommand(LoadSkeletonCommand);
+
+                // Handle simple skin dependencies
+                this.WhenAnyValue(x => x.SimpleSkin)
+                    .Subscribe(simpleSkin =>
+                    {
+                        // Reset mesh primitives, skeleton and animations when mesh gets loaded
+                        this.SkeletonPath = null;
+                        this.SkinnedMeshPrimitives.Clear();
+                        this.Animations.Clear();
+
+                        if (simpleSkin is null)
+                            return;
+
+                        this.SkinnedMeshPrimitives.AddRange(
+                            simpleSkin.Ranges.Select(
+                                range =>
+                                    new SkinnedMeshPrimitiveViewModel()
+                                    {
+                                        Material = range.Material,
+                                        VertexCount = range.VertexCount,
+                                        FaceCount = range.IndexCount / 3
+                                    }
+                            )
+                        );
+                    });
+
+                this.LoadSimpleSkinCommand.ThrownExceptions.Subscribe(ex =>
+                {
+                    this.SimpleSkinPath = null;
+                    this.LocalError = Error.FromException(ex);
+                    this.Log().Error(ex);
+                });
+                this.LoadSkeletonCommand.ThrownExceptions.Subscribe(ex =>
+                {
+                    this.SkeletonPath = null;
+                    this.LocalError = Error.FromException(ex);
+                    this.Log().Error(ex);
+                });
+                this.AddAnimationsCommand.ThrownExceptions.Subscribe(ex =>
+                {
+                    this.LocalError = Error.FromException(ex);
+                    this.Log().Error(ex);
+                });
+                this.ExportGltfCommand.ThrownExceptions.Subscribe(ex =>
+                {
+                    this.LocalError = Error.FromException(ex);
+                    this.Log().Error(ex);
+                });
             });
         }
 
-        private async Task<SkinnedMesh> LoadSimpleSkinAsync()
+        private async Task<string> SelectSimpleSkinPathAsync()
         {
             string path = await this.ShowSelectSimpleSkinDialog.Handle(new());
 
-            if (string.IsNullOrEmpty(path))
-                return null;
-
-            this.SimpleSkinPath = path;
-
-            SkinnedMesh simpleSkin = SkinnedMesh.ReadFromSimpleSkin(path);
-
-            // Reset mesh primitives, skeleton and animations when mesh gets loaded
-            this.SkeletonPath = null;
-            this.SkinnedMeshPrimitives.Clear();
-            this.Animations.Clear();
-
-            this.SkinnedMeshPrimitives.AddRange(
-                simpleSkin.Ranges.Select(
-                    range =>
-                        new SkinnedMeshPrimitiveViewModel()
-                        {
-                            Material = range.Material,
-                            VertexCount = range.VertexCount,
-                            FaceCount = range.IndexCount / 3
-                        }
-                )
-            );
-
-            return simpleSkin;
+            return path;
         }
 
-        private async Task<Skeleton> LoadSkeletonAsync()
+        private async Task<string> SelectSkeletonPathAsync()
         {
             string path = await this.ShowSelectSkeletonDialog.Handle(new());
 
+            return path;
+        }
+
+        private SkinnedMesh LoadSimpleSkin(string path)
+        {
+            this.LocalError = null;
+
             if (string.IsNullOrEmpty(path))
                 return null;
 
-            this.SkeletonPath = path;
+            try
+            {
+                return SkinnedMesh.ReadFromSimpleSkin(path);
+            }
+            catch (Exception exception)
+            {
+                throw new InvalidOperationException("Failed to load Simple Skin", exception);
+            }
+        }
 
-            return new(path);
+        private Skeleton LoadSkeleton(string path)
+        {
+            this.LocalError = null;
+
+            if (string.IsNullOrEmpty(path))
+                return null;
+
+            try
+            {
+                return new(path);
+            }
+            catch (Exception exception)
+            {
+                throw new InvalidOperationException("Failed to load skeleton", exception);
+            }
         }
 
         private async Task AddAnimationsAsync()
         {
-            string[] paths = await this.ShowAddAnimationsDialog.Handle(new());
+            this.LocalError = null;
 
+            string[] paths = await this.ShowAddAnimationsDialog.Handle(new());
             if (paths is null)
                 return;
 
@@ -168,9 +241,16 @@ namespace lol2gltf.ViewModels
             );
             foreach (string path in uniqueNewPaths)
             {
-                LeagueAnimation animation = new(path);
-
-                this.Animations.Add(new(Path.GetFileNameWithoutExtension(path), animation));
+                string animationName = Path.GetFileNameWithoutExtension(path);
+                try
+                {
+                    LeagueAnimation animation = new(path);
+                    this.Animations.Add(new(animationName, animation));
+                }
+                catch (Exception exception)
+                {
+                    throw new InvalidOperationException($"Failed to load animation: {animationName}", exception);
+                }
             }
         }
 
@@ -186,6 +266,8 @@ namespace lol2gltf.ViewModels
 
         public IObservable<Unit> ExportGltfAsync(string extension)
         {
+            this.LocalError = null;
+
             return Observable.StartAsync(async _ =>
             {
                 Guard.IsNotNullOrEmpty(extension, nameof(extension));

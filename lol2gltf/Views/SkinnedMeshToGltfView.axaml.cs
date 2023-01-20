@@ -38,8 +38,9 @@ namespace lol2gltf.Views
 
             this.WhenActivated(disposables =>
             {
-                this.BindCommand(this.ViewModel, vm => vm.LoadSimpleSkinCommand, v => v.LoadSimpleSkinButton);
-                this.BindCommand(this.ViewModel, vm => vm.LoadSkeletonCommand, v => v.LoadSkeletonButton);
+                // Bind commands
+                this.BindCommand(this.ViewModel, vm => vm.SelectSimpleSkinPathCommand, v => v.LoadSimpleSkinButton);
+                this.BindCommand(this.ViewModel, vm => vm.SelectSkeletonPathCommand, v => v.LoadSkeletonButton);
                 this.BindCommand(this.ViewModel, vm => vm.AddAnimationsCommand, v => v.AddAnimationsButton);
                 this.BindCommand(
                         this.ViewModel,
@@ -56,6 +57,7 @@ namespace lol2gltf.Views
                     )
                     .DisposeWith(disposables);
 
+                // Bind interactions
                 this.BindInteraction(
                         this.ViewModel,
                         vm => vm.ShowSelectSimpleSkinDialog,

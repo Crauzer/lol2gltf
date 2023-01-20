@@ -36,7 +36,7 @@ namespace lol2gltf.Core
         public static void ConvertMapGeometryToGltf(ConvertMapGeometryToGltf opts)
         {
             MapGeometry mapGeometry = ReadMapGeometry(opts.MapGeometryPath);
-            ModelRoot gltf = mapGeometry.ToGLTF();
+            ModelRoot gltf = null; // TODO
 
             gltf.Save(opts.OutputPath);
         }
@@ -54,6 +54,7 @@ namespace lol2gltf.Core
                 throw new Exception("Error: Failed to read specified SKN file", exception);
             }
         }
+
         private static Skeleton ReadSkeleton(string location)
         {
             try
@@ -65,6 +66,7 @@ namespace lol2gltf.Core
                 throw new Exception("Error: Failed to read specified SKL file", exception);
             }
         }
+
         private static List<(string, LeagueAnimation)> ReadAnimations(IEnumerable<string> animationPaths)
         {
             var animations = new List<(string, LeagueAnimation)>();
@@ -79,6 +81,7 @@ namespace lol2gltf.Core
 
             return animations;
         }
+
         private static MapGeometry ReadMapGeometry(string location)
         {
             try
@@ -90,6 +93,7 @@ namespace lol2gltf.Core
                 throw new Exception("Error: Failed to read map geometry file", exception);
             }
         }
+
         private static ModelRoot ReadGltf(string location)
         {
             try

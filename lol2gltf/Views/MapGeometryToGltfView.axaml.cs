@@ -6,6 +6,8 @@ using Avalonia.Threading;
 using CommunityToolkit.Diagnostics;
 using FluentAvalonia.UI.Controls;
 using LeagueToolkit.IO.MapGeometryFile;
+using LeagueToolkit.IO.PropertyBin;
+using LeagueToolkit.Meta;
 using lol2gltf.ViewModels;
 using ReactiveUI;
 using SharpGLTF.Schema2;
@@ -15,6 +17,7 @@ using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace lol2gltf.Views
@@ -27,7 +30,13 @@ namespace lol2gltf.Views
 
             this.WhenActivated(disposables =>
             {
-                this.BindCommand(this.ViewModel, vm => vm.LoadMapGeometryCommand, v => v.LoadMapGeometryButton);
+                // Bind Commands
+                this.BindCommand(this.ViewModel, vm => vm.SelectMapGeometryPathCommand, v => v.LoadMapGeometryButton)
+                    .DisposeWith(disposables);
+                this.BindCommand(this.ViewModel, vm => vm.SelectMaterialsBinPathCommand, v => v.LoadMaterialsBinButton)
+                    .DisposeWith(disposables);
+                this.BindCommand(this.ViewModel, vm => vm.SelectGameDataPathCommand, v => v.SelectGameDataPathButton)
+                    .DisposeWith(disposables);
                 this.BindCommand(
                         this.ViewModel,
                         vm => vm.ExportGltfCommand,
@@ -43,10 +52,23 @@ namespace lol2gltf.Views
                     )
                     .DisposeWith(disposables);
 
+                // Bind Interactions
                 this.BindInteraction(
                         this.ViewModel,
                         vm => vm.ShowSelectMapGeometryDialog,
                         ShowSelectMapGeometryDialogAsync
+                    )
+                    .DisposeWith(disposables);
+                this.BindInteraction(
+                        this.ViewModel,
+                        vm => vm.ShowSelectMaterialsBinDialog,
+                        ShowSelectMaterialsBinDialogAsync
+                    )
+                    .DisposeWith(disposables);
+                this.BindInteraction(
+                        this.ViewModel,
+                        vm => vm.ShowSelectGameDataDialog,
+                        ShowSelectGameDataPathDialogAsync
                     )
                     .DisposeWith(disposables);
                 this.BindInteraction(
@@ -84,6 +106,45 @@ namespace lol2gltf.Views
             );
 
             interaction.SetOutput(files?.FirstOrDefault());
+        }
+
+        private async Task ShowSelectMaterialsBinDialogAsync(InteractionContext<Unit, string> interaction)
+        {
+            Guard.IsNotNull(interaction, nameof(interaction));
+
+            OpenFileDialog dialog =
+                new()
+                {
+                    AllowMultiple = false,
+                    Title = "Select a Materials (.bin) file",
+                    Filters = new()
+                    {
+                        new()
+                        {
+                            Name = "Materials Bin files",
+                            Extensions = new() { "bin" }
+                        }
+                    }
+                };
+
+            string[] files = await dialog.ShowAsync(
+                ((ClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).MainWindow
+            );
+
+            interaction.SetOutput(files?.FirstOrDefault());
+        }
+
+        private async Task ShowSelectGameDataPathDialogAsync(InteractionContext<Unit, string> interaction)
+        {
+            Guard.IsNotNull(interaction, nameof(interaction));
+
+            OpenFolderDialog dialog = new() { Title = "Select a Game Data path" };
+
+            string path = await dialog.ShowAsync(
+                ((ClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).MainWindow
+            );
+
+            interaction.SetOutput(path);
         }
 
         private async Task ShowSelectExportedGltfDialogAsync(InteractionContext<string, string> interaction)
@@ -128,6 +189,22 @@ namespace lol2gltf.Views
                         TaskDialogProgressState.Normal | TaskDialogProgressState.Indeterminate;
 
                     MapGeometry mapGeometry = this.ViewModel.MapGeometry;
+                    BinTree materialsBin = this.ViewModel.MaterialsBin;
+
+                    MapGeometryGltfConversionContext conversionContext =
+                        new(
+                            MetaEnvironment.Create(
+                                Assembly.Load("LeagueToolkit.Meta.Classes").GetExportedTypes().Where(x => x.IsClass)
+                            ),
+                            new()
+                            {
+                                FlipAcrossX = this.ViewModel.FlipAcrossX,
+                                GameDataPath = this.ViewModel.GameDataPath,
+                                LayerGroupingPolicy = this.ViewModel.SelectedLayerGroupingPolicy,
+                                TextureQuality = this.ViewModel.SelectedTextureQuality
+                            }
+                        );
+
                     TaskDialog dialog =
                         new()
                         {
@@ -150,7 +227,7 @@ namespace lol2gltf.Views
                                 dialog.Content = "Converting to glTF...";
                             });
 
-                            ModelRoot gltfAsset = mapGeometry.ToGLTF();
+                            ModelRoot gltfAsset = mapGeometry.ToGltf(materialsBin, conversionContext);
 
                             // Save glTF asset
                             RxApp.MainThreadScheduler.Schedule(() =>

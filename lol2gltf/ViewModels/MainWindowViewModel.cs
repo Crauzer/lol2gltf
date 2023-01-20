@@ -1,3 +1,4 @@
+using Avalonia.Controls.Notifications;
 using HanumanInstitute.MvvmDialogs;
 using ReactiveUI.Fody.Helpers;
 using Splat;
@@ -12,12 +13,8 @@ namespace lol2gltf.ViewModels
         [Reactive]
         public MainViewModel MainViewModel { get; set; }
 
-        private IDialogService _dialogService;
-
-        public MainWindowViewModel(IDialogService dialogService)
+        public MainWindowViewModel()
         {
-            this._dialogService = dialogService;
-
             this.MainViewModel = new();
         }
     }

@@ -6,8 +6,9 @@
              xmlns:uip="using:FluentAvalonia.UI.Controls.Primitives"
              xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
              xmlns:vm="using:lol2gltf.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="lol2gltf.Views.MapGeometryToGltfView">
+             mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="800"
+             x:Class="lol2gltf.Views.MapGeometryToGltfView"
+             x:DataType="vm:MapGeometryToGltfViewModel">
   <Design.DataContext>
     <vm:MapGeometryToGltfViewModel/>
   </Design.DataContext>
@@ -19,10 +20,19 @@
     </ExperimentalAcrylicBorder>
     <Grid RowDefinitions="*, Auto" ColumnDefinitions="*">
       <ScrollViewer>
-        <Grid RowDefinitions="Auto" ColumnDefinitions="*">
-          <Border Padding="24">
-            <Grid RowDefinitions="*" ColumnDefinitions="*, Auto">
-              <Grid RowDefinitions="Auto, *" ColumnDefinitions="*, Auto">
+        <Border Padding="24">
+          <StackPanel Orientation="Vertical">
+            <!-- Error Bar -->
+            <ui:InfoBar IsOpen="{Binding Error, Converter={x:Static ObjectConverters.IsNotNull}}"
+                        IsVisible="{Binding Error, Converter={x:Static ObjectConverters.IsNotNull}}"
+                        CloseButtonCommand="{Binding CloseErrorCommand}"
+                        Severity="Error" IsClosable="True" IsIconVisible="True"
+                        Title="{Binding Error.Title}" Message="{Binding Error.Message}"
+                        Margin="0 0 0 16"/>
+            <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="*">
+              <!-- Select Map Geometry -->
+              <Grid Grid.Row="0" Grid.Column="0"
+                    RowDefinitions="Auto, *" ColumnDefinitions="*, Auto">
                 <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
                   Map Geometry:
                 </Label>
@@ -35,15 +45,83 @@
                   <i:Icon Value="fa-solid fa-file-import" FontSize="16"/>
                 </Button>
               </Grid>
+
+              <!-- Select Materials Bin -->
+              <Grid Grid.Row="1" Grid.Column="0"
+                    Margin="0 16 0 0"
+                    RowDefinitions="Auto, *" ColumnDefinitions="*, Auto"
+                    IsEnabled="{Binding MapGeometryPath, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
+                  Materials Bin:
+                </Label>
+                <TextBox Grid.Row="1" Grid.Column="0"
+                         IsReadOnly="True"
+                         Text="{Binding MaterialsBinPath}"/>
+                <Button Name="LoadMaterialsBinButton"
+                        Grid.Row="1" Grid.Column="1" Margin="16 0 0 0"
+                        Classes="accent">
+                  <i:Icon Value="fa-solid fa-file-import" FontSize="16"/>
+                </Button>
+              </Grid>
+
+              <!-- Select Game Data -->
+              <Grid Grid.Row="2" Grid.Column="0"
+                    Margin="0 16 0 0"
+                    RowDefinitions="Auto, *" ColumnDefinitions="*, Auto"
+                    IsEnabled="{Binding MaterialsBinPath, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
+                  Game Data:
+                </Label>
+                <TextBox Grid.Row="1" Grid.Column="0"
+                         IsReadOnly="True"
+                         Text="{Binding GameDataPath}"/>
+                <Button Name="SelectGameDataPathButton"
+                        Grid.Row="1" Grid.Column="1" Margin="16 0 0 0"
+                        Classes="accent">
+                  <i:Icon Value="fa-regular fa-folder-open" FontSize="16"/>
+                </Button>
+              </Grid>
+
+              <!-- Settings -->
+              <Grid Grid.Row="3" Grid.Column="0"
+                    Margin="0 16 0 0"
+                    RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="Auto">
+                <StackPanel Grid.Row="0" Grid.Column="0"
+                            Orientation="Horizontal">
+                  <Label>Texture Quality:</Label>
+                  <ui:ComboBox MinWidth="120" Margin="8 0 0 0"
+                               SelectedItem="{Binding SelectedTextureQuality}" Items="{Binding TextureQualities}"/>
+                </StackPanel>
+                <StackPanel Grid.Row="1" Grid.Column="0"
+                            Orientation="Horizontal"
+                            Margin="0 8 0 0">
+                  <Label>Visibility Grouping Policy:</Label>
+                  <ui:ComboBox MinWidth="120"
+                               Margin="8 0 0 0"
+                               SelectedItem="{Binding SelectedLayerGroupingPolicy}" Items="{Binding LayerGroupingPolicies}"/>
+                </StackPanel>
+                <CheckBox Grid.Row="2" Grid.Column="0"
+                          Margin="0 8 0 0"
+                          IsChecked="{Binding FlipAcrossX}">
+                  Flip X
+                </CheckBox>
+              </Grid>
             </Grid>
-          </Border>
-        </Grid>
+          </StackPanel>
+        </Border>
       </ScrollViewer>
       <Border Grid.Row="1" Grid.Column="0" Padding="8">
         <DockPanel VerticalAlignment="Bottom" HorizontalAlignment="Right">
           <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+            <StackPanel.IsEnabled>
+              <MultiBinding Converter="{x:Static BoolConverters.And}">
+                <Binding Path="MapGeometryPath" Converter="{x:Static StringConverters.IsNotNullOrEmpty}"/>
+                <Binding Path="MaterialsBinPath" Converter="{x:Static StringConverters.IsNotNullOrEmpty}"/>
+                <Binding Path="GameDataPath" Converter="{x:Static StringConverters.IsNotNullOrEmpty}"/>
+              </MultiBinding>
+            </StackPanel.IsEnabled>
+            
             <Button Name="ExportGlbButton"
-                    IsEnabled="{Binding MapGeometryPath, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                     CommandParameter="glb"
                     Classes="accent">
               <StackPanel Orientation="Horizontal">
@@ -51,9 +129,9 @@
                 <TextBlock Margin="4 0 0 0">Export to GLB</TextBlock>
               </StackPanel>
             </Button>
+            
             <Button Name="ExportGltfButton"
                     Margin="8 0 0 0"
-                    IsEnabled="{Binding MapGeometryPath, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                     CommandParameter="gltf"
                     Classes="accent">
               <StackPanel Orientation="Horizontal">

@@ -1,18 +1,17 @@
-﻿using CommunityToolkit.Diagnostics;
+﻿using Avalonia.Controls.Notifications;
+using CommunityToolkit.Diagnostics;
 using FluentAvalonia.UI.Controls;
 using LeagueToolkit.IO.MapGeometryFile;
-using LeagueToolkit.IO.SkeletonFile;
+using LeagueToolkit.IO.PropertyBin;
+using lol2gltf.Models;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using SharpGLTF.Schema2;
 using Splat;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace lol2gltf.ViewModels
@@ -22,15 +21,50 @@ namespace lol2gltf.ViewModels
         public ViewModelActivator Activator { get; } = new();
 
         [Reactive]
+        public Error Error { get; set; }
+
+        [Reactive]
         public string MapGeometryPath { get; set; }
+
+        [Reactive]
+        public string MaterialsBinPath { get; set; }
+
+        [Reactive]
+        public string GameDataPath { get; set; }
+
+        [Reactive]
+        public MapGeometryGltfTextureQuality SelectedTextureQuality { get; set; } = MapGeometryGltfTextureQuality.Low;
+        public IReadOnlyList<MapGeometryGltfTextureQuality> TextureQualities { get; } =
+            Enum.GetValues<MapGeometryGltfTextureQuality>();
+
+        [Reactive]
+        public MapGeometryGltfLayerGroupingPolicy SelectedLayerGroupingPolicy { get; set; } =
+            MapGeometryGltfLayerGroupingPolicy.Default;
+        public IReadOnlyList<MapGeometryGltfLayerGroupingPolicy> LayerGroupingPolicies { get; } =
+            Enum.GetValues<MapGeometryGltfLayerGroupingPolicy>();
+
+        [Reactive]
+        public bool FlipAcrossX { get; set; } = true;
 
         public MapGeometry MapGeometry => this._mapGeometry?.Value;
         private ObservableAsPropertyHelper<MapGeometry> _mapGeometry;
 
-        public ReactiveCommand<Unit, MapGeometry> LoadMapGeometryCommand { get; }
+        public BinTree MaterialsBin => this._materialsBin?.Value;
+        private ObservableAsPropertyHelper<BinTree> _materialsBin;
+
+        public ReactiveCommand<Unit, Unit> CloseErrorCommand { get; }
+
+        public ReactiveCommand<Unit, string> SelectMapGeometryPathCommand { get; }
+        public ReactiveCommand<Unit, string> SelectMaterialsBinPathCommand { get; }
+
+        public ReactiveCommand<string, MapGeometry> LoadMapGeometryCommand { get; }
+        public ReactiveCommand<string, BinTree> LoadMaterialsBinCommand { get; }
+        public ReactiveCommand<Unit, Unit> SelectGameDataPathCommand { get; }
         public ReactiveCommand<string, Unit> ExportGltfCommand { get; }
 
         public Interaction<Unit, string> ShowSelectMapGeometryDialog { get; }
+        public Interaction<Unit, string> ShowSelectMaterialsBinDialog { get; }
+        public Interaction<Unit, string> ShowSelectGameDataDialog { get; }
         public Interaction<string, string> ShowSelectExportedGltfDialog { get; }
         public Interaction<string, Unit> ShowSaveGltfDialog { get; }
 
@@ -45,42 +79,124 @@ namespace lol2gltf.ViewModels
             Guard.IsNotNullOrEmpty(name, nameof(name));
             Guard.IsNotNullOrEmpty(tooltip, nameof(tooltip));
 
-            this.LoadMapGeometryCommand = ReactiveCommand.CreateFromTask(LoadMapGeometryAsync);
+            this.CloseErrorCommand = ReactiveCommand.Create(() =>
+            {
+                this.Error = null;
+            });
+
+            this.SelectMapGeometryPathCommand = ReactiveCommand.CreateFromTask(SelectMapGeometryPathAsync);
+            this.SelectMaterialsBinPathCommand = ReactiveCommand.CreateFromTask(SelectMaterialsBinPathAsync);
+            this.SelectGameDataPathCommand = ReactiveCommand.CreateFromTask(SelectGameDataPathAsync);
+
+            this.LoadMapGeometryCommand = ReactiveCommand.Create<string, MapGeometry>(LoadMapGeometry);
+            this.LoadMaterialsBinCommand = ReactiveCommand.Create<string, BinTree>(LoadMaterialsBin);
+
             this.ExportGltfCommand = ReactiveCommand.CreateFromObservable<string, Unit>(
                 ExportGltfAsync,
                 outputScheduler: RxApp.MainThreadScheduler
             );
 
             this.ShowSelectMapGeometryDialog = new();
+            this.ShowSelectMaterialsBinDialog = new();
+            this.ShowSelectGameDataDialog = new();
             this.ShowSelectExportedGltfDialog = new();
             this.ShowSaveGltfDialog = new();
 
             this.WhenActivated(disposables =>
             {
-                this._mapGeometry = this.LoadMapGeometryCommand
+                // Handle path selection
+                this.SelectMapGeometryPathCommand
                     .WhereNotNull()
-                    .ToProperty(this, nameof(this.MapGeometry), scheduler: RxApp.MainThreadScheduler)
+                    .Subscribe(x => this.MapGeometryPath = x)
+                    .DisposeWith(disposables);
+                this.SelectMaterialsBinPathCommand
+                    .WhereNotNull()
+                    .Subscribe(x => this.MaterialsBinPath = x)
                     .DisposeWith(disposables);
 
-                this.LoadMapGeometryCommand.ThrownExceptions.Subscribe(ex => this.Log().Error(ex));
-                this.ExportGltfCommand.ThrownExceptions.Subscribe(ex => this.Log().Error(ex));
+                // Handle loading
+                this._mapGeometry = this.LoadMapGeometryCommand
+                    .ToProperty(this, nameof(this.MapGeometry))
+                    .DisposeWith(disposables);
+                this._materialsBin = this.LoadMaterialsBinCommand
+                    .ToProperty(this, nameof(this.MaterialsBin))
+                    .DisposeWith(disposables);
+
+                // Re-load files when paths change
+                this.WhenAnyValue(x => x.MapGeometryPath).InvokeCommand(this.LoadMapGeometryCommand);
+                this.WhenAnyValue(x => x.MaterialsBinPath).InvokeCommand(this.LoadMaterialsBinCommand);
+
+                // Reset materials bin path when map geometry path changes
+                this.WhenAnyValue(x => x.MapGeometryPath).Subscribe(_ => this.MaterialsBinPath = null);
+
+                this.LoadMapGeometryCommand.ThrownExceptions.Subscribe(ex =>
+                {
+                    this.MapGeometryPath = null;
+                    this.Error = new("Load Map Geometry Error", ex.Message);
+                    this.Log().Error(ex);
+                });
+                this.LoadMaterialsBinCommand.ThrownExceptions.Subscribe(ex =>
+                {
+                    this.MaterialsBinPath = null;
+                    this.Error = new("Load Materials Bin Error", ex.Message);
+                    this.Log().Error(ex);
+                });
+                this.ExportGltfCommand.ThrownExceptions.Subscribe(ex =>
+                {
+                    this.Error = new("Export glTF Error", ex.Message);
+                    this.Log().Error(ex);
+                });
             });
         }
 
-        private async Task<MapGeometry> LoadMapGeometryAsync()
+        private async Task<string> SelectMapGeometryPathAsync()
         {
             string path = await this.ShowSelectMapGeometryDialog.Handle(new());
+
+            return path;
+        }
+
+        private async Task<string> SelectMaterialsBinPathAsync()
+        {
+            string path = await this.ShowSelectMaterialsBinDialog.Handle(new());
+
+            return path;
+        }
+
+        private MapGeometry LoadMapGeometry(string path)
+        {
+            this.Error = null;
 
             if (string.IsNullOrEmpty(path))
                 return null;
 
-            this.MapGeometryPath = path;
+            return new(path);
+        }
+
+        private BinTree LoadMaterialsBin(string path)
+        {
+            this.Error = null;
+
+            if (string.IsNullOrEmpty(path))
+                return null;
 
             return new(path);
         }
 
+        private async Task SelectGameDataPathAsync()
+        {
+            string path = await this.ShowSelectGameDataDialog.Handle(new());
+
+            if (string.IsNullOrEmpty(path))
+                return;
+
+            this.GameDataPath = path;
+        }
+
         public IObservable<Unit> ExportGltfAsync(string extension)
         {
+            this.Error = null;
+
             return Observable.StartAsync(async _ =>
             {
                 Guard.IsNotNullOrEmpty(extension, nameof(extension));

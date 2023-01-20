@@ -25,8 +25,6 @@ namespace lol2gltf
 
         public override void OnFrameworkInitializationCompleted()
         {
-            GC.KeepAlive(typeof(DialogService));
-
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 desktop.MainWindow = new MainWindow { DataContext = MainWindow, };

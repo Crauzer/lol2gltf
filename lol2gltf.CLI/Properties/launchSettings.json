@@ -2,7 +2,7 @@
   "profiles": {
     "lol2gltf": {
       "commandName": "Project",
-      "commandLineArgs": "skn2gltf-rigged -m ezreal_skin21.skn -s ezreal_skin21.skl -o ezreal_skin21.glb -t \"Body:ezreal_skin21_tx_cm.dds\" --animations-folder animations"
+      "commandLineArgs": "skn2gltf -m gwen_base.skn -s gwen_base.skl -g gwen_base.glb --materials Body --textures Gwen_Base_Main_TX_CM.dds --anm animations"
     }
   }
 }

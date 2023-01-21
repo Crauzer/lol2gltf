@@ -7,19 +7,56 @@ using CommandLine;
 
 namespace lol2gltf.CLI
 {
+    [Verb("skn2gltf", HelpText = "Converts a Skinned Mesh (skn, skl, anm) into a glTF asset")]
+    public class SkinnedMeshToGltfOptions
+    {
+        [Option('m', "skn", Required = true, HelpText = "Simple Skin (.skn) path")]
+        public string SimpleSkinPath { get; set; }
+
+        [Option('s', "skl", Required = true, HelpText = "Skeleton (.skl) path")]
+        public string SkeletonPath { get; set; }
+
+        [Option(
+            'g',
+            "gltf",
+            Required = true,
+            HelpText = "Path of the generated glTF file (Use .glb extension for binary format)"
+        )]
+        public string GltfPath { get; set; }
+
+        [Option('a', "anm", Required = false, HelpText = "Animations (.anm) folder path")]
+        public string AnimationsPath { get; set; }
+
+        [Option("materials", Required = false, HelpText = "Simple Skin material names for textures")]
+        public IEnumerable<string> MaterialNames { get; set; }
+
+        [Option("textures", Required = false, HelpText = "Texture paths for the specified materials")]
+        public IEnumerable<string> TexturePaths { get; set; }
+    }
+
+    // -----
+
     public interface IBaseSimpleSkinToGltfOptions
     {
         [Option('m', "skn", Required = true, HelpText = "Path to the SKN (Simple Skin) file")]
         public string SimpleSkinPath { get; set; }
 
-        [Option('t', "material-textures", Required = false, HelpText = "Specifies what textures to assign to what materials. Example: Body:aatrox_base_tx_cm.dds")]
+        [Option(
+            't',
+            "material-textures",
+            Required = false,
+            HelpText = "Specifies what textures to assign to what materials. Example: Body:aatrox_base_tx_cm.dds"
+        )]
         public IEnumerable<string> MaterialTextures { get; set; }
 
-        [Option('o', "output-path", Required = true,
-            HelpText = 
-            "Where the glTF file should be saved.\n" +
-            "Use .gltf extension to save a JSON .glTF file with a resoruce file (.bin)\n" +
-            "Use .glb extension to save a binary glTF gile")]
+        [Option(
+            'o',
+            "output-path",
+            Required = true,
+            HelpText = "Where the glTF file should be saved.\n"
+                + "Use .gltf extension to save a JSON .glTF file with a resoruce file (.bin)\n"
+                + "Use .glb extension to save a binary glTF gile"
+        )]
         public string OutputPath { get; set; }
     }
 
@@ -27,11 +64,15 @@ namespace lol2gltf.CLI
     {
         [Option('m', "mapgeo", Required = true, HelpText = "Path to a Map Geometry file")]
         public string MapGeometryPath { get; set; }
-    
-        [Option('o', "output", Required = true, HelpText =
-            "Where the glTF file should be saved.\n" +
-            "Use .gltf extension to save a JSON .glTF file with a resoruce file (.bin)\n" +
-            "Use .glb extension to save a binary glTF gile")]
+
+        [Option(
+            'o',
+            "output",
+            Required = true,
+            HelpText = "Where the glTF file should be saved.\n"
+                + "Use .gltf extension to save a JSON .glTF file with a resoruce file (.bin)\n"
+                + "Use .glb extension to save a binary glTF gile"
+        )]
         public string OutputPath { get; set; }
     }
 
@@ -43,7 +84,10 @@ namespace lol2gltf.CLI
         public string OutputPath { get; set; }
     }
 
-    [Verb("skn2gltf-rigged", HelpText = "Converts an SKN (Simple Skin) file with a SKL (Skeleton) file to a glTF with optional textures and animations")]
+    [Verb(
+        "skn2gltf-rigged",
+        HelpText = "Converts an SKN (Simple Skin) file with a SKL (Skeleton) file to a glTF with optional textures and animations"
+    )]
     public class SkinnedModelToGltfOptions : IBaseSimpleSkinToGltfOptions
     {
         public string SimpleSkinPath { get; set; }
@@ -53,10 +97,18 @@ namespace lol2gltf.CLI
         [Option('s', "skeleton", Required = true, HelpText = "Path to the SKL (Skeleton) file")]
         public string SkeletonPath { get; set; }
 
-        [Option("animations-folder", Group = "animations", HelpText = "Path to the folder which contains the ANM (Animation) files used for conversion")]
+        [Option(
+            "animations-folder",
+            Group = "animations",
+            HelpText = "Path to the folder which contains the ANM (Animation) files used for conversion"
+        )]
         public string AnimationsFolder { get; set; }
 
-        [Option("animations", Group = "animations", HelpText = "Paths to the ANM (Animation) files used for conversion")]
+        [Option(
+            "animations",
+            Group = "animations",
+            HelpText = "Paths to the ANM (Animation) files used for conversion"
+        )]
         public IEnumerable<string> AnimationPaths { get; set; }
     }
 

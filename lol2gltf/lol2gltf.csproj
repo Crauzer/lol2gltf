@@ -8,6 +8,7 @@
     <RuntimeIdentifier>win10-x64</RuntimeIdentifier>
     <Platforms>x64</Platforms>
     <Version>3.0.0-beta.4</Version>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
   </PropertyGroup>
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />

@@ -3,30 +3,14 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
-    <Platforms>x64</Platforms>
-    <Configurations>Debug;Release;ReleasePortable</Configurations>
     <Authors>Crauzer</Authors>
     <Company>Crauzer</Company>
-    <Version>2.0.1</Version>
-    <AssemblyVersion>2.0.1.0</AssemblyVersion>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <WarningsAsErrors />
-    <SelfContained>false</SelfContained>
-    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
-    <PublishSingleFile>true</PublishSingleFile>
-    <SatelliteResourceLanguages> en </SatelliteResourceLanguages>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleasePortable|x64'">
-    <WarningsAsErrors />
+    <Version>3.0.0-beta.4</Version>
+    <Platforms>x64</Platforms>
     <SelfContained>true</SelfContained>
-    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <PublishSingleFile>true</PublishSingleFile>
     <SatelliteResourceLanguages> en </SatelliteResourceLanguages>
     <PublishReadyToRun>true</PublishReadyToRun>
-    <PublishReadyToRunShowWarnings>true</PublishReadyToRunShowWarnings>
   </PropertyGroup>
 
   <ItemGroup>

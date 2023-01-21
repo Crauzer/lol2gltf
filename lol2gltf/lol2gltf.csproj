@@ -7,7 +7,7 @@
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <RuntimeIdentifier>win10-x64</RuntimeIdentifier>
     <Platforms>x64</Platforms>
-    <Version>3.0.0-beta.3</Version>
+    <Version>3.0.0-beta.4</Version>
   </PropertyGroup>
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />

@@ -5,8 +5,6 @@ VisualStudioVersion = 17.4.33122.133
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "lol2gltf.CLI", "lol2gltf.CLI\lol2gltf.CLI.csproj", "{9D878A83-941F-449A-85E0-10AC757DCD2D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "lol2gltf.Core.Tests", "lol2gltf.Core.Tests\lol2gltf.Core.Tests.csproj", "{D78101A9-DA8C-452E-B4D2-B61E4084B672}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "lol2gltf.Core", "lol2gltf.Core\lol2gltf.Core.csproj", "{BD2671F2-D609-4C92-8839-FE3551CD7E94}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E31500B7-3316-40A4-9AE0-0BD71E24492D}"
@@ -27,10 +25,6 @@ Global
 		{9D878A83-941F-449A-85E0-10AC757DCD2D}.Debug|x64.Build.0 = Debug|x64
 		{9D878A83-941F-449A-85E0-10AC757DCD2D}.Release|x64.ActiveCfg = Release|x64
 		{9D878A83-941F-449A-85E0-10AC757DCD2D}.Release|x64.Build.0 = Release|x64
-		{D78101A9-DA8C-452E-B4D2-B61E4084B672}.Debug|x64.ActiveCfg = Debug|x64
-		{D78101A9-DA8C-452E-B4D2-B61E4084B672}.Debug|x64.Build.0 = Debug|x64
-		{D78101A9-DA8C-452E-B4D2-B61E4084B672}.Release|x64.ActiveCfg = Release|x64
-		{D78101A9-DA8C-452E-B4D2-B61E4084B672}.Release|x64.Build.0 = Release|x64
 		{BD2671F2-D609-4C92-8839-FE3551CD7E94}.Debug|x64.ActiveCfg = Debug|x64
 		{BD2671F2-D609-4C92-8839-FE3551CD7E94}.Debug|x64.Build.0 = Debug|x64
 		{BD2671F2-D609-4C92-8839-FE3551CD7E94}.Release|x64.ActiveCfg = Release|x64

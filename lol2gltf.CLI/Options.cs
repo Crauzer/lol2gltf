@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CommandLine;
+using LeagueToolkit.IO.MapGeometryFile;
 
 namespace lol2gltf.CLI
 {
@@ -32,5 +33,47 @@ namespace lol2gltf.CLI
 
         [Option("textures", Required = false, HelpText = "Texture paths for the specified materials")]
         public IEnumerable<string> TexturePaths { get; set; }
+    }
+
+    [Verb("mapgeo2gltf", HelpText = "Converts Map Geometry into a glTF asset")]
+    public class MapGeometryToGltfOptions
+    {
+        [Option('m', "mgeo", Required = true, HelpText = "Map Geometry (.mapgeo) path")]
+        public string MapGeometryPath { get; set; }
+
+        [Option('b', "matbin", Required = true, HelpText = "Materials Bin (.materials.bin) path")]
+        public string MaterialsBinPath { get; set; }
+
+        [Option(
+            'g',
+            "gltf",
+            Required = true,
+            HelpText = "Path of the generated glTF file (Use .glb extension for binary format)"
+        )]
+        public string GltfPath { get; set; }
+
+        [Option('g', "gamedata", Required = false, HelpText = "Game Data path (required for bundling textures)")]
+        public string GameDataPath { get; set; }
+
+        [Option('x', "flipX", Required = false, Default = true, HelpText = "Whether to flip the map node's X axis")]
+        public bool FlipAcrossX { get; set; }
+
+        [Option(
+            'l',
+            "layerGroupingPolicy",
+            Required = false,
+            Default = MapGeometryGltfLayerGroupingPolicy.Default,
+            HelpText = $"The layer grouping policy for meshes (use `Ignore` if you don't want to group meshes based on layers)"
+        )]
+        public MapGeometryGltfLayerGroupingPolicy LayerGroupingPolicy { get; set; }
+
+        [Option(
+            'q',
+            "textureQuality",
+            Required = false,
+            Default = MapGeometryGltfTextureQuality.Low,
+            HelpText = $"The quality of textures to bundle (Low = 4x, Medium = 2x)"
+        )]
+        public MapGeometryGltfTextureQuality TextureQuality { get; set; }
     }
 }

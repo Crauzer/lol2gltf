@@ -1,14 +1,6 @@
 ﻿using Avalonia.Controls;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Reactive.Disposables;
-using System.Reactive.Subjects;
-using Avalonia.Xaml.Interactivity;
-using WalletWasabi.Fluent.Behaviors;
 using lol2gltf.Helpers;
+using System.Reactive.Disposables;
 
 namespace lol2gltf.Behaviors
 {

@@ -2,28 +2,29 @@
 using Avalonia.Xaml.Interactivity;
 using System.Reactive.Disposables;
 
-namespace WalletWasabi.Fluent.Behaviors;
-
-public abstract class DisposingBehavior<T> : Behavior<T> where T : class, IAvaloniaObject
+namespace lol2gltf.Behaviors
 {
-    private CompositeDisposable _disposables;
-
-    protected override void OnAttached()
+    public abstract class DisposingBehavior<T> : Behavior<T> where T : class, IAvaloniaObject
     {
-        base.OnAttached();
+        private CompositeDisposable _disposables;
 
-        this._disposables?.Dispose();
-        this._disposables = new CompositeDisposable();
+        protected override void OnAttached()
+        {
+            base.OnAttached();
 
-        OnAttached(this._disposables);
-    }
+            this._disposables?.Dispose();
+            this._disposables = new CompositeDisposable();
 
-    protected abstract void OnAttached(CompositeDisposable disposables);
+            OnAttached(this._disposables);
+        }
 
-    protected override void OnDetaching()
-    {
-        base.OnDetaching();
+        protected abstract void OnAttached(CompositeDisposable disposables);
 
-        this._disposables?.Dispose();
+        protected override void OnDetaching()
+        {
+            base.OnDetaching();
+
+            this._disposables?.Dispose();
+        }
     }
 }

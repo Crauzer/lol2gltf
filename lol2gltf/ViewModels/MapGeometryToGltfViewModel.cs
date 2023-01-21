@@ -1,9 +1,8 @@
-﻿using Avalonia.Controls.Notifications;
-using CommunityToolkit.Diagnostics;
+﻿using CommunityToolkit.Diagnostics;
 using FluentAvalonia.UI.Controls;
 using LeagueToolkit.IO.MapGeometryFile;
 using LeagueToolkit.IO.PropertyBin;
-using lol2gltf.Models;
+using lol2gltf.Helpers;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Splat;
@@ -19,9 +18,6 @@ namespace lol2gltf.ViewModels
     public class MapGeometryToGltfViewModel : PageViewModel, IActivatableViewModel
     {
         public ViewModelActivator Activator { get; } = new();
-
-        [Reactive]
-        public Error Error { get; set; }
 
         [Reactive]
         public string MapGeometryPath { get; set; }
@@ -52,8 +48,6 @@ namespace lol2gltf.ViewModels
         public BinTree MaterialsBin => this._materialsBin?.Value;
         private ObservableAsPropertyHelper<BinTree> _materialsBin;
 
-        public ReactiveCommand<Unit, Unit> CloseErrorCommand { get; }
-
         public ReactiveCommand<Unit, string> SelectMapGeometryPathCommand { get; }
         public ReactiveCommand<Unit, string> SelectMaterialsBinPathCommand { get; }
 
@@ -78,11 +72,6 @@ namespace lol2gltf.ViewModels
         {
             Guard.IsNotNullOrEmpty(name, nameof(name));
             Guard.IsNotNullOrEmpty(tooltip, nameof(tooltip));
-
-            this.CloseErrorCommand = ReactiveCommand.Create(() =>
-            {
-                this.Error = null;
-            });
 
             this.SelectMapGeometryPathCommand = ReactiveCommand.CreateFromTask(SelectMapGeometryPathAsync);
             this.SelectMaterialsBinPathCommand = ReactiveCommand.CreateFromTask(SelectMaterialsBinPathAsync);
@@ -129,21 +118,30 @@ namespace lol2gltf.ViewModels
                 // Reset materials bin path when map geometry path changes
                 this.WhenAnyValue(x => x.MapGeometryPath).Subscribe(_ => this.MaterialsBinPath = null);
 
+                this.WhenAnyValue(x => x.MapGeometry)
+                    .WhereNotNull()
+                    .Subscribe(_ => NotificationHelper.ShowSuccess("Loaded Map Geometry"));
+                this.WhenAnyValue(x => x.MaterialsBin)
+                    .WhereNotNull()
+                    .Subscribe(_ => NotificationHelper.ShowSuccess("Loaded Materials Bin"));
+
+                this.ExportGltfCommand.Subscribe(_ => NotificationHelper.ShowSuccess("Exported glTF"));
+
                 this.LoadMapGeometryCommand.ThrownExceptions.Subscribe(ex =>
                 {
                     this.MapGeometryPath = null;
-                    this.Error = new("Load Map Geometry Error", ex.Message);
+                    NotificationHelper.Show(ex);
                     this.Log().Error(ex);
                 });
                 this.LoadMaterialsBinCommand.ThrownExceptions.Subscribe(ex =>
                 {
                     this.MaterialsBinPath = null;
-                    this.Error = new("Load Materials Bin Error", ex.Message);
+                    NotificationHelper.Show(ex);
                     this.Log().Error(ex);
                 });
                 this.ExportGltfCommand.ThrownExceptions.Subscribe(ex =>
                 {
-                    this.Error = new("Export glTF Error", ex.Message);
+                    NotificationHelper.Show(ex);
                     this.Log().Error(ex);
                 });
             });
@@ -165,22 +163,32 @@ namespace lol2gltf.ViewModels
 
         private MapGeometry LoadMapGeometry(string path)
         {
-            this.Error = null;
-
             if (string.IsNullOrEmpty(path))
                 return null;
 
-            return new(path);
+            try
+            {
+                return new(path);
+            }
+            catch (Exception exception)
+            {
+                throw new InvalidOperationException("Failed to load Map Geometry", exception);
+            }
         }
 
         private BinTree LoadMaterialsBin(string path)
         {
-            this.Error = null;
-
             if (string.IsNullOrEmpty(path))
                 return null;
 
-            return new(path);
+            try
+            {
+                return new(path);
+            }
+            catch (Exception exception)
+            {
+                throw new InvalidOperationException("Failed to load Materials Bin", exception);
+            }
         }
 
         private async Task SelectGameDataPathAsync()
@@ -195,8 +203,6 @@ namespace lol2gltf.ViewModels
 
         public IObservable<Unit> ExportGltfAsync(string extension)
         {
-            this.Error = null;
-
             return Observable.StartAsync(async _ =>
             {
                 Guard.IsNotNullOrEmpty(extension, nameof(extension));
@@ -208,7 +214,14 @@ namespace lol2gltf.ViewModels
                 if (string.IsNullOrEmpty(path))
                     return;
 
-                await this.ShowSaveGltfDialog.Handle(path);
+                try
+                {
+                    await this.ShowSaveGltfDialog.Handle(path);
+                }
+                catch (Exception exception)
+                {
+                    throw new InvalidOperationException("Failed to export glTF", exception);
+                }
             });
         }
     }

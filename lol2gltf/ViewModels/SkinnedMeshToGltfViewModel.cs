@@ -7,7 +7,7 @@ using DynamicData;
 using FluentAvalonia.UI.Controls;
 using LeagueToolkit.Core.Mesh;
 using LeagueToolkit.IO.SkeletonFile;
-using lol2gltf.Models;
+using lol2gltf.Helpers;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Splat;
@@ -29,9 +29,6 @@ namespace lol2gltf.ViewModels
         public ViewModelActivator Activator { get; } = new();
 
         [Reactive]
-        public Error LocalError { get; set; }
-
-        [Reactive]
         public string SimpleSkinPath { get; set; }
 
         [Reactive]
@@ -48,8 +45,6 @@ namespace lol2gltf.ViewModels
 
         public Skeleton Skeleton => this._skeleton?.Value;
         private ObservableAsPropertyHelper<Skeleton> _skeleton;
-
-        public ReactiveCommand<Unit, Unit> CloseErrorCommand { get; }
 
         public ReactiveCommand<Unit, string> SelectSimpleSkinPathCommand { get; }
         public ReactiveCommand<Unit, string> SelectSkeletonPathCommand { get; }
@@ -78,11 +73,6 @@ namespace lol2gltf.ViewModels
         {
             Guard.IsNotNullOrEmpty(name, nameof(name));
             Guard.IsNotNullOrEmpty(tooltip, nameof(tooltip));
-
-            this.CloseErrorCommand = ReactiveCommand.Create(() =>
-            {
-                this.LocalError = null;
-            });
 
             this.SelectSimpleSkinPathCommand = ReactiveCommand.CreateFromTask(SelectSimpleSkinPathAsync);
             this.SelectSkeletonPathCommand = ReactiveCommand.CreateFromTask(SelectSkeletonPathAsync);
@@ -145,28 +135,39 @@ namespace lol2gltf.ViewModels
                                     }
                             )
                         );
+
+                        NotificationHelper.ShowSuccess("Loaded Simple Skin");
                     });
+
+                this.WhenAnyValue(x => x.Skeleton)
+                    .WhereNotNull()
+                    .Subscribe(_ =>
+                    {
+                        NotificationHelper.ShowSuccess("Loaded Skeleton");
+                    });
+
+                this.ExportGltfCommand.Subscribe(_ => NotificationHelper.ShowSuccess("Exported glTF"));
 
                 this.LoadSimpleSkinCommand.ThrownExceptions.Subscribe(ex =>
                 {
                     this.SimpleSkinPath = null;
-                    this.LocalError = Error.FromException(ex);
+                    NotificationHelper.Show(ex);
                     this.Log().Error(ex);
                 });
                 this.LoadSkeletonCommand.ThrownExceptions.Subscribe(ex =>
                 {
                     this.SkeletonPath = null;
-                    this.LocalError = Error.FromException(ex);
+                    NotificationHelper.Show(ex);
                     this.Log().Error(ex);
                 });
                 this.AddAnimationsCommand.ThrownExceptions.Subscribe(ex =>
                 {
-                    this.LocalError = Error.FromException(ex);
+                    NotificationHelper.Show(ex);
                     this.Log().Error(ex);
                 });
                 this.ExportGltfCommand.ThrownExceptions.Subscribe(ex =>
                 {
-                    this.LocalError = Error.FromException(ex);
+                    NotificationHelper.Show(ex);
                     this.Log().Error(ex);
                 });
             });
@@ -188,8 +189,6 @@ namespace lol2gltf.ViewModels
 
         private SkinnedMesh LoadSimpleSkin(string path)
         {
-            this.LocalError = null;
-
             if (string.IsNullOrEmpty(path))
                 return null;
 
@@ -205,8 +204,6 @@ namespace lol2gltf.ViewModels
 
         private Skeleton LoadSkeleton(string path)
         {
-            this.LocalError = null;
-
             if (string.IsNullOrEmpty(path))
                 return null;
 
@@ -222,8 +219,6 @@ namespace lol2gltf.ViewModels
 
         private async Task AddAnimationsAsync()
         {
-            this.LocalError = null;
-
             string[] paths = await this.ShowAddAnimationsDialog.Handle(new());
             if (paths is null)
                 return;
@@ -259,8 +254,6 @@ namespace lol2gltf.ViewModels
 
         public IObservable<Unit> ExportGltfAsync(string extension)
         {
-            this.LocalError = null;
-
             return Observable.StartAsync(async _ =>
             {
                 Guard.IsNotNullOrEmpty(extension, nameof(extension));
@@ -272,7 +265,14 @@ namespace lol2gltf.ViewModels
                 if (string.IsNullOrEmpty(path))
                     return;
 
-                await this.ShowSaveGltfDialog.Handle(path);
+                try
+                {
+                    await this.ShowSaveGltfDialog.Handle(path);
+                }
+                catch (Exception exception)
+                {
+                    throw new InvalidOperationException("Failed to export glTF", exception);
+                }
             });
         }
     }

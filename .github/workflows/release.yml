@@ -104,3 +104,12 @@ jobs:
       
       - name: Package lol2gltf.CLI
         run: 7z a "${{ env.LOL2GLTF_CLI_PROJECT }}_${{ github.event.inputs.version }}_${{ env.LOL2GLTF_CLI_RID }}.zip" "./${{ env.LOL2GLTF_CLI_PROJECT }}_publish/*"
+        
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.event.inputs.version }}
+          prerelease: ${{ github.event.inputs.is_prerelease }}
+          append_body: true
+          files: "${{ env.LOL2GLTF_PROJECT }}_${{ github.event.inputs.version }}_${{ env.LOL2GLTF_RID }}.zip ${{ env.LOL2GLTF_CLI_PROJECT }}_${{ github.event.inputs.version }}_${{ env.LOL2GLTF_CLI_RID }}.zip"
+

@@ -1,0 +1,42 @@
+name: Release
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version'     
+        required: true
+      
+jobs:
+  publish-lol2gltf:
+    env:
+      LOL2GLTF_PROJECT: "lol2gltf"
+      BUILD_CONFIG: "Release"
+      BUILD_RID: "win-x64"
+      OUTPUT_DIR: "lol2gltf_win-x64"
+
+    runs-on: windows-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v3.0.3
+        with:
+          dotnet-version: 6.x
+
+      - name: Install dependencies
+        run: dotnet restore
+
+      - name: Publish
+        run: dotnet publish ${{ env.LOL2GLTF_PROJECT }} --no-restore -c ${{ env.BUILD_CONFIG }} -o ${{ env.OUTPUT_DIR }} -r ${{ env.BUILD_RID }} -p:PublishSingleFile=true --self-contained true
+  
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: "${{ env.LOL2GLTF_PROJECT }}_${{ github.event.inputs.environment }}_${{ env.TARGET_FRAMEWORK }}"
+          path: "${{ env.OUTPUT_DIR }}"

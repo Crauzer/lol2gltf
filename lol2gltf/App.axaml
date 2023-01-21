@@ -8,6 +8,6 @@
     </Application.DataTemplates>
 
     <Application.Styles>
-        <sty:FluentAvaloniaTheme UseSystemThemeOnWindows="True" UseUserAccentColorOnWindows="True"/>
+        <sty:FluentAvaloniaTheme RequestedTheme="Dark" UseUserAccentColorOnWindows="True"/>
     </Application.Styles>
 </Application>

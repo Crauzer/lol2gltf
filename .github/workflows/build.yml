@@ -37,8 +37,8 @@ jobs:
         run: dotnet restore
 
       - name: Build lol2gltf
-        run: dotnet build ${{ LOL2GLTF_PROJECT }} --configuration ${{ BUILD_CONFIG }} --no-restore
+        run: dotnet build ${{ env.LOL2GLTF_PROJECT }} --configuration ${{ env.BUILD_CONFIG }} --no-restore
       
       - name: Build lol2gltf.CLI
-        run: dotnet build ${{ LOL2GLTF_CLI_PROJECT }} --configuration ${{ BUILD_CONFIG }} --no-restore
+        run: dotnet build ${{ env.LOL2GLTF_CLI_PROJECT }} --configuration ${{ env.BUILD_CONFIG }} --no-restore
 

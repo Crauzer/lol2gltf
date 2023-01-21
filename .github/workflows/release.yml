@@ -38,7 +38,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: "${{ env.LOL2GLTF_PROJECT }}_${{ github.event.inputs.environment }}_${{ env.BUILD_RID }}"
+          name: "${{ env.LOL2GLTF_PROJECT }}_${{ github.event.inputs.version }}_${{ env.BUILD_RID }}"
           path: "${{ env.OUTPUT_DIR }}"
   
   publish-lol2gltf-cli:
@@ -72,5 +72,5 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: "${{ env.LOL2GLTF_CLI_PROJECT }}_${{ github.event.inputs.environment }}_${{ env.BUILD_RID }}"
+          name: "${{ env.LOL2GLTF_CLI_PROJECT }}_${{ github.event.inputs.version }}_${{ env.BUILD_RID }}"
           path: "${{ env.OUTPUT_DIR }}"

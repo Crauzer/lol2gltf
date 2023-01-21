@@ -27,15 +27,11 @@
 </p>
 
 * Features:
-* * SKN -> glTF
-* * SKN + SKL -> glTF
-* * SKN + SKL + Animations -> glTF
-* * Mapgeo -> glTF
-* * Texture bundling (SKN)
+* * Skinned Mesh (skn, skl, anm) -> glTF
+* * Map Geometry -> glTF
 
 * Upcoming features:
-* * Converting glTF back to SKN, SKL and ANM
-* * FBX -> SKN + SKL
+* * Converting glTF back into SKN, SKL and ANM
 
 ******
 ![](https://www.khronos.org/assets/uploads/apis/2017-collada-gltf-positioning.png)
@@ -50,8 +46,3 @@
     <img src="https://thumbs.gfycat.com/ShorttermThoroughDingo-size_restricted.gif"></>
   </a>
 </p>
-
-# Special thanks to:
-[vpenades](https://github.com/vpenades) - for creating the [SharpGLTF library](https://github.com/vpenades/SharpGLTF) and fixing a critical bug before release
-
-[moonshadow565](https://github.com/moonshadow565) - for helping me reverse engineer the ANM file format

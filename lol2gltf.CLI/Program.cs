@@ -3,14 +3,17 @@ using CommandLine;
 using CommunityToolkit.HighPerformance;
 using LeagueToolkit.Core.Mesh;
 using LeagueToolkit.IO.MapGeometryFile;
+using LeagueToolkit.IO.PropertyBin;
 using LeagueToolkit.IO.SimpleSkinFile;
 using LeagueToolkit.IO.SkeletonFile;
+using LeagueToolkit.Meta;
 using LeagueToolkit.Toolkit;
 using SixLabors.ImageSharp;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using ImageSharpImage = SixLabors.ImageSharp.Image;
 using LeagueAnimation = LeagueToolkit.IO.AnimationFile.Animation;
 using LeagueTexture = LeagueToolkit.Core.Renderer.Texture;
@@ -21,9 +24,13 @@ namespace lol2gltf.CLI
     {
         static void Main(string[] args)
         {
-            Parser.Default
-                .ParseArguments<SkinnedMeshToGltfOptions>(args)
-                .MapResult((SkinnedMeshToGltfOptions opts) => ConvertSkinnedMeshToGltf(opts), HandleErrors);
+            CommandLine.Parser.Default
+                .ParseArguments<SkinnedMeshToGltfOptions, MapGeometryToGltfOptions>(args)
+                .MapResult(
+                    (SkinnedMeshToGltfOptions opts) => ConvertSkinnedMeshToGltf(opts),
+                    (MapGeometryToGltfOptions opts) => ConvertMapGeometryToGltf(opts),
+                    HandleErrors
+                );
         }
 
         private static int HandleErrors(IEnumerable<Error> errors)
@@ -64,6 +71,30 @@ namespace lol2gltf.CLI
             Skeleton skeleton = new(options.SkeletonPath);
 
             simpleSkin.ToGltf(skeleton, materialTextures, animations).Save(options.GltfPath);
+
+            return 1;
+        }
+
+        private static int ConvertMapGeometryToGltf(MapGeometryToGltfOptions options)
+        {
+            MapGeometryGltfConversionContext conversionContext =
+                new(
+                    MetaEnvironment.Create(
+                        Assembly.Load("LeagueToolkit.Meta.Classes").GetExportedTypes().Where(x => x.IsClass)
+                    ),
+                    new()
+                    {
+                        FlipAcrossX = options.FlipAcrossX,
+                        GameDataPath = options.GameDataPath,
+                        LayerGroupingPolicy = options.LayerGroupingPolicy,
+                        TextureQuality = options.TextureQuality
+                    }
+                );
+
+            using MapGeometry mapGeometry = new(options.MapGeometryPath);
+            BinTree materialsBin = new(options.MaterialsBinPath);
+
+            mapGeometry.ToGltf(materialsBin, conversionContext).Save(options.GltfPath);
 
             return 1;
         }

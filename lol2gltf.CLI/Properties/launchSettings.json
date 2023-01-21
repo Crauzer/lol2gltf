@@ -1,8 +1,12 @@
 {
   "profiles": {
-    "lol2gltf": {
+    "skn2gltf": {
       "commandName": "Project",
       "commandLineArgs": "skn2gltf -m gwen_base.skn -s gwen_base.skl -g gwen_base.glb --materials Body --textures Gwen_Base_Main_TX_CM.dds --anm animations"
+    },
+    "mapgeo2gltf": {
+      "commandName": "Project",
+      "commandLineArgs": "mapgeo2gltf -m X:/lol/game/data/maps/mapgeometry/map11/base_srx.mapgeo -b X:/lol/game/data/maps/mapgeometry/map11/base_srx.materials.bin -g base_srx.glb"
     }
   }
 }

@@ -52,7 +52,7 @@ namespace lol2gltf.CLI
         )]
         public string GltfPath { get; set; }
 
-        [Option('g', "gamedata", Required = false, HelpText = "Game Data path (required for bundling textures)")]
+        [Option('d', "gamedata", Required = false, HelpText = "Game Data path (required for bundling textures)")]
         public string GameDataPath { get; set; }
 
         [Option('x', "flipX", Required = false, Default = true, HelpText = "Whether to flip the map node's X axis")]

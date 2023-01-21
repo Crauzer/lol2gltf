@@ -5,15 +5,25 @@ on:
       version:
         description: 'Release version'     
         required: true
-      
+      is_prerelease:
+        description: 'Is prerelease Version'
+        type: boolean
+        required: true
+
+env:
+  LOL2GLTF_RID: "win10-x64"
+  LOL2GLTF_CLI_RID: "win-x64"
+  
+  LOL2GLTF_PROJECT: "lol2gltf"
+  LOL2GLTF_CLI_PROJECT: "lol2gltf.CLI"
+  
+  LOL2GLTF_OUTPUT: "${{ env.LOL2GLTF_PROJECT }}_${{ env.LOL2GLTF_RID }}"
+  LOL2GLTF_CLI_OUTPUT: "${{ env.LOL2GLTF_CLI_PROJECT }}_${{ env.LOL2GLTF_CLI_RID }}"
+  
+  BUILD_CONFIG: "Release"
+
 jobs:
   publish-lol2gltf:
-    env:
-      LOL2GLTF_PROJECT: "lol2gltf"
-      BUILD_CONFIG: "Release"
-      BUILD_RID: "win10-x64"
-      OUTPUT_DIR: "lol2gltf_win10-x64"
-
     runs-on: windows-latest
 
     permissions:
@@ -33,21 +43,15 @@ jobs:
         run: dotnet restore
 
       - name: Publish
-        run: dotnet publish ${{ env.LOL2GLTF_PROJECT }} --no-restore -c ${{ env.BUILD_CONFIG }} -o ${{ env.OUTPUT_DIR }} -r ${{ env.BUILD_RID }} -p:PublishSingleFile=true --self-contained true
+        run: dotnet publish ${{ env.LOL2GLTF_PROJECT }} --no-restore -c ${{ env.BUILD_CONFIG }} -o ${{ env.LOL2GLTF_OUTPUT }} -r ${{ env.LOL2GLTF_RID }} -p:PublishSingleFile=true --self-contained true
   
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: "${{ env.LOL2GLTF_PROJECT }}_${{ github.event.inputs.version }}_${{ env.BUILD_RID }}"
-          path: "${{ env.OUTPUT_DIR }}"
+          name: "${{ env.LOL2GLTF_PROJECT }}_${{ github.event.inputs.version }}_${{ env.LOL2GLTF_RID }}"
+          path: "${{ env.LOL2GLTF_OUTPUT }}"
   
   publish-lol2gltf-cli:
-    env:
-      LOL2GLTF_CLI_PROJECT: "lol2gltf.CLI"
-      BUILD_CONFIG: "Release"
-      BUILD_RID: "win-x64"
-      OUTPUT_DIR: "lol2gltf.CLI_win-x64"
-
     runs-on: windows-latest
 
     permissions:
@@ -67,10 +71,28 @@ jobs:
         run: dotnet restore
 
       - name: Publish
-        run: dotnet publish ${{ env.LOL2GLTF_CLI_PROJECT }} --no-restore -c ${{ env.BUILD_CONFIG }} -o ${{ env.OUTPUT_DIR }} -r ${{ env.BUILD_RID }} -p:PublishSingleFile=true --self-contained true
+        run: dotnet publish ${{ env.LOL2GLTF_CLI_PROJECT }} --no-restore -c ${{ env.BUILD_CONFIG }} -o ${{ env.LOL2GLTF_CLI_OUTPUT }} -r ${{ env.LOL2GLTF_CLI_RID }} -p:PublishSingleFile=true --self-contained true
   
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: "${{ env.LOL2GLTF_CLI_PROJECT }}_${{ github.event.inputs.version }}_${{ env.BUILD_RID }}"
-          path: "${{ env.OUTPUT_DIR }}"
+          name: "${{ env.LOL2GLTF_CLI_PROJECT }}_${{ github.event.inputs.version }}_${{ env.LOL2GLTF_CLI_RID }}"
+          path: "${{ env.LOL2GLTF_CLI_OUTPUT }}"
+  release:
+    needs: [publish-lol2gltf, publish-lol2gltf-cli]
+  
+    runs-on: windows-latest
+    
+    permissions:
+      contents: write
+      
+    steps:
+      - name: Download lol2gltf Artifact
+        uses: actions/download-artifact@v3.0.2
+        with:
+          name: "${{ env.LOL2GLTF_PROJECT }}_${{ github.event.inputs.version }}_${{ env.LOL2GLTF_RID }}"
+          
+      - name: Download lol2gltf.CLI Artifact
+        uses: actions/download-artifact@v3.0.2
+        with:
+          name: "${{ env.LOL2GLTF_CLI_PROJECT }}_${{ github.event.inputs.version }}_${{ env.LOL2GLTF_CLI_RID }}"

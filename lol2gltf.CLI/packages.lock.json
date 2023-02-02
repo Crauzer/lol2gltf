@@ -10,9 +10,9 @@
       },
       "LeagueToolkit": {
         "type": "Direct",
-        "requested": "[4.0.0-beta.5, )",
-        "resolved": "4.0.0-beta.5",
-        "contentHash": "ctm+3GS0CtRB/+wfXEjSarWM6k0ZUYk0oiKFeFxkF66IKaBQumSIn5E+ZqWvnsIGRKqoqPKTqK6IhZHRFKZHGA==",
+        "requested": "[4.0.0-beta.6, )",
+        "resolved": "4.0.0-beta.6",
+        "contentHash": "8zosHSRS2kbzpUqlVrIuvfKK3G4SqynawmJhsCPhiQgD8lRGn50NPDCjWuQUz+lMo3fq6eZYKFIUbTIvcxDyWw==",
         "dependencies": {
           "CommunityToolkit.Diagnostics": "8.0.0",
           "CommunityToolkit.HighPerformance": "8.0.0",
@@ -24,11 +24,11 @@
       },
       "LeagueToolkit.IO.Extensions": {
         "type": "Direct",
-        "requested": "[4.0.0-beta.5, )",
-        "resolved": "4.0.0-beta.5",
-        "contentHash": "tHi1vdElqFaOawpD5zep5oOuC/yr0V3KPSNHx9acLSWgASV2+rdEcJS/4MKFkfJrVhgkpV8VnELCQNsxacGlWQ==",
+        "requested": "[4.0.0-beta.6, )",
+        "resolved": "4.0.0-beta.6",
+        "contentHash": "pxvrJh8PQC3P12FPEfxBHAUqBiTVeLgdDgYWuIh4DeomD5qTG+TrK+oozZJP7EvlHLk3pOrpNouISXVz/0/uiw==",
         "dependencies": {
-          "LeagueToolkit": "4.0.0-beta.5",
+          "LeagueToolkit": "4.0.0-beta.6",
           "LeagueToolkit.Meta.Classes": "13.3.490.3613",
           "SharpGLTF.Toolkit": "1.0.0-alpha0027"
         }

@@ -7,6 +7,10 @@
     "mapgeo2gltf": {
       "commandName": "Project",
       "commandLineArgs": "mapgeo2gltf -m X:/lol/game/data/maps/mapgeometry/map11/base_srx.mapgeo -b X:/lol/game/data/maps/mapgeometry/map11/base_srx.materials.bin -g base_srx.glb"
+    },
+    "gltf2skn": {
+      "commandName": "Project",
+      "commandLineArgs": "gltf2skn -g akali.glb -m akali.skn -s akali.skl"
     }
   }
 }

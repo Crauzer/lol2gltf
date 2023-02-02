@@ -8,6 +8,7 @@ using LeagueToolkit.IO.PropertyBin;
 using LeagueToolkit.IO.SimpleSkinFile;
 using LeagueToolkit.Meta;
 using LeagueToolkit.Toolkit;
+using SharpGLTF.Schema2;
 using SixLabors.ImageSharp;
 using System;
 using System.Collections.Generic;
@@ -24,10 +25,11 @@ namespace lol2gltf.CLI
         static void Main(string[] args)
         {
             CommandLine.Parser.Default
-                .ParseArguments<SkinnedMeshToGltfOptions, MapGeometryToGltfOptions>(args)
+                .ParseArguments<SkinnedMeshToGltfOptions, MapGeometryToGltfOptions, GltfToSkinnedMeshOptions>(args)
                 .MapResult(
                     (SkinnedMeshToGltfOptions opts) => ConvertSkinnedMeshToGltf(opts),
                     (MapGeometryToGltfOptions opts) => ConvertMapGeometryToGltf(opts),
+                    (GltfToSkinnedMeshOptions opts) => ConvertGltfToSkinnedMesh(opts),
                     HandleErrors
                 );
         }
@@ -70,6 +72,27 @@ namespace lol2gltf.CLI
             RigResource skeleton = new(skeletonStream);
 
             simpleSkin.ToGltf(skeleton, textures, animations).Save(options.GltfPath);
+
+            return 1;
+        }
+
+        private static int ConvertGltfToSkinnedMesh(GltfToSkinnedMeshOptions options)
+        {
+            string skeletonPath = string.IsNullOrEmpty(options.SkeletonPath) switch
+            {
+                true => Path.ChangeExtension(options.SimpleSkinPath, "skl"),
+                false => options.SkeletonPath
+            };
+
+            ModelRoot gltf = ModelRoot.Load(options.GltfPath);
+
+            var (simpleSkin, rig) = gltf.ToRiggedMesh();
+
+            using FileStream simpleSkinStream = File.Create(options.SimpleSkinPath);
+            simpleSkin.WriteSimpleSkin(simpleSkinStream);
+
+            using FileStream rigStream = File.Create(skeletonPath);
+            rig.Write(rigStream);
 
             return 1;
         }

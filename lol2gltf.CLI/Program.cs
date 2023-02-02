@@ -1,11 +1,11 @@
 ﻿using BCnEncoder.Shared;
 using CommandLine;
 using CommunityToolkit.HighPerformance;
+using LeagueToolkit.Core.Animation;
 using LeagueToolkit.Core.Mesh;
 using LeagueToolkit.IO.MapGeometryFile;
 using LeagueToolkit.IO.PropertyBin;
 using LeagueToolkit.IO.SimpleSkinFile;
-using LeagueToolkit.IO.SkeletonFile;
 using LeagueToolkit.Meta;
 using LeagueToolkit.Toolkit;
 using SixLabors.ImageSharp;
@@ -15,7 +15,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using ImageSharpImage = SixLabors.ImageSharp.Image;
-using LeagueAnimation = LeagueToolkit.IO.AnimationFile.Animation;
 using LeagueTexture = LeagueToolkit.Core.Renderer.Texture;
 
 namespace lol2gltf.CLI
@@ -44,33 +43,33 @@ namespace lol2gltf.CLI
                 throw new InvalidOperationException("Material name count and Animation path count must be equal");
 
             // Convert textures to png
-            Dictionary<string, ReadOnlyMemory<byte>> materialTextures =
-                new(
-                    options.MaterialNames
-                        .Zip(options.TexturePaths)
-                        .Select(x =>
-                        {
-                            using FileStream textureFileStream = File.OpenRead(x.Second);
-                            LeagueTexture texture = LeagueTexture.Load(textureFileStream);
+            IEnumerable<(string, Stream)> textures = options.MaterialNames
+                .Zip(options.TexturePaths)
+                .Select(x =>
+                {
+                    using FileStream textureFileStream = File.OpenRead(x.Second);
+                    LeagueTexture texture = LeagueTexture.Load(textureFileStream);
 
-                            ReadOnlyMemory2D<ColorRgba32> mipMap = texture.Mips[0];
-                            using ImageSharpImage image = mipMap.ToImage();
+                    ReadOnlyMemory2D<ColorRgba32> mipMap = texture.Mips[0];
+                    using ImageSharpImage image = mipMap.ToImage();
 
-                            using MemoryStream imageStream = new();
-                            image.SaveAsPng(imageStream);
+                    MemoryStream imageStream = new();
+                    image.SaveAsPng(imageStream);
+                    imageStream.Seek(0, SeekOrigin.Begin);
 
-                            return new KeyValuePair<string, ReadOnlyMemory<byte>>(x.First, imageStream.ToArray());
-                        })
-                );
+                    return (x.First, (Stream)imageStream);
+                });
 
-            List<(string name, LeagueAnimation animation)> animations = !string.IsNullOrEmpty(options.AnimationsPath)
+            IEnumerable<(string, IAnimationAsset)> animations = !string.IsNullOrEmpty(options.AnimationsPath)
                 ? LoadAnimations(options.AnimationsPath)
-                : new();
+                : Enumerable.Empty<(string, IAnimationAsset)>();
+
+            using FileStream skeletonStream = File.OpenRead(options.SkeletonPath);
 
             SkinnedMesh simpleSkin = SkinnedMesh.ReadFromSimpleSkin(options.SimpleSkinPath);
-            Skeleton skeleton = new(options.SkeletonPath);
+            RigResource skeleton = new(skeletonStream);
 
-            simpleSkin.ToGltf(skeleton, materialTextures, animations).Save(options.GltfPath);
+            simpleSkin.ToGltf(skeleton, textures, animations).Save(options.GltfPath);
 
             return 1;
         }
@@ -99,13 +98,13 @@ namespace lol2gltf.CLI
             return 1;
         }
 
-        private static List<(string name, LeagueAnimation animation)> LoadAnimations(string path) =>
+        private static IEnumerable<(string, IAnimationAsset)> LoadAnimations(string path) =>
             Directory
                 .EnumerateFiles(path, "*.anm")
-                .Select(
-                    animationPath =>
-                        (Path.GetFileNameWithoutExtension(animationPath), new LeagueAnimation(animationPath))
-                )
-                .ToList();
+                .Select(animationPath =>
+                {
+                    using FileStream stream = File.OpenRead(animationPath);
+                    return (Path.GetFileNameWithoutExtension(animationPath), AnimationAsset.Load(stream));
+                });
     }
 }

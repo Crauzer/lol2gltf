@@ -29,9 +29,10 @@
 * Features:
 * * Skinned Mesh (skn, skl, anm) -> glTF
 * * Map Geometry -> glTF
+* * glTF -> SKN/SKL
 
 * Upcoming features:
-* * Converting glTF back into SKN, SKL and ANM
+* * glTF -> ANM
 
 ******
 ![](https://www.khronos.org/assets/uploads/apis/2017-collada-gltf-positioning.png)

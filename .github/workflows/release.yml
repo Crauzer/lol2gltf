@@ -91,19 +91,19 @@ jobs:
         uses: actions/download-artifact@v3.0.2
         with:
           name: "${{ env.LOL2GLTF_PROJECT }}_${{ github.event.inputs.version }}_${{ env.LOL2GLTF_RID }}"
-          path: "${{ env.LOL2GLTF_PROJECT }}_publish"
+          path: "./${{ env.LOL2GLTF_PROJECT }}_publish"
           
       - name: Download lol2gltf.CLI Artifact
         uses: actions/download-artifact@v3.0.2
         with:
           name: "${{ env.LOL2GLTF_CLI_PROJECT }}_${{ github.event.inputs.version }}_${{ env.LOL2GLTF_CLI_RID }}"
-          path: "${{ env.LOL2GLTF_CLI_PROJECT }}_publish"
+          path: "./${{ env.LOL2GLTF_CLI_PROJECT }}_publish"
       
       - name: Package lol2gltf
-        run: 7z a "${{ env.LOL2GLTF_PROJECT }}_${{ github.event.inputs.version }}_${{ env.LOL2GLTF_RID }}.zip" "./${{ env.LOL2GLTF_PROJECT }}_publish/*"
+        run: 7z a "./${{ env.LOL2GLTF_PROJECT }}_${{ github.event.inputs.version }}_${{ env.LOL2GLTF_RID }}.zip" "./${{ env.LOL2GLTF_PROJECT }}_publish/*"
       
       - name: Package lol2gltf.CLI
-        run: 7z a "${{ env.LOL2GLTF_CLI_PROJECT }}_${{ github.event.inputs.version }}_${{ env.LOL2GLTF_CLI_RID }}.zip" "./${{ env.LOL2GLTF_CLI_PROJECT }}_publish/*"
+        run: 7z a "./${{ env.LOL2GLTF_CLI_PROJECT }}_${{ github.event.inputs.version }}_${{ env.LOL2GLTF_CLI_RID }}.zip" "./${{ env.LOL2GLTF_CLI_PROJECT }}_publish/*"
         
       - name: Create Release
         uses: softprops/action-gh-release@v1

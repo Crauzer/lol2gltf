@@ -35,6 +35,24 @@ namespace lol2gltf.CLI
         public IEnumerable<string> TexturePaths { get; set; }
     }
 
+    [Verb("gltf2skn", HelpText = "Converts a glTF asset into a Skinned Mesh (.skn, .skl)")]
+    public class GltfToSkinnedMeshOptions
+    {
+        [Option('g', "gltf", Required = true, HelpText = "glTF Asset (.glb, .gltf) path")]
+        public string GltfPath { get; set; }
+
+        [Option('m', "skn", Required = true, HelpText = "Simple Skin (.skn) path")]
+        public string SimpleSkinPath { get; set; }
+
+        [Option(
+            's',
+            "skl",
+            Required = false,
+            HelpText = "Skeleton (.skl) path (if not specified, will be saved under the same name as the Simple Skin)"
+        )]
+        public string SkeletonPath { get; set; }
+    }
+
     [Verb("mapgeo2gltf", HelpText = "Converts Map Geometry into a glTF asset")]
     public class MapGeometryToGltfOptions
     {

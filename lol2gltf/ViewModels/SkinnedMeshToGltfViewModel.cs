@@ -5,8 +5,8 @@ using Avalonia.Controls.Mixins;
 using CommunityToolkit.Diagnostics;
 using DynamicData;
 using FluentAvalonia.UI.Controls;
+using LeagueToolkit.Core.Animation;
 using LeagueToolkit.Core.Mesh;
-using LeagueToolkit.IO.SkeletonFile;
 using lol2gltf.Helpers;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -20,7 +20,6 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using LeagueAnimation = LeagueToolkit.IO.AnimationFile.Animation;
 
 namespace lol2gltf.ViewModels
 {
@@ -43,14 +42,14 @@ namespace lol2gltf.ViewModels
         public SkinnedMesh SimpleSkin => this._simpleSkin?.Value;
         private ObservableAsPropertyHelper<SkinnedMesh> _simpleSkin;
 
-        public Skeleton Skeleton => this._skeleton?.Value;
-        private ObservableAsPropertyHelper<Skeleton> _skeleton;
+        public RigResource Skeleton => this._skeleton?.Value;
+        private ObservableAsPropertyHelper<RigResource> _skeleton;
 
         public ReactiveCommand<Unit, string> SelectSimpleSkinPathCommand { get; }
         public ReactiveCommand<Unit, string> SelectSkeletonPathCommand { get; }
 
         public ReactiveCommand<string, SkinnedMesh> LoadSimpleSkinCommand { get; }
-        public ReactiveCommand<string, Skeleton> LoadSkeletonCommand { get; }
+        public ReactiveCommand<string, RigResource> LoadSkeletonCommand { get; }
 
         public ReactiveCommand<Unit, Unit> AddAnimationsCommand { get; }
         public ReactiveCommand<IList, Unit> RemoveSelectedAnimationsCommand { get; }
@@ -78,7 +77,7 @@ namespace lol2gltf.ViewModels
             this.SelectSkeletonPathCommand = ReactiveCommand.CreateFromTask(SelectSkeletonPathAsync);
 
             this.LoadSimpleSkinCommand = ReactiveCommand.Create<string, SkinnedMesh>(LoadSimpleSkin);
-            this.LoadSkeletonCommand = ReactiveCommand.Create<string, Skeleton>(LoadSkeleton);
+            this.LoadSkeletonCommand = ReactiveCommand.Create<string, RigResource>(LoadSkeleton);
 
             this.AddAnimationsCommand = ReactiveCommand.CreateFromTask(AddAnimationsAsync);
             this.RemoveSelectedAnimationsCommand = ReactiveCommand.Create<IList>(RemoveSelectedAnimations);
@@ -202,14 +201,15 @@ namespace lol2gltf.ViewModels
             }
         }
 
-        private Skeleton LoadSkeleton(string path)
+        private RigResource LoadSkeleton(string path)
         {
             if (string.IsNullOrEmpty(path))
                 return null;
 
             try
             {
-                return new(path);
+                using FileStream stream = File.OpenRead(path);
+                return new(stream);
             }
             catch (Exception exception)
             {
@@ -232,7 +232,8 @@ namespace lol2gltf.ViewModels
                 string animationName = Path.GetFileNameWithoutExtension(path);
                 try
                 {
-                    LeagueAnimation animation = new(path);
+                    using FileStream stream = File.OpenRead(path);
+                    IAnimationAsset animation = AnimationAsset.Load(stream);
                     this.Animations.Add(new(animationName, animation));
                 }
                 catch (Exception exception)
@@ -338,11 +339,11 @@ namespace lol2gltf.ViewModels
     public class AnimationViewModel
     {
         public string Name { get; }
-        public float FPS => this.Animation.FPS;
+        public float FPS => this.Animation.Fps;
 
-        public LeagueAnimation Animation { get; }
+        public IAnimationAsset Animation { get; }
 
-        public AnimationViewModel(string name, LeagueAnimation animation)
+        public AnimationViewModel(string name, IAnimationAsset animation)
         {
             this.Name = name;
             this.Animation = animation;

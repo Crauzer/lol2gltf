@@ -6,10 +6,10 @@ using BCnEncoder.Shared;
 using CommunityToolkit.Diagnostics;
 using CommunityToolkit.HighPerformance;
 using FluentAvalonia.UI.Controls;
+using LeagueToolkit.Core.Animation;
 using LeagueToolkit.Core.Mesh;
 using LeagueToolkit.IO.MapGeometryFile;
 using LeagueToolkit.IO.SimpleSkinFile;
-using LeagueToolkit.IO.SkeletonFile;
 using LeagueToolkit.Toolkit;
 using lol2gltf.ViewModels;
 using ReactiveUI;
@@ -25,7 +25,6 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using ImageSharpImage = SixLabors.ImageSharp.Image;
-using LeagueAnimation = LeagueToolkit.IO.AnimationFile.Animation;
 using LeagueTexture = LeagueToolkit.Core.Renderer.Texture;
 
 namespace lol2gltf.Views
@@ -188,18 +187,15 @@ namespace lol2gltf.Views
                     TaskDialogProgressState progressState =
                         TaskDialogProgressState.Normal | TaskDialogProgressState.Indeterminate;
 
-                    Dictionary<string, ReadOnlyMemory<byte>> materialTextures = await CreateMaterialTexturesAsync(
+                    List<(string, Stream)> textures = await CreateMaterialTexturesAsync(
                         this.ViewModel.SkinnedMeshPrimitives
                     );
-                    List<(string name, LeagueAnimation animation)> animations =
-                        new(
-                            this.ViewModel.Animations
-                                .Select(animation => (animation.Name, animation.Animation))
-                                .DistinctBy(animation => animation.Name)
-                        );
+                    IEnumerable<(string, IAnimationAsset)> animations = this.ViewModel.Animations
+                        .Select(animation => (animation.Name, animation.Animation))
+                        .DistinctBy(animation => animation.Name);
 
                     SkinnedMesh skinnedMesh = this.ViewModel.SimpleSkin;
-                    Skeleton skeleton = this.ViewModel.Skeleton;
+                    RigResource skeleton = this.ViewModel.Skeleton;
                     TaskDialog dialog =
                         new()
                         {
@@ -224,8 +220,8 @@ namespace lol2gltf.Views
 
                             ModelRoot gltfAsset = skeleton switch
                             {
-                                null => skinnedMesh.ToGltf(materialTextures),
-                                Skeleton skeleton => skinnedMesh.ToGltf(skeleton, materialTextures, animations)
+                                null => skinnedMesh.ToGltf(textures),
+                                RigResource skeleton => skinnedMesh.ToGltf(skeleton, textures, animations)
                             };
 
                             // Save glTF asset
@@ -253,11 +249,11 @@ namespace lol2gltf.Views
             );
         }
 
-        private static async Task<Dictionary<string, ReadOnlyMemory<byte>>> CreateMaterialTexturesAsync(
+        private static async Task<List<(string Material, Stream Texture)>> CreateMaterialTexturesAsync(
             IEnumerable<SkinnedMeshPrimitiveViewModel> primitives
         )
         {
-            Dictionary<string, ReadOnlyMemory<byte>> materialTextures = new();
+            List<(string, Stream)> textures = new();
 
             IEnumerable<SkinnedMeshPrimitiveViewModel> texturedPrimitives = primitives.Where(
                 x => string.IsNullOrEmpty(x.TexturePath) is false
@@ -270,13 +266,14 @@ namespace lol2gltf.Views
                 ReadOnlyMemory2D<ColorRgba32> mipMap = texture.Mips[0];
                 using ImageSharpImage image = mipMap.ToImage();
 
-                using MemoryStream imageStream = new();
+                MemoryStream imageStream = new();
                 await image.SaveAsPngAsync(imageStream);
+                imageStream.Seek(0, SeekOrigin.Begin);
 
-                materialTextures.Add(primitive.Material, imageStream.ToArray());
+                textures.Add((primitive.Material, imageStream));
             }
 
-            return materialTextures;
+            return textures;
         }
     }
 }

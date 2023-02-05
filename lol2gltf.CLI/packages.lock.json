@@ -10,25 +10,25 @@
       },
       "LeagueToolkit": {
         "type": "Direct",
-        "requested": "[4.0.0-beta.7, )",
-        "resolved": "4.0.0-beta.7",
-        "contentHash": "/ZDkdFbQXtTuV6LlU/sknGLfMUqkzbnk4R8xo5qy71LA3SZaODNakkkAS2wPKmhhZKGrZR5qN5FovCVMLV0JUA==",
+        "requested": "[4.0.0-beta.8, )",
+        "resolved": "4.0.0-beta.8",
+        "contentHash": "muVXeGjT1aGCt/Ou16Nm4zdxOvyG9zj+GRI3agKEhNuUVd2JllFhkYN++iRu6r5yj6Xu2iHtrf8iMXnbyRL6Xg==",
         "dependencies": {
           "CommunityToolkit.Diagnostics": "8.0.0",
           "CommunityToolkit.HighPerformance": "8.0.0",
           "FlatSharp.Runtime": "7.0.2",
           "SixLabors.ImageSharp": "2.1.3",
-          "XXHash3.NET": "1.2.2",
-          "ZstdSharp.Port": "0.6.1"
+          "XXHash3.NET": "2.1.0",
+          "ZstdNet": "1.4.5"
         }
       },
       "LeagueToolkit.IO.Extensions": {
         "type": "Direct",
-        "requested": "[4.0.0-beta.7, )",
-        "resolved": "4.0.0-beta.7",
-        "contentHash": "Kd1h2xeNWfD231O25t6euUUVflIELbN5UJwQW4YHu4ekLluntf2tTRxxv+PxWtcWe2zXgYtZ1Ol9iAyZF6Od8A==",
+        "requested": "[4.0.0-beta.8, )",
+        "resolved": "4.0.0-beta.8",
+        "contentHash": "2/MGW6pWdwaDRupIbkaIXBh+A3pJG20cViTuc7ggIy7ltdPPTHIyXnRvsJRz+mkTOsw5fwSgwC4/BOMD4Wtfsg==",
         "dependencies": {
-          "LeagueToolkit": "4.0.0-beta.7",
+          "LeagueToolkit": "4.0.0-beta.8",
           "LeagueToolkit.Meta.Classes": "13.3.490.3613",
           "SharpGLTF.Toolkit": "1.0.0-alpha0027"
         }
@@ -107,16 +107,16 @@
       },
       "XXHash3.NET": {
         "type": "Transitive",
-        "resolved": "1.2.2",
-        "contentHash": "/JFi9foLqJoxuS60X+/zV29W347NAEenkgbEnvJupwkKohlQB9T5ce4LhgGT785G2+yKZJVgNyJ9T3VhwVH0cA==",
+        "resolved": "2.1.0",
+        "contentHash": "lLCpCFIb7Uwun3TaMcb8W2RMmMXATjwwNOD97Cmo3iXhnlrhSfGfWVOEFwRn6Ngcc3qTexPaIVDOgmPRe1mSmw==",
         "dependencies": {
-          "System.Memory": "4.5.4"
+          "CommunityToolkit.Diagnostics": "8.0.0"
         }
       },
-      "ZstdSharp.Port": {
+      "ZstdNet": {
         "type": "Transitive",
-        "resolved": "0.6.1",
-        "contentHash": "KZjt1x8ioy16iuFIBbNq7Sv9nAXU4k5DVSPB4cP69qaAnEeO/ru7MwfvAXHTfFKJTipOgHtvolL+QMRiYGGxkw=="
+        "resolved": "1.4.5",
+        "contentHash": "fi9aP1QY3ZenIMUW1pxdSjku6lYAUjScrwfXSXT1qyKtTdLxOIzeBMe+w/hQm0vMsvQnjcFInByMrIT7AlXUHA=="
       }
     },
     "net6.0/win-x64": {

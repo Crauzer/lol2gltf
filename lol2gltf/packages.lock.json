@@ -101,26 +101,26 @@
       },
       "LeagueToolkit": {
         "type": "Direct",
-        "requested": "[4.0.0-beta.8, )",
-        "resolved": "4.0.0-beta.8",
-        "contentHash": "muVXeGjT1aGCt/Ou16Nm4zdxOvyG9zj+GRI3agKEhNuUVd2JllFhkYN++iRu6r5yj6Xu2iHtrf8iMXnbyRL6Xg==",
+        "requested": "[4.0.0-beta.11, )",
+        "resolved": "4.0.0-beta.11",
+        "contentHash": "FHA9vo+JmlEsI8VhDcTD8c4ppDReGoPt0OVU2En4XLKYtP7ioOLmhoeUnXwo3tgjjxZAZxL5SgNuDSYpML1mvQ==",
         "dependencies": {
           "CommunityToolkit.Diagnostics": "8.0.0",
           "CommunityToolkit.HighPerformance": "8.0.0",
           "FlatSharp.Runtime": "7.0.2",
           "SixLabors.ImageSharp": "2.1.3",
           "XXHash3.NET": "2.1.0",
-          "ZstdNet": "1.4.5"
+          "ZstdSharp.Port": "0.6.7"
         }
       },
       "LeagueToolkit.IO.Extensions": {
         "type": "Direct",
-        "requested": "[4.0.0-beta.8, )",
-        "resolved": "4.0.0-beta.8",
-        "contentHash": "2/MGW6pWdwaDRupIbkaIXBh+A3pJG20cViTuc7ggIy7ltdPPTHIyXnRvsJRz+mkTOsw5fwSgwC4/BOMD4Wtfsg==",
+        "requested": "[4.0.0-beta.11, )",
+        "resolved": "4.0.0-beta.11",
+        "contentHash": "wWu8WzvcQEzbwSdzoiFA5lyHcTZpQP1q8NBSuzTXxGcHMHQ1G+8Zs33pNnCbb2EGZSusWSY1/CENRTS1j5y/kw==",
         "dependencies": {
-          "LeagueToolkit": "4.0.0-beta.8",
-          "LeagueToolkit.Meta.Classes": "13.3.490.3613",
+          "LeagueToolkit": "4.0.0-beta.11",
+          "LeagueToolkit.Meta.Classes": "4.0.0-beta.11",
           "SharpGLTF.Toolkit": "1.0.0-alpha0027"
         }
       },
@@ -321,10 +321,10 @@
       },
       "LeagueToolkit.Meta.Classes": {
         "type": "Transitive",
-        "resolved": "13.3.490.3613",
-        "contentHash": "753Jja0Xc//W9WFpu85ifX/vw0z62CVu8la/XpEGh5bn3LloF7RvaBuLWlAxEnOL3acymMupZvDTa0LJbrlkDg==",
+        "resolved": "4.0.0-beta.11",
+        "contentHash": "M/fTwvLZduvMztRB0yJVHbbti24d96+T+h5WV5E0IZkb36A6knCIvNQb+Drv5CorQXMPJSAdBFwl+MpPZYRBhw==",
         "dependencies": {
-          "LeagueToolkit": "4.0.0-beta.5"
+          "LeagueToolkit": "4.0.0-beta.11"
         }
       },
       "MicroCom.CodeGenerator.MSBuild": {
@@ -901,10 +901,10 @@
           "CommunityToolkit.Diagnostics": "8.0.0"
         }
       },
-      "ZstdNet": {
+      "ZstdSharp.Port": {
         "type": "Transitive",
-        "resolved": "1.4.5",
-        "contentHash": "fi9aP1QY3ZenIMUW1pxdSjku6lYAUjScrwfXSXT1qyKtTdLxOIzeBMe+w/hQm0vMsvQnjcFInByMrIT7AlXUHA=="
+        "resolved": "0.6.7",
+        "contentHash": "h29Aow/VACXrMEAIbDC0gQmVMqccVL1LmcwW7X3iimI4wDJsPIHbV11Kf/W6ZakfcYAO1bp7eds/cwb6rysi5Q=="
       }
     },
     "net6.0-windows7.0/win10-x64": {

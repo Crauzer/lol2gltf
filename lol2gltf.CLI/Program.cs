@@ -2,9 +2,10 @@
 using CommandLine;
 using CommunityToolkit.HighPerformance;
 using LeagueToolkit.Core.Animation;
+using LeagueToolkit.Core.Environment;
 using LeagueToolkit.Core.Mesh;
+using LeagueToolkit.Core.Meta;
 using LeagueToolkit.IO.MapGeometryFile;
-using LeagueToolkit.IO.PropertyBin;
 using LeagueToolkit.IO.SimpleSkinFile;
 using LeagueToolkit.Meta;
 using LeagueToolkit.Toolkit;
@@ -113,8 +114,11 @@ namespace lol2gltf.CLI
                     }
                 );
 
-            using MapGeometry mapGeometry = new(options.MapGeometryPath);
-            BinTree materialsBin = new(options.MaterialsBinPath);
+            using FileStream environmentAssetStream = File.OpenRead(options.MapGeometryPath);
+            using FileStream materialsBinStream = File.OpenRead(options.MaterialsBinPath);
+
+            using EnvironmentAsset mapGeometry = new(environmentAssetStream);
+            BinTree materialsBin = new(materialsBinStream);
 
             mapGeometry.ToGltf(materialsBin, conversionContext).Save(options.GltfPath);
 

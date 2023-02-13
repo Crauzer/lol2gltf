@@ -1,13 +1,15 @@
 ﻿using CommunityToolkit.Diagnostics;
 using FluentAvalonia.UI.Controls;
+using LeagueToolkit.Core.Environment;
+using LeagueToolkit.Core.Meta;
 using LeagueToolkit.IO.MapGeometryFile;
-using LeagueToolkit.IO.PropertyBin;
 using lol2gltf.Helpers;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Splat;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -42,8 +44,8 @@ namespace lol2gltf.ViewModels
         [Reactive]
         public bool FlipAcrossX { get; set; } = true;
 
-        public MapGeometry MapGeometry => this._mapGeometry?.Value;
-        private ObservableAsPropertyHelper<MapGeometry> _mapGeometry;
+        public EnvironmentAsset MapGeometry => this._mapGeometry?.Value;
+        private ObservableAsPropertyHelper<EnvironmentAsset> _mapGeometry;
 
         public BinTree MaterialsBin => this._materialsBin?.Value;
         private ObservableAsPropertyHelper<BinTree> _materialsBin;
@@ -51,7 +53,7 @@ namespace lol2gltf.ViewModels
         public ReactiveCommand<Unit, string> SelectMapGeometryPathCommand { get; }
         public ReactiveCommand<Unit, string> SelectMaterialsBinPathCommand { get; }
 
-        public ReactiveCommand<string, MapGeometry> LoadMapGeometryCommand { get; }
+        public ReactiveCommand<string, EnvironmentAsset> LoadMapGeometryCommand { get; }
         public ReactiveCommand<string, BinTree> LoadMaterialsBinCommand { get; }
         public ReactiveCommand<Unit, Unit> SelectGameDataPathCommand { get; }
         public ReactiveCommand<string, Unit> ExportGltfCommand { get; }
@@ -77,7 +79,7 @@ namespace lol2gltf.ViewModels
             this.SelectMaterialsBinPathCommand = ReactiveCommand.CreateFromTask(SelectMaterialsBinPathAsync);
             this.SelectGameDataPathCommand = ReactiveCommand.CreateFromTask(SelectGameDataPathAsync);
 
-            this.LoadMapGeometryCommand = ReactiveCommand.Create<string, MapGeometry>(LoadMapGeometry);
+            this.LoadMapGeometryCommand = ReactiveCommand.Create<string, EnvironmentAsset>(LoadMapGeometry);
             this.LoadMaterialsBinCommand = ReactiveCommand.Create<string, BinTree>(LoadMaterialsBin);
 
             this.ExportGltfCommand = ReactiveCommand.CreateFromObservable<string, Unit>(
@@ -161,14 +163,15 @@ namespace lol2gltf.ViewModels
             return path;
         }
 
-        private MapGeometry LoadMapGeometry(string path)
+        private EnvironmentAsset LoadMapGeometry(string path)
         {
             if (string.IsNullOrEmpty(path))
                 return null;
 
             try
             {
-                return new(path);
+                using FileStream stream = File.OpenRead(path);
+                return new(stream);
             }
             catch (Exception exception)
             {
@@ -183,7 +186,8 @@ namespace lol2gltf.ViewModels
 
             try
             {
-                return new(path);
+                using FileStream stream = File.OpenRead(path);
+                return new(stream);
             }
             catch (Exception exception)
             {

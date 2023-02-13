@@ -2,11 +2,11 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.ReactiveUI;
-using Avalonia.Threading;
 using CommunityToolkit.Diagnostics;
 using FluentAvalonia.UI.Controls;
+using LeagueToolkit.Core.Environment;
+using LeagueToolkit.Core.Meta;
 using LeagueToolkit.IO.MapGeometryFile;
-using LeagueToolkit.IO.PropertyBin;
 using LeagueToolkit.Meta;
 using lol2gltf.ViewModels;
 using ReactiveUI;
@@ -188,7 +188,7 @@ namespace lol2gltf.Views
                     TaskDialogProgressState progressState =
                         TaskDialogProgressState.Normal | TaskDialogProgressState.Indeterminate;
 
-                    MapGeometry mapGeometry = this.ViewModel.MapGeometry;
+                    EnvironmentAsset mapGeometry = this.ViewModel.MapGeometry;
                     BinTree materialsBin = this.ViewModel.MaterialsBin;
 
                     MapGeometryGltfConversionContext conversionContext =

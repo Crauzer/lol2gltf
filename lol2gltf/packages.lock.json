@@ -101,9 +101,9 @@
       },
       "LeagueToolkit": {
         "type": "Direct",
-        "requested": "[4.0.0-beta.11, )",
-        "resolved": "4.0.0-beta.11",
-        "contentHash": "FHA9vo+JmlEsI8VhDcTD8c4ppDReGoPt0OVU2En4XLKYtP7ioOLmhoeUnXwo3tgjjxZAZxL5SgNuDSYpML1mvQ==",
+        "requested": "[4.0.0-beta.14, )",
+        "resolved": "4.0.0-beta.14",
+        "contentHash": "O7zFv6KTApx56i4eD1K3XLjs+XyH9NYUroRQ8AyT7m5FfmU0Tt09hxwCHhCR35u0RuhVUJpogEdOvE4EZvdgcQ==",
         "dependencies": {
           "CommunityToolkit.Diagnostics": "8.0.0",
           "CommunityToolkit.HighPerformance": "8.0.0",
@@ -115,12 +115,12 @@
       },
       "LeagueToolkit.IO.Extensions": {
         "type": "Direct",
-        "requested": "[4.0.0-beta.11, )",
-        "resolved": "4.0.0-beta.11",
-        "contentHash": "wWu8WzvcQEzbwSdzoiFA5lyHcTZpQP1q8NBSuzTXxGcHMHQ1G+8Zs33pNnCbb2EGZSusWSY1/CENRTS1j5y/kw==",
+        "requested": "[4.0.0-beta.14, )",
+        "resolved": "4.0.0-beta.14",
+        "contentHash": "VPpQPH560hOGPumvSH1wKSIC9+sg6KNJJrXYNoVB220O/Qx++8JHNFpPUpMSg1zUKVcCdPN/TWcUaI+n5dzH2Q==",
         "dependencies": {
-          "LeagueToolkit": "4.0.0-beta.11",
-          "LeagueToolkit.Meta.Classes": "4.0.0-beta.11",
+          "LeagueToolkit": "4.0.0-beta.14",
+          "LeagueToolkit.Meta.Classes": "4.0.0-beta.14",
           "SharpGLTF.Toolkit": "1.0.0-alpha0027"
         }
       },
@@ -321,10 +321,10 @@
       },
       "LeagueToolkit.Meta.Classes": {
         "type": "Transitive",
-        "resolved": "4.0.0-beta.11",
-        "contentHash": "M/fTwvLZduvMztRB0yJVHbbti24d96+T+h5WV5E0IZkb36A6knCIvNQb+Drv5CorQXMPJSAdBFwl+MpPZYRBhw==",
+        "resolved": "4.0.0-beta.14",
+        "contentHash": "KDbydlMx8/+HIHMZ04X85vQicRM5ZBaTeaBdXEgBr+WlkvYGm0OvE3YfcgLZaE/XkLSzmI/otDNbTe99UbQorA==",
         "dependencies": {
-          "LeagueToolkit": "4.0.0-beta.11"
+          "LeagueToolkit": "4.0.0-beta.14"
         }
       },
       "MicroCom.CodeGenerator.MSBuild": {

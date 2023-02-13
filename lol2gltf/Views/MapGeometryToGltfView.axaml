@@ -33,7 +33,8 @@
                        Text="{Binding MapGeometryPath}"/>
               <Button Name="LoadMapGeometryButton"
                       Grid.Row="1" Grid.Column="1" Margin="16 0 0 0"
-                      Classes="accent">
+                      Classes="accent"
+                      ToolTip.Tip="The path to the map geometry file of the map being converted (Required)">
                 <i:Icon Value="fa-solid fa-file-import" FontSize="16"/>
               </Button>
             </Grid>
@@ -51,7 +52,9 @@
                        Text="{Binding MaterialsBinPath}"/>
               <Button Name="LoadMaterialsBinButton"
                       Grid.Row="1" Grid.Column="1" Margin="16 0 0 0"
-                      Classes="accent">
+                      Classes="accent"
+                      ToolTip.Tip="The path to the materials property bin file of the map being converted
+                      (Required for converting materials)">
                 <i:Icon Value="fa-solid fa-file-import" FontSize="16"/>
               </Button>
             </Grid>
@@ -69,7 +72,9 @@
                        Text="{Binding GameDataPath}"/>
               <Button Name="SelectGameDataPathButton"
                       Grid.Row="1" Grid.Column="1" Margin="16 0 0 0"
-                      Classes="accent">
+                      Classes="accent"
+                      ToolTip.Tip="The path to the extracted data of the map that is being converted 
+                      (Required for converting textures, select the path to which you extracted the whole MapXX wad file)">
                 <i:Icon Value="fa-regular fa-folder-open" FontSize="16"/>
               </Button>
             </Grid>
@@ -94,7 +99,8 @@
               </StackPanel>
               <CheckBox Grid.Row="2" Grid.Column="0"
                         Margin="0 8 0 0"
-                        IsChecked="{Binding FlipAcrossX}">
+                        IsChecked="{Binding FlipAcrossX}"
+                        ToolTip.Tip="Whether the converted asset should be flipped across the X axis">
                 Flip X
               </CheckBox>
             </Grid>
@@ -107,8 +113,6 @@
             <StackPanel.IsEnabled>
               <MultiBinding Converter="{x:Static BoolConverters.And}">
                 <Binding Path="MapGeometryPath" Converter="{x:Static StringConverters.IsNotNullOrEmpty}"/>
-                <Binding Path="MaterialsBinPath" Converter="{x:Static StringConverters.IsNotNullOrEmpty}"/>
-                <Binding Path="GameDataPath" Converter="{x:Static StringConverters.IsNotNullOrEmpty}"/>
               </MultiBinding>
             </StackPanel.IsEnabled>
             

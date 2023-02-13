@@ -53,8 +53,7 @@
               <Button Name="LoadMaterialsBinButton"
                       Grid.Row="1" Grid.Column="1" Margin="16 0 0 0"
                       Classes="accent"
-                      ToolTip.Tip="The path to the materials property bin file of the map being converted
-                      (Required for converting materials)">
+                      ToolTip.Tip="The path to the materials property bin file of the map being converted (Required for converting materials)">
                 <i:Icon Value="fa-solid fa-file-import" FontSize="16"/>
               </Button>
             </Grid>
@@ -73,8 +72,7 @@
               <Button Name="SelectGameDataPathButton"
                       Grid.Row="1" Grid.Column="1" Margin="16 0 0 0"
                       Classes="accent"
-                      ToolTip.Tip="The path to the extracted data of the map that is being converted 
-                      (Required for converting textures, select the path to which you extracted the whole MapXX wad file)">
+                      ToolTip.Tip="The path to the extracted data of the map that is being converted (Required for converting textures, select the path to which you extracted the whole MapXX wad file)">
                 <i:Icon Value="fa-regular fa-folder-open" FontSize="16"/>
               </Button>
             </Grid>

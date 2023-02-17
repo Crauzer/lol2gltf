@@ -1,0 +1,80 @@
+﻿@using LeagueToolkit.IO.MapGeometryFile
+@using CommunityToolkit.Maui;
+@using CommunityToolkit.Maui.Core.Primitives;
+
+@page "/skinnedmesh"
+
+<MudPaper Elevation="0" Class="pa-6">
+    <MudStack Spacing="4">
+        <MudText Typo="Typo.h3">Skinned Mesh to glTF</MudText>
+        <MudDivider />
+
+        <MudForm Model="@model" @ref="@form">
+            <MudGrid Spacing="2">
+                <MudItem xs="12">
+                    <MudStack Row AlignItems="AlignItems.Center">
+                        <MudFileUpload T="IBrowserFile" Accept=".mapgeo" @bind-Files="model.MapGeometryFile" For="@(() => model.MapGeometryFile)"
+                                       Class="mt-0">
+                            <ButtonTemplate>
+                                <MudButton HtmlTag="label"
+                                           Variant="Variant.Outlined"
+                                           Color="Color.Primary"
+                                           StartIcon="@Icons.Material.TwoTone.Map"
+                                           for="@context">
+                                    Select Map Geometry
+                                </MudButton>
+                            </ButtonTemplate>
+                        </MudFileUpload>
+                        @if (model.MapGeometryFile is not null)
+                        {
+                            <MudText Typo="Typo.body1">@model.MapGeometryFile.Name</MudText>
+                        }
+                    </MudStack>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudStack Row AlignItems="AlignItems.Center">
+                        <MudFileUpload T="IBrowserFile" Accept=".materials.bin" @bind-Files="model.MaterialsBinFile" For="@(() => model.MaterialsBinFile)"
+                                       Class="mt-0">
+                            <ButtonTemplate>
+                                <MudButton HtmlTag="label"
+                                           Variant="Variant.Outlined"
+                                           Color="Color.Primary"
+                                           StartIcon="@Icons.Material.TwoTone.TextSnippet"
+                                           for="@context">
+                                    Select Materials Bin
+                                </MudButton>
+                            </ButtonTemplate>
+                        </MudFileUpload>
+                        @if (model.MaterialsBinFile is not null)
+                        {
+                            <MudText Typo="Typo.body1">@model.MaterialsBinFile.Name</MudText>
+                        }
+                    </MudStack>
+                </MudItem>
+            </MudGrid>
+        </MudForm>
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Inject] ISnackbar Snackbar { get; set; }
+
+    MudForm form;
+    SkinnedMeshToGltfModel model = new();
+
+    public class SkinnedMeshToGltfModel
+    {
+        public IBrowserFile MapGeometryFile { get; set; }
+        public IBrowserFile MaterialsBinFile { get; set; }
+        public Folder GameDataFolder { get; set; }
+
+        public bool FlipAcrossX { get; set; }
+        public MapGeometryGltfLayerGroupingPolicy GroupingPolicy { get; set; }
+        public MapGeometryGltfTextureQuality TextureQuality { get; set; }
+    }
+
+    public void OnSelectMapGeoemtry(InputFileChangeEventArgs e)
+    {
+        this.model.MapGeometryFile = e.File;
+    }
+}

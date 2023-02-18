@@ -1,0 +1,307 @@
+﻿@using CommunityToolkit.Maui.Storage;
+@using FluentValidation.Results;
+@using KristofferStrube.Blazor.FileSystem;
+@using KristofferStrube.Blazor.FileSystemAccess;
+@using KristofferStrube.Blazor.Streams;
+@using LeagueToolkit.Core.Animation;
+@using LeagueToolkit.Core.Environment;
+@using LeagueToolkit.Core.Meta;
+@using LeagueToolkit.IO.MapGeometryFile
+@using CommunityToolkit.Maui;
+@using CommunityToolkit.Maui.Core.Primitives;
+@using LeagueToolkit.Meta;
+@using SharpGLTF.Schema2;
+@using System.Reflection;
+@using lol2gltf.Data;
+@using FluentValidation
+@using MudSeverity = MudBlazor.Severity;
+@using LeagueSkinnedMesh = LeagueToolkit.Core.Mesh.SkinnedMesh;
+
+@page "/skinnedmesh"
+
+<MudPaper Elevation="0" Class="pa-6">
+    <MudStack Spacing="4">
+        <MudText Typo="Typo.h4">Skinned Mesh to glTF</MudText>
+        <MudDivider />
+        <MudForm Model="@model" @ref="@form" Validation="@(validator.ValidateValue)">
+            <MudGrid Spacing="2">
+                <MudItem xs="12">
+                    <MudStack Row AlignItems="AlignItems.Center">
+                        <MudFileUpload T="IBrowserFile" Accept=".skn" @bind-Files="model.SimpleSkinFile" For="@(() => model.SimpleSkinFile)" OnFilesChanged="UploadSimpleSkin"
+                                       Class="mt-0">
+                            <ButtonTemplate>
+                                <MudButton HtmlTag="label"
+                                           Variant="Variant.Outlined"
+                                           Color="Color.Primary"
+                                           StartIcon="@Icons.Material.TwoTone.FileOpen"
+                                           for="@context">
+                                    Select Simple Skin
+                                </MudButton>
+                            </ButtonTemplate>
+                        </MudFileUpload>
+                        @if (model.SimpleSkinFile is not null)
+                        {
+                            <MudText Typo="Typo.body1">@model.SimpleSkinFile.Name</MudText>
+                        }
+                    </MudStack>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudStack Row AlignItems="AlignItems.Center">
+                        <MudFileUpload T="IBrowserFile" Accept=".skl" @bind-Files="model.SkeletonFile" For="@(() => model.SkeletonFile)"
+                                       Class="mt-0">
+                            <ButtonTemplate>
+                                <MudButton HtmlTag="label"
+                                           Variant="Variant.Outlined"
+                                           Color="Color.Primary"
+                                           StartIcon="@Icons.Material.TwoTone.FileOpen"
+                                           for="@context">
+                                    Select Skeleton
+                                </MudButton>
+                            </ButtonTemplate>
+                        </MudFileUpload>
+                        @if (model.SkeletonFile is not null)
+                        {
+                            <MudText Typo="Typo.body1">@model.SkeletonFile.Name</MudText>
+                        }
+                    </MudStack>
+                </MudItem>
+                
+                <MudItem xs="12">
+                    <MudGrid Class="dw-100" Spacing="2">
+                        <MudItem xs="6">
+                            @if (model.Materials is not null)
+                            {
+                                <MudTable Dense
+                                      Class="flex-grow-1"
+                                      Items="@model.Materials">
+                                    <HeaderContent>
+                                        <MudTh>Material</MudTh>
+                                        <MudTh>Texture</MudTh>
+                                    </HeaderContent>
+                                    <RowTemplate>
+                                        <MudTd DataLabel="Material">@context.Name</MudTd>
+                                        <MudTd DataLabel="Texture">
+                                            <MudStack Row AlignItems="AlignItems.Center">
+                                                <MudFileUpload T="IBrowserFile" Accept=".dds;.tex;.png" @bind-Files="context.TextureFile" For="@(() => context.TextureFile)"
+                                                           Class="mt-0">
+                                                    <ButtonTemplate Context="fileUpload">
+                                                        <MudIconButton HtmlTag="label"
+                                                                   Variant="Variant.Outlined"
+                                                                   Color="Color.Primary"
+                                                                   Icon="@Icons.Material.TwoTone.FileOpen"
+                                                                   for="@fileUpload" />
+                                                    </ButtonTemplate>
+                                                </MudFileUpload>
+                                                @if (context.TextureFile is not null)
+                                                {
+                                                    <MudText Typo="Typo.body1">@context.TextureFile.Name</MudText>
+                                                }
+                                                else
+                                                {
+                                                    <MudText Typo="Typo.body1">Select Texture</MudText>
+                                                }
+                                            </MudStack>
+                                        </MudTd>
+                                    </RowTemplate>
+                                </MudTable>
+                            }
+                        </MudItem>
+                        <MudItem xs="6">
+                            <MudStack Spacing="2">
+                                 <MudTable Dense FixedHeader Virtualize Height="500px" Items="model.Animations">
+                                     <HeaderContent>
+                                         <MudTh>Animation</MudTh>
+                                         <MudTh>Duration</MudTh>
+                                         <MudTh>FPS</MudTh>
+                                     </HeaderContent>
+                                     <RowTemplate>
+                                         <MudTd DataLabel="Name">@context.Name</MudTd>
+                                        <MudTd DataLabel="Duration">@(Math.Round(context.Asset.Duration, 3)) s</MudTd>
+                                         <MudTd DataLabel="FPS">@(Math.Round(context.Asset.Fps))</MudTd>
+                                     </RowTemplate>
+                                 </MudTable>
+                                 <MudButton Variant="Variant.Filled"
+                                            Color="Color.Primary"
+                                            OnClick="AddAnimations">
+                                            Add Animations
+                                 </MudButton>
+                            </MudStack>
+                        </MudItem>
+                    </MudGrid>
+                </MudItem>
+                
+            </MudGrid>
+        </MudForm>
+        <MudDivider />
+        <MudStack Class="ml-auto">
+            <MudTooltip Text="Export to glTF">
+                <MudButton Disabled="@_isConverting" Variant="Variant.Filled" Color="Color.Primary" OnClick="@Submit">
+                    @if (_isConverting)
+                    {
+                        <MudProgressCircular Indeterminate Size="Size.Small" />
+                    }
+                    else
+                    {
+                        <MudText>GLTF</MudText>
+                    }
+                </MudButton>
+            </MudTooltip>
+        </MudStack>
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Inject] IFileSystemAccessService FileSystem { get; set; }
+    [Inject] ISnackbar Snackbar { get; set; }
+
+    private bool _isConverting;
+
+    MudForm form;
+    SkinnedMeshToGltfModel model = new();
+
+    SkinnedMeshToGltfModelValidator validator = new();
+
+    public class SkinnedMeshToGltfModel
+    {
+        public IBrowserFile SimpleSkinFile { get; set; }
+        public IBrowserFile SkeletonFile { get; set; }
+
+        public IEnumerable<MaterialModel> Materials { get; set; }
+        public IEnumerable<AnimationModel> Animations { get; set; } = new List<AnimationModel>();
+    }
+
+    public class MaterialModel
+    {
+        public string Name { get; set; }
+        public IBrowserFile TextureFile { get; set; }
+    }
+
+    public class AnimationModel
+    {
+        public string Name { get; set; }
+
+        public IAnimationAsset Asset { get; set; }
+    }
+
+    public class SkinnedMeshToGltfModelValidator : AbstractValidator<SkinnedMeshToGltfModel>
+    {
+        public Func<object, string, Task<IEnumerable<string>>> ValidateValue =>
+            async (model, propertyName) =>
+                await ValidateAsync(ValidationContext<SkinnedMeshToGltfModel>.CreateWithOptions((SkinnedMeshToGltfModel)model, x => x.IncludeProperties(propertyName))) switch
+                {
+                    { IsValid: true } => Array.Empty<string>(),
+                    ValidationResult result => result.Errors.Select(e => e.ErrorMessage)
+                };
+
+        public SkinnedMeshToGltfModelValidator()
+        {
+            RuleFor(x => x.SimpleSkinFile)
+                .NotEmpty()
+                .DependentRules(() =>
+                {
+                    RuleFor(x => x.SkeletonFile).NotEmpty();    
+                });
+        }
+    }
+
+    public async void UploadSimpleSkin(InputFileChangeEventArgs e)
+    {
+        using MemoryStream simpleSkinStream = new();
+        using (Stream fileStream = e.File.OpenReadStream(long.MaxValue))
+        {
+            await fileStream.CopyToAsync(simpleSkinStream);
+            simpleSkinStream.Position = 0;
+        }
+
+        using LeagueSkinnedMesh skinnedMesh = LeagueSkinnedMesh.ReadFromSimpleSkin(simpleSkinStream);
+
+        this.model.Materials = skinnedMesh.Ranges.Select(x =>
+            new MaterialModel()
+            {
+                Name = x.Material 
+            }
+        ).ToList();
+        StateHasChanged();
+    }
+
+    public async Task AddAnimations()
+    {
+        FileSystemFileHandle[] animationFileHandles = null;
+        try
+        {
+            animationFileHandles = await this.FileSystem.ShowOpenFilePickerAsync(new OpenFilePickerOptionsStartInFileSystemHandle()
+            {
+                ExcludeAcceptAllOption = true,
+                Multiple = true,
+                Types = new FilePickerAcceptType[]
+                {
+                    new()
+                    {
+                        Description = "Animation",
+                        Accept = new() { { "application/octet-stream", new[] { ".anm" } } }
+                    }
+                }
+            });
+        }
+        catch(JSException)
+        {
+            return;
+        }
+
+        try
+        {
+            await AddAnimations(animationFileHandles);
+        }
+        catch(Exception exception)
+        {
+            this.Snackbar.Add($"Error: {exception}", MudSeverity.Error, o => o.RequireInteraction = true);
+        }
+    }
+    private async Task AddAnimations(FileSystemFileHandle[] animationFileHandles)
+    {
+        List<AnimationModel> animations = new();
+        foreach (FileSystemFileHandle animationFileHandle in animationFileHandles)
+        {
+            string name = await animationFileHandle.GetNameAsync();
+
+            var file = await animationFileHandle.GetFileAsync();
+            byte[] animationFileBuffer = await file.ArrayBufferAsync();
+            using MemoryStream animationStream = new(animationFileBuffer);
+
+            animations.Add(new() { Name = name, Asset = AnimationAsset.Load(animationStream) });
+        }
+
+        this.model.Animations = animations;
+    }
+
+    public async Task Submit()
+    {
+        // Validate form
+        await this.form.Validate();
+        if (this.form.IsValid is false)
+            return;
+
+        // Get handle to output file
+        FileSystemFileHandle fileHandle = null;
+        try
+        {
+            fileHandle = await this.FileSystem.ShowSaveFilePickerAsync(
+                new SaveFilePickerOptionsStartInFileSystemHandle()
+                {
+                    Types = GltfFileUtils.CreateFilePickerAcceptTypes()
+                }
+            );
+        }
+        catch (JSException)
+        {
+            return;
+        }
+
+        // Convert
+        this._isConverting = true;
+        StateHasChanged();
+        await Task.Delay(2000);
+        this._isConverting = false;
+        StateHasChanged();
+    }
+}

@@ -1,0 +1,271 @@
+﻿@using CommunityToolkit.Maui.Storage;
+@using FluentValidation.Results;
+@using KristofferStrube.Blazor.FileSystem;
+@using KristofferStrube.Blazor.FileSystemAccess;
+@using LeagueToolkit.Core.Environment;
+@using LeagueToolkit.Core.Meta;
+@using LeagueToolkit.IO.MapGeometryFile
+@using CommunityToolkit.Maui;
+@using CommunityToolkit.Maui.Core.Primitives;
+@using LeagueToolkit.Meta;
+@using SharpGLTF.Schema2;
+@using System.Reflection;
+@using lol2gltf.Data;
+@using FluentValidation
+@using MudSeverity = MudBlazor.Severity;
+
+@page "/environmentasset"
+
+<MudPaper Elevation="0" Class="pa-6">
+    <MudStack Spacing="4">
+        <MudText Typo="Typo.h4">Convert Map Geometry to glTF</MudText>
+        <MudDivider />
+        <MudForm Model="@model" @ref="@form" Validation="@(validator.ValidateValue)">
+            <MudGrid Spacing="2">
+                <MudItem xs="12">
+                    <MudStack Row AlignItems="AlignItems.Center">
+                        <MudFileUpload T="IBrowserFile" Accept=".mapgeo" @bind-Files="model.MapGeometryFile" For="@(() => model.MapGeometryFile)"
+                                       Class="mt-0">
+                            <ButtonTemplate>
+                                <MudButton HtmlTag="label"
+                                           Variant="Variant.Outlined"
+                                           Color="Color.Primary"
+                                           StartIcon="@Icons.Material.TwoTone.Map"
+                                           for="@context">
+                                    Select Map Geometry
+                                </MudButton>
+                            </ButtonTemplate>
+                        </MudFileUpload>
+                        @if (model.MapGeometryFile is not null)
+                        {
+                            <MudText Typo="Typo.body1">@model.MapGeometryFile.Name</MudText>
+                        }
+                    </MudStack>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudStack Row AlignItems="AlignItems.Center">
+                        <MudFileUpload T="IBrowserFile" Accept=".materials.bin" @bind-Files="model.MaterialsBinFile" For="@(() => model.MaterialsBinFile)"
+                                       Class="mt-0">
+                            <ButtonTemplate>
+                                <MudButton HtmlTag="label"
+                                           Variant="Variant.Outlined"
+                                           Color="Color.Primary"
+                                           StartIcon="@Icons.Material.TwoTone.TextSnippet"
+                                           for="@context">
+                                    Select Materials Bin
+                                </MudButton>
+                            </ButtonTemplate>
+                        </MudFileUpload>
+                        @if (model.MaterialsBinFile is not null)
+                        {
+                            <MudText Typo="Typo.body1">@model.MaterialsBinFile.Name</MudText>
+                        }
+                    </MudStack>
+                </MudItem>
+                <MudItem xs="12" Class="mt-8">
+                    <MudStack Spacing="2">
+                        <MudAlert Severity="MudSeverity.Info">
+                            Select the folder into which you extracted the Wad package of the Map that you are converting and also and additional dependency Wad packages
+                        </MudAlert>
+                        <MudAlert Severity="MudSeverity.Warning">
+                            You must provide a path to the extracted data if you want to convert textures
+                        </MudAlert>
+                    </MudStack>
+                    <MudField Label="Game Data" Variant="Variant.Filled">
+                        <MudStack Row AlignItems="AlignItems.Center" Spacing="2">
+                            <MudIconButton Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.TwoTone.FolderOpen" OnClick="@SelectGameDataFolder" />
+                            @if (string.IsNullOrEmpty(model.GameDataFolder?.Path))
+                            {
+                                <MudText Class="flex-grow-1">Select Game Data folder</MudText>
+                            }
+                            else
+                            {
+                                <MudText Class="flex-grow-1">@model.GameDataFolder?.Path</MudText>
+                                <MudIconButton Icon="@Icons.Material.TwoTone.Close" OnClick="@RemoveGameDataFolder" />
+                            }
+                        </MudStack>
+                    </MudField>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudGrid Spacing="2">
+                        <MudItem>
+                            <MudSelect T="MapGeometryGltfLayerGroupingPolicy"
+                                       Class="flex-grow-0" Color="Color.Primary"
+                                       Label="Mesh grouping policy" AnchorOrigin="Origin.BottomCenter"
+                                       @bind-Value="model.GroupingPolicy">
+                                <MudSelectItem Value="MapGeometryGltfLayerGroupingPolicy.Default" />
+                                <MudSelectItem Value="MapGeometryGltfLayerGroupingPolicy.Ignore" />
+                            </MudSelect>
+                        </MudItem>
+                        <MudItem>
+                             <MudSelect T="MapGeometryGltfTextureQuality"
+                                        Class="flex-grow-0" Color="Color.Primary"
+                                        Label="Texture quality" AnchorOrigin="Origin.BottomCenter"
+                                        @bind-Value="model.TextureQuality">
+                                        <MudSelectItem Value="MapGeometryGltfTextureQuality.High" />
+                                        <MudSelectItem Value="MapGeometryGltfTextureQuality.Medium" />
+                                        <MudSelectItem Value="MapGeometryGltfTextureQuality.Low" />
+                             </MudSelect>
+                        </MudItem>
+                        <MudItem>
+                            <MudCheckBox @bind-Checked="model.FlipAcrossX" Color="Color.Primary">Flip X Axis</MudCheckBox>
+                        </MudItem>
+                    </MudGrid>
+                </MudItem>
+               
+            </MudGrid>
+        </MudForm>
+        <MudDivider/>
+        <MudStack Class="ml-auto">
+            <MudTooltip Text="Export to glTF">
+                <MudButton Disabled="@_isConverting" Variant="Variant.Filled" Color="Color.Primary" OnClick="@Submit">
+                    @if (_isConverting)
+                    {
+                        <MudProgressCircular Indeterminate Size="Size.Small" />
+                    }
+                    else
+                    {
+                        <MudText>GLTF</MudText>
+                    }
+                </MudButton>
+            </MudTooltip>
+        </MudStack>
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Inject] IFileSystemAccessService FileSystem { get; set; }
+    [Inject] ISnackbar Snackbar { get; set; }
+
+    private bool _isConverting;
+
+    MudForm form;
+    MapGeometryToGltfModel model = new();
+
+    MapGeometryToGltfModelValidator validator = new();
+
+    public class MapGeometryToGltfModel
+    {
+        public IBrowserFile MapGeometryFile { get; set; }
+        public IBrowserFile MaterialsBinFile { get; set; }
+        public Folder GameDataFolder { get; set; }
+
+        public bool FlipAcrossX { get; set; } = true;
+        public MapGeometryGltfLayerGroupingPolicy GroupingPolicy { get; set; } = MapGeometryGltfLayerGroupingPolicy.Default;
+        public MapGeometryGltfTextureQuality TextureQuality { get; set; } = MapGeometryGltfTextureQuality.High;
+    }
+
+    public class MapGeometryToGltfModelValidator : AbstractValidator<MapGeometryToGltfModel>
+    {
+        public Func<object, string, Task<IEnumerable<string>>> ValidateValue => 
+            async (model, propertyName) => 
+                await ValidateAsync(ValidationContext<MapGeometryToGltfModel>.CreateWithOptions((MapGeometryToGltfModel)model, x => x.IncludeProperties(propertyName))) switch 
+                { 
+                    { IsValid: true } => Array.Empty<string>(),
+                    ValidationResult result => result.Errors.Select(e => e.ErrorMessage)
+                };
+
+        public MapGeometryToGltfModelValidator()
+        {
+            RuleFor(x => x.MapGeometryFile).NotEmpty();
+        }
+    }
+
+    public async Task SelectGameDataFolder()
+    {
+        CancellationTokenSource tokenSource = new();
+        try
+        {
+            this.model.GameDataFolder = await FolderPicker.PickAsync(tokenSource.Token);
+        }
+        catch(Exception) { }
+    }
+
+    public void RemoveGameDataFolder()
+    {
+        this.model.GameDataFolder = null;
+    }
+
+    public async Task Submit()
+    {
+        // Validate form
+        await this.form.Validate();
+        if (this.form.IsValid is false)
+            return;
+
+        // Get handle to output file
+        FileSystemFileHandle fileHandle = null;
+        try
+        {
+            fileHandle = await this.FileSystem.ShowSaveFilePickerAsync(
+                new SaveFilePickerOptionsStartInFileSystemHandle()
+                {
+                    Types = GltfFileUtils.CreateFilePickerAcceptTypes()
+                }
+            );
+        }
+        catch (JSException)
+        {
+            return;
+        }
+
+        // Convert
+        this._isConverting = true;
+        StateHasChanged();
+        try
+        {
+            await ConvertToGltf(fileHandle);
+            this.Snackbar.Add("Converted to glTF!", MudSeverity.Success);
+        }
+        catch(Exception exception)
+        {
+            this.Snackbar.Add($"Error: {exception}", MudSeverity.Error, o => o.RequireInteraction = true);
+        }
+        finally
+        {
+            this._isConverting = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task ConvertToGltf(FileSystemFileHandle gltfHandle)
+    {
+        await using FileSystemWritableFileStream outputStream = await gltfHandle.CreateWritableAsync();
+        using MemoryStream gltfStream = new();
+
+        // Read the map geometry file into memory because async read is not supported
+        using MemoryStream mapGeometryStream = new();
+        await this.model.MapGeometryFile.OpenReadStream(long.MaxValue).CopyToAsync(mapGeometryStream);
+        mapGeometryStream.Position = 0;
+        
+        using (EnvironmentAsset environmentAsset = new(mapGeometryStream))
+        {
+             environmentAsset.ToGltf(LoadMaterialsBin(),
+                new() 
+                {
+                    MetaEnvironment = MetaEnvironment.Create(Assembly.Load("LeagueToolkit.Meta.Classes").GetExportedTypes().Where(x => x.IsClass)),
+                    Settings = new()
+                    {
+                        GameDataPath = this.model.GameDataFolder?.Path, 
+                        FlipAcrossX = this.model.FlipAcrossX,
+                        LayerGroupingPolicy = this.model.GroupingPolicy,
+                        TextureQuality = this.model.TextureQuality
+                    }
+                }
+             ).WriteGLB(gltfStream);
+        }
+       
+
+        gltfStream.Position = 0;
+        await gltfStream.CopyToAsync(outputStream);
+    }
+
+    private BinTree LoadMaterialsBin()
+    {
+        if (this.model.MaterialsBinFile is null)
+            return null;
+
+        using Stream materialsBinStream = this.model.MaterialsBinFile.OpenReadStream(long.MaxValue);
+        return new(materialsBinStream);
+    }
+}

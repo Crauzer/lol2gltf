@@ -1,0 +1,53 @@
+﻿@inherits LayoutComponentBase
+
+<MudThemeProvider IsDarkMode Theme="Theme"/>
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <MudAppBar Elevation="1">
+        <MudPaper Class="py-2 px-4 d-flex flex-row">
+            <div class="d-flex justify-center" style="max-height: 100%">
+                <MudImage Width="100" Src="images/lol2gltf_logo.png" Alt="lol2gltf logo" />
+            </div>  
+            <MudText Typo="Typo.h5" Class="ml-3">lol2gltf</MudText>
+        </MudPaper>
+        <MudSpacer />
+        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
+    </MudAppBar>
+    <MudDrawer Open ClipMode="DrawerClipMode.Docked" Elevation="2">
+        <NavMenu/>
+    </MudDrawer>
+    <MudMainContent>
+        <MudContainer Class="my-12">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    bool _drawerOpen = true;
+
+    void DrawerToggle()
+    {
+        this._drawerOpen = !this._drawerOpen;
+    }
+
+    MudTheme Theme = new() 
+    {
+        Palette = new Palette() 
+        { 
+            Primary = Colors.Green.Default,
+            AppbarBackground = Colors.Green.Darken1 
+        },
+        PaletteDark = new PaletteDark() 
+        {
+            Primary = Colors.Green.Default,
+            AppbarBackground = Colors.Green.Darken1
+        },
+        LayoutProperties = new LayoutProperties() 
+        {
+            DefaultBorderRadius = "8px"
+        },
+    };
+}

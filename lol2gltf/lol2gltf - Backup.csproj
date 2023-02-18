@@ -19,8 +19,8 @@
         <ApplicationTitle>lol2gltf</ApplicationTitle>
 
         <!-- App Identifier -->
-        <ApplicationId>37070crauzer.lol2gltf</ApplicationId>
-        <ApplicationIdGuid>751A4AB8-F9E6-4282-B3B3-C65FB7B33DD4</ApplicationIdGuid>
+        <ApplicationId>com.companyname.lol2gltf</ApplicationId>
+        <ApplicationIdGuid>038C5CB7-4A99-46B0-A2E0-D43EACE8BA56</ApplicationIdGuid>
 
         <!-- Versions -->
         <ApplicationDisplayVersion>3.0.0</ApplicationDisplayVersion>
@@ -39,9 +39,17 @@
         <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
     </PropertyGroup>
 
+    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-windows10.0.22621.0|AnyCPU'">
+      <ApplicationTitle>lol2gltf</ApplicationTitle>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-windows10.0.22621.0|AnyCPU'">
+      <ApplicationTitle>lol2gltf</ApplicationTitle>
+    </PropertyGroup>
+
     <ItemGroup>
         <!-- App Icon -->
-        <MauiIcon Include="Resources\AppIcon\lol2gltf_icon_256.png" BaseSize="256,256"/>
+        <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
 
         <!-- Splash Screen -->
         <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />

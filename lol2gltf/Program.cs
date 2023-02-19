@@ -1,27 +1,43 @@
-using Avalonia;
-using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.ReactiveUI;
-using Projektanker.Icons.Avalonia;
-using Projektanker.Icons.Avalonia.FontAwesome;
-using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using MudBlazor;
+using MudBlazor.Services;
+using Photino.Blazor;
 
-namespace lol2gltf
+namespace lol2gltf;
+
+public class Program
 {
-    internal class Program
+    [STAThread]
+    static void Main(string[] args)
     {
-        // Initialization code. Don't use any Avalonia, third-party APIs or any
-        // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
-        // yet and stuff might break.
-        [STAThread]
-        public static void Main(string[] args) => BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+        PhotinoBlazorAppBuilder builder = PhotinoBlazorAppBuilder.CreateDefault(args);
 
-        // Avalonia configuration, don't remove; also used by visual designer.
-        public static AppBuilder BuildAvaloniaApp() =>
-            AppBuilder
-                .Configure<App>()
-                .UsePlatformDetect()
-                .LogToTrace()
-                .UseReactiveUI()
-                .WithIcons(container => container.Register<FontAwesomeIconProvider>());
+        builder.Services.AddLogging();
+
+        // register root component and selector
+        builder.RootComponents.Add<App>("app");
+
+        builder.Services.AddMudServices(config =>
+        {
+            config.SnackbarConfiguration.PreventDuplicates = true;
+            config.SnackbarConfiguration.ShowCloseIcon = true;
+            config.SnackbarConfiguration.VisibleStateDuration = 5000;
+            config.SnackbarConfiguration.ShowTransitionDuration = 250;
+            config.SnackbarConfiguration.HideTransitionDuration = 250;
+            config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
+            config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomCenter;
+        });
+
+        PhotinoBlazorApp app = builder.Build();
+
+        // customize window
+        app.MainWindow.SetIconFile("favicon.ico").SetTitle("lol2gltf");
+
+        AppDomain.CurrentDomain.UnhandledException += (sender, error) =>
+        {
+            app.MainWindow.OpenAlertWindow("Fatal exception", error.ExceptionObject.ToString());
+        };
+
+        app.Run();
     }
 }

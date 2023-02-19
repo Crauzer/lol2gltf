@@ -145,6 +145,7 @@ class Build : NukeBuild
                             s.SetProject(Solution.GetProject("lol2gltf"))
                                 .SetOutput(Lol2GltfPublishDirectory)
                                 .SetConfiguration(Configuration)
+                                .EnableSelfContained()
                                 .EnableNoRestore()
                                 .EnableNoBuild()
                                 .SetVersion(MinVer.Version)

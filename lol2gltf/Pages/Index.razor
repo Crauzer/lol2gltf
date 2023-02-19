@@ -1,6 +1,13 @@
 ﻿@page "/"
 
-<h1>Hello, world!</h1>
+<div></div>
 
-Welcome to your new app.
+@code {
+    [Inject] public NavigationManager NavigationManager { get; set; }
+
+    protected override void OnInitialized()
+    {
+        this.NavigationManager.NavigateTo("/skinnedmesh");
+    }
+}
 

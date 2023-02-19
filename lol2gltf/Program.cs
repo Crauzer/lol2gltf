@@ -31,7 +31,11 @@ public class Program
         PhotinoBlazorApp app = builder.Build();
 
         // customize window
-        app.MainWindow.SetIconFile("favicon.ico").SetTitle("lol2gltf");
+        app.MainWindow.SetIconFile("favicon.ico").SetTitle("lol2gltf").Center().SetWidth(1000).SetHeight(1000);
+
+#if DEBUG
+        app.MainWindow.SetDevToolsEnabled(true);
+#endif
 
         AppDomain.CurrentDomain.UnhandledException += (sender, error) =>
         {

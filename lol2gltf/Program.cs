@@ -32,7 +32,7 @@ public class Program
 
         // customize window
         app.MainWindow.UseOsDefaultSize = false;
-        app.MainWindow.SetIconFile("favicon.ico").SetTitle("lol2gltf").Center().SetWidth(1400).SetHeight(1100);
+        app.MainWindow.SetIconFile("favicon.ico").SetTitle("lol2gltf").Center().SetWidth(1600).SetHeight(1100);
 
 #if DEBUG
         app.MainWindow.SetDevToolsEnabled(true);

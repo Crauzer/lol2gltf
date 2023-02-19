@@ -86,6 +86,10 @@
                                 <MudTable Dense
                                       Class="flex-grow-1"
                                       Items="@model.Materials">
+                                     <ColGroup>
+                                         <col style="width: 35%"/>
+                                         <col style="width: 65%" />
+                                     </ColGroup>
                                     <HeaderContent>
                                         <MudTh>Material</MudTh>
                                         <MudTh>Texture</MudTh>
@@ -107,6 +111,7 @@
                                                 @if (context.TextureFile is not null)
                                                 {
                                                     <MudText Typo="Typo.body1">@context.TextureFile.Name</MudText>
+                                                    <MudIconButton Icon="@Icons.Material.TwoTone.Close" Size="Size.Small" Color="Color.Error" OnClick="@(() => context.TextureFile = null)"/>
                                                 }
                                                 else
                                                 {

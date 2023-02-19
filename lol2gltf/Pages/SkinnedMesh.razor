@@ -1,21 +1,27 @@
-﻿@using CommunityToolkit.Maui.Storage;
+﻿@using BCnEncoder.Shared;
+@using CommunityToolkit.HighPerformance;
 @using FluentValidation.Results;
-@using KristofferStrube.Blazor.FileSystem;
-@using KristofferStrube.Blazor.FileSystemAccess;
-@using KristofferStrube.Blazor.Streams;
 @using LeagueToolkit.Core.Animation;
 @using LeagueToolkit.Core.Environment;
 @using LeagueToolkit.Core.Meta;
 @using LeagueToolkit.IO.MapGeometryFile
-@using CommunityToolkit.Maui;
-@using CommunityToolkit.Maui.Core.Primitives;
+@using LeagueToolkit.IO.SimpleSkinFile;
 @using LeagueToolkit.Meta;
+@using LeagueToolkit.Toolkit;
+@using NativeFileDialogSharp;
 @using SharpGLTF.Schema2;
 @using System.Reflection;
-@using lol2gltf.Data;
 @using FluentValidation
+@using SixLabors.ImageSharp.ColorSpaces;
 @using MudSeverity = MudBlazor.Severity;
 @using LeagueSkinnedMesh = LeagueToolkit.Core.Mesh.SkinnedMesh;
+@using SystemDialogResult = NativeFileDialogSharp.DialogResult;
+@using LeagueTexture = LeagueToolkit.Core.Renderer.Texture;
+@using SharpImage = SixLabors.ImageSharp.Image<SixLabors.ImageSharp.PixelFormats.Rgba32>;
+@using SixLabors.ImageSharp.PixelFormats;
+@using SixLabors.ImageSharp;
+@using Color = MudBlazor.Color;
+@using Size = MudBlazor.Size;
 
 @page "/skinnedmesh"
 
@@ -151,7 +157,6 @@
 </MudPaper>
 
 @code {
-    [Inject] IFileSystemAccessService FileSystem { get; set; }
     [Inject] ISnackbar Snackbar { get; set; }
 
     private bool _isConverting;
@@ -173,6 +178,7 @@
     public class MaterialModel
     {
         public string Name { get; set; }
+
         public IBrowserFile TextureFile { get; set; }
     }
 
@@ -201,6 +207,11 @@
                 {
                     RuleFor(x => x.SkeletonFile).NotEmpty();    
                 });
+
+            When(x => x.Animations is not null && x.Animations.Count() is not 0, () =>
+            {
+                RuleFor(x => x.SkeletonFile).NotEmpty();
+            });
         }
     }
 
@@ -226,49 +237,30 @@
 
     public async Task AddAnimations()
     {
-        FileSystemFileHandle[] animationFileHandles = null;
-        try
-        {
-            animationFileHandles = await this.FileSystem.ShowOpenFilePickerAsync(new OpenFilePickerOptionsStartInFileSystemHandle()
-            {
-                ExcludeAcceptAllOption = true,
-                Multiple = true,
-                Types = new FilePickerAcceptType[]
-                {
-                    new()
-                    {
-                        Description = "Animation",
-                        Accept = new() { { "application/octet-stream", new[] { ".anm" } } }
-                    }
-                }
-            });
-        }
-        catch(JSException)
-        {
-            return;
-        }
+        SystemDialogResult dialogResult = Dialog.FileOpenMultiple("anm");
+        if (dialogResult.IsCancelled) return;
 
         try
         {
-            await AddAnimations(animationFileHandles);
+            await Task.Run(() => AddAnimations(dialogResult.Paths));
         }
         catch(Exception exception)
         {
             this.Snackbar.Add($"Error: {exception}", MudSeverity.Error, o => o.RequireInteraction = true);
         }
     }
-    private async Task AddAnimations(FileSystemFileHandle[] animationFileHandles)
+    private void AddAnimations(IReadOnlyList<string> animationFiles)
     {
         List<AnimationModel> animations = new();
-        foreach (FileSystemFileHandle animationFileHandle in animationFileHandles)
+        foreach (string animationFile in animationFiles)
         {
-            string name = await animationFileHandle.GetNameAsync();
+            using FileStream animationStream = File.OpenRead(animationFile);
 
-            var file = await animationFileHandle.GetFileAsync();
-            byte[] animationFileBuffer = await file.ArrayBufferAsync();
-            using MemoryStream animationStream = new(animationFileBuffer);
-
-            animations.Add(new() { Name = name, Asset = AnimationAsset.Load(animationStream) });
+            animations.Add(new()
+            {
+                Name = Path.GetFileName(animationFile), 
+                Asset = AnimationAsset.Load(animationStream)
+            });
         }
 
         this.model.Animations = animations;
@@ -282,26 +274,95 @@
             return;
 
         // Get handle to output file
-        FileSystemFileHandle fileHandle = null;
-        try
-        {
-            fileHandle = await this.FileSystem.ShowSaveFilePickerAsync(
-                new SaveFilePickerOptionsStartInFileSystemHandle()
-                {
-                    Types = GltfFileUtils.CreateFilePickerAcceptTypes()
-                }
-            );
-        }
-        catch (JSException)
-        {
-            return;
-        }
+        SystemDialogResult dialogResult = Dialog.FileSave("glb;gltf");
+        if (dialogResult.IsCancelled) return;
 
         // Convert
         this._isConverting = true;
         StateHasChanged();
-        await Task.Delay(2000);
-        this._isConverting = false;
-        StateHasChanged();
+        try
+        {
+            await ConvertToGltf(dialogResult.Path);
+            this.Snackbar.Add("Converted to glTF!", MudSeverity.Success);
+        }
+        catch(Exception exception)
+        {
+            this.Snackbar.Add($"Error: {exception}", MudSeverity.Error, o => o.RequireInteraction = true);
+        }
+        finally
+        {
+            this._isConverting = false;
+            StateHasChanged();
+        }
+
+    }
+
+    private async Task ConvertToGltf(string gltfPath)
+    {
+        // TODO: Change this to use native dialog
+        using MemoryStream simpleSkinStream = new();
+        await this.model.SimpleSkinFile.OpenReadStream(long.MaxValue).CopyToAsync(simpleSkinStream);
+        simpleSkinStream.Position = 0;
+
+        // Load assets
+        using LeagueSkinnedMesh skinnedMesh = LeagueSkinnedMesh.ReadFromSimpleSkin(simpleSkinStream);
+        RigResource skeleton = await LoadSkeleton();
+
+        // Load textures
+        IEnumerable<(string, Stream)> textures = await LoadTextures();
+
+        ModelRoot gltf = skeleton switch
+        {
+            null => skinnedMesh.ToGltf(textures),
+            _ => skinnedMesh.ToGltf(skeleton, textures, this.model.Animations.Select(x => (x.Name, x.Asset)))
+        };
+
+        gltf.Save(gltfPath);
+    }
+    private async Task<RigResource> LoadSkeleton()
+    {
+        if (this.model.SkeletonFile is null)
+            return null;
+
+        // TODO: Change this to use native dialog
+        using MemoryStream skeletonStream = new();
+        await this.model.SkeletonFile.OpenReadStream(long.MaxValue).CopyToAsync(skeletonStream);
+        skeletonStream.Position = 0;
+
+        return new(skeletonStream);
+    }
+
+    // this is the most digusting shit I've ever seen
+    private async Task<IEnumerable<(string, Stream)>> LoadTextures()
+    {
+        IEnumerable<Task<(string, MemoryStream)>> asyncTextures = this.model.Materials
+           .Where(x => x.TextureFile is not null)
+           .Select(async x =>
+           {
+               // TODO: Change this to use native dialog
+               using MemoryStream textureStream = new();
+               await x.TextureFile.OpenReadStream(long.MaxValue).CopyToAsync(textureStream);
+               textureStream.Position = 0;
+
+               // Load texture
+               LeagueTexture texture = LeagueTexture.Load(textureStream);
+               ReadOnlyMemory2D<ColorRgba32> mip = texture.Mips[0];
+               using SharpImage image = mip.ToImage();
+
+               // Convert to png
+               MemoryStream imageStream = new();
+               await image.SaveAsPngAsync(imageStream);
+               imageStream.Position = 0;
+
+               return (x.Name, imageStream);
+           });
+
+        List<(string, Stream)> textures = new();
+        foreach(Task<(string, MemoryStream)> asyncTexture in asyncTextures)
+        {
+            textures.Add(await asyncTexture);
+        }
+
+        return textures;
     }
 }

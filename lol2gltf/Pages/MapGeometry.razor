@@ -1,18 +1,14 @@
-﻿@using CommunityToolkit.Maui.Storage;
-@using FluentValidation.Results;
-@using KristofferStrube.Blazor.FileSystem;
-@using KristofferStrube.Blazor.FileSystemAccess;
+﻿@using FluentValidation.Results;
 @using LeagueToolkit.Core.Environment;
 @using LeagueToolkit.Core.Meta;
 @using LeagueToolkit.IO.MapGeometryFile
-@using CommunityToolkit.Maui;
-@using CommunityToolkit.Maui.Core.Primitives;
 @using LeagueToolkit.Meta;
+@using NativeFileDialogSharp;
 @using SharpGLTF.Schema2;
 @using System.Reflection;
-@using lol2gltf.Data;
 @using FluentValidation
 @using MudSeverity = MudBlazor.Severity;
+@using SystemDialogResult = NativeFileDialogSharp.DialogResult;
 
 @page "/environmentasset"
 
@@ -74,13 +70,13 @@
                     <MudField Label="Game Data" Variant="Variant.Filled">
                         <MudStack Row AlignItems="AlignItems.Center" Spacing="2">
                             <MudIconButton Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.TwoTone.FolderOpen" OnClick="@SelectGameDataFolder" />
-                            @if (string.IsNullOrEmpty(model.GameDataFolder?.Path))
+                            @if (string.IsNullOrEmpty(model.GameDataFolder))
                             {
                                 <MudText Class="flex-grow-1">Select Game Data folder</MudText>
                             }
                             else
                             {
-                                <MudText Class="flex-grow-1">@model.GameDataFolder?.Path</MudText>
+                                <MudText Class="flex-grow-1">@model.GameDataFolder</MudText>
                                 <MudIconButton Icon="@Icons.Material.TwoTone.Close" OnClick="@RemoveGameDataFolder" />
                             }
                         </MudStack>
@@ -134,7 +130,6 @@
 </MudPaper>
 
 @code {
-    [Inject] IFileSystemAccessService FileSystem { get; set; }
     [Inject] ISnackbar Snackbar { get; set; }
 
     private bool _isConverting;
@@ -148,7 +143,7 @@
     {
         public IBrowserFile MapGeometryFile { get; set; }
         public IBrowserFile MaterialsBinFile { get; set; }
-        public Folder GameDataFolder { get; set; }
+        public string GameDataFolder { get; set; }
 
         public bool FlipAcrossX { get; set; } = true;
         public MapGeometryGltfLayerGroupingPolicy GroupingPolicy { get; set; } = MapGeometryGltfLayerGroupingPolicy.Default;
@@ -171,14 +166,11 @@
         }
     }
 
-    public async Task SelectGameDataFolder()
+    public void SelectGameDataFolder()
     {
-        CancellationTokenSource tokenSource = new();
-        try
-        {
-            this.model.GameDataFolder = await FolderPicker.PickAsync(tokenSource.Token);
-        }
-        catch(Exception) { }
+        SystemDialogResult result = Dialog.FolderPicker();
+        if (result.IsOk)
+            this.model.GameDataFolder = result.Path;
     }
 
     public void RemoveGameDataFolder()
@@ -194,27 +186,15 @@
             return;
 
         // Get handle to output file
-        FileSystemFileHandle fileHandle = null;
-        try
-        {
-            fileHandle = await this.FileSystem.ShowSaveFilePickerAsync(
-                new SaveFilePickerOptionsStartInFileSystemHandle()
-                {
-                    Types = GltfFileUtils.CreateFilePickerAcceptTypes()
-                }
-            );
-        }
-        catch (JSException)
-        {
-            return;
-        }
+        SystemDialogResult dialogResult = Dialog.FileOpen("mapgeo");
+        if (dialogResult.IsError) return;
 
         // Convert
         this._isConverting = true;
         StateHasChanged();
         try
         {
-            await ConvertToGltf(fileHandle);
+            await ConvertToGltf(dialogResult.Path);
             this.Snackbar.Add("Converted to glTF!", MudSeverity.Success);
         }
         catch(Exception exception)
@@ -228,36 +208,29 @@
         }
     }
 
-    private async Task ConvertToGltf(FileSystemFileHandle gltfHandle)
+    private async Task ConvertToGltf(string gltfPath)
     {
-        await using FileSystemWritableFileStream outputStream = await gltfHandle.CreateWritableAsync();
-        using MemoryStream gltfStream = new();
-
+        // TODO: Change this to use native dialog
         // Read the map geometry file into memory because async read is not supported
         using MemoryStream mapGeometryStream = new();
         await this.model.MapGeometryFile.OpenReadStream(long.MaxValue).CopyToAsync(mapGeometryStream);
         mapGeometryStream.Position = 0;
-        
-        using (EnvironmentAsset environmentAsset = new(mapGeometryStream))
-        {
-             environmentAsset.ToGltf(LoadMaterialsBin(),
-                new() 
-                {
-                    MetaEnvironment = MetaEnvironment.Create(Assembly.Load("LeagueToolkit.Meta.Classes").GetExportedTypes().Where(x => x.IsClass)),
-                    Settings = new()
-                    {
-                        GameDataPath = this.model.GameDataFolder?.Path, 
-                        FlipAcrossX = this.model.FlipAcrossX,
-                        LayerGroupingPolicy = this.model.GroupingPolicy,
-                        TextureQuality = this.model.TextureQuality
-                    }
-                }
-             ).WriteGLB(gltfStream);
-        }
-       
 
-        gltfStream.Position = 0;
-        await gltfStream.CopyToAsync(outputStream);
+        using EnvironmentAsset environmentAsset = new(mapGeometryStream);
+        
+        environmentAsset.ToGltf(LoadMaterialsBin(),
+           new() 
+           {
+               MetaEnvironment = MetaEnvironment.Create(Assembly.Load("LeagueToolkit.Meta.Classes").GetExportedTypes().Where(x => x.IsClass)),
+               Settings = new()
+               {
+                   GameDataPath = this.model.GameDataFolder, 
+                   FlipAcrossX = this.model.FlipAcrossX,
+                   LayerGroupingPolicy = this.model.GroupingPolicy,
+                   TextureQuality = this.model.TextureQuality
+               }
+           }
+        ).Save(gltfPath);
     }
 
     private BinTree LoadMaterialsBin()

@@ -6,14 +6,10 @@
 
 <MudLayout>
     <MudAppBar Elevation="1">
-        <MudPaper Class="py-2 px-4 d-flex flex-row">
-            <div class="d-flex justify-center" style="max-height: 100%">
-                <MudImage Width="100" Src="images/lol2gltf_logo.png" Alt="lol2gltf logo" />
-            </div>  
-            <MudText Typo="Typo.h5" Class="ml-3">lol2gltf</MudText>
-        </MudPaper>
+        <MudImage ObjectFit="ObjectFit.ScaleDown" Height="50" Src="images/lol2gltf_icon_256.png" Alt="lol2gltf logo" Style="border-radius: 8px"/>
+        <MudText Typo="Typo.h5" Class="ml-3">LOL2GLTF</MudText>
         <MudSpacer />
-        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
+        <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" Edge="Edge.End" Href="https://github.com/Crauzer/lol2gltf" Target="_blank"/>
     </MudAppBar>
     <MudDrawer Open ClipMode="DrawerClipMode.Docked" Elevation="2">
         <NavMenu/>

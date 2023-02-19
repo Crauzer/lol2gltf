@@ -22,10 +22,16 @@
 @using SixLabors.ImageSharp;
 @using Color = MudBlazor.Color;
 @using Size = MudBlazor.Size;
+@using Severity = MudBlazor.Severity;
 
 @page "/skinnedmesh"
 
-<MudPaper Elevation="0" Class="pa-6">
+<MudStack Spacing="2">
+    <MudAlert Severity="Severity.Warning">
+        Important: The <MudLink Href="https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#joint-hierarchy" Target="_blank">glTF specification prohibits</MudLink> the usage of the mesh's transform if the mesh is bound to a skin.
+        This means that lol2gltf exports the assets as-is without flipping the X axis (League world is left-handed), so if you want to have the correct handedness in i.e. Blender, you will have to flip the root node/scene across the X axis (Blender is right-handed).
+    </MudAlert>
+    <MudPaper Elevation="0" Class="pa-6">
     <MudStack Spacing="4">
         <MudText Typo="Typo.h4">Skinned Mesh to glTF</MudText>
         <MudDivider />
@@ -155,7 +161,7 @@
         </MudStack>
     </MudStack>
 </MudPaper>
-
+</MudStack>
 @code {
     [Inject] ISnackbar Snackbar { get; set; }
 

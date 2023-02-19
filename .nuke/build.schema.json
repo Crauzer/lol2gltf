@@ -74,9 +74,16 @@
             "enum": [
               "Clean",
               "Compile",
-              "Restore"
+              "Publish",
+              "Release",
+              "Restore",
+              "Test"
             ]
           }
+        },
+        "Solution": {
+          "type": "string",
+          "description": "Path to a solution file that is automatically loaded"
         },
         "Target": {
           "type": "array",
@@ -86,7 +93,10 @@
             "enum": [
               "Clean",
               "Compile",
-              "Restore"
+              "Publish",
+              "Release",
+              "Restore",
+              "Test"
             ]
           }
         },

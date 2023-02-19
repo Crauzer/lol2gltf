@@ -186,7 +186,7 @@
             return;
 
         // Get handle to output file
-        SystemDialogResult dialogResult = Dialog.FileOpen("mapgeo");
+        SystemDialogResult dialogResult = Dialog.FileSave("glb;gltf");
         if (dialogResult.IsError) return;
 
         // Convert

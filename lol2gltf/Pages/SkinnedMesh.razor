@@ -289,7 +289,7 @@
         if (this.form.IsValid is false)
             return;
 
-        CommonOpenFileDialog dialog = new("Save glTF") { Multiselect = false };
+        CommonSaveFileDialog dialog = new("Save glTF");
         foreach (CommonFileDialogFilter filter in FileDialogUtils.CreateGltfFilters())
             dialog.Filters.Add(filter);
 

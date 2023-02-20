@@ -3,12 +3,13 @@
 @using LeagueToolkit.Core.Meta;
 @using LeagueToolkit.IO.MapGeometryFile
 @using LeagueToolkit.Meta;
-@using NativeFileDialogSharp;
+@using Microsoft.WindowsAPICodePack.Dialogs;
+@using PhotinoNET;
 @using SharpGLTF.Schema2;
 @using System.Reflection;
 @using FluentValidation
 @using MudSeverity = MudBlazor.Severity;
-@using SystemDialogResult = NativeFileDialogSharp.DialogResult;
+@using lol2gltf.Utils;
 
 @page "/environmentasset"
 
@@ -131,6 +132,7 @@
 
 @code {
     [Inject] ISnackbar Snackbar { get; set; }
+    [Inject] PhotinoWindow Window { get; set; }
 
     private bool _isConverting;
 
@@ -168,9 +170,9 @@
 
     public void SelectGameDataFolder()
     {
-        SystemDialogResult result = Dialog.FolderPicker();
-        if (result.IsOk)
-            this.model.GameDataFolder = result.Path;
+        CommonOpenFileDialog dialog = new("Select Game Data folder") { IsFolderPicker = true};
+        if (dialog.ShowDialog(this.Window.WindowHandle) is CommonFileDialogResult.Ok)
+            this.model.GameDataFolder = dialog.FileName;
     }
 
     public void RemoveGameDataFolder()
@@ -185,16 +187,19 @@
         if (this.form.IsValid is false)
             return;
 
-        // Get handle to output file
-        SystemDialogResult dialogResult = Dialog.FileSave("glb;gltf");
-        if (dialogResult.IsError) return;
+        CommonOpenFileDialog dialog = new("Save glTF") { Multiselect = false };
+        foreach (CommonFileDialogFilter filter in FileDialogUtils.CreateGltfFilters())
+            dialog.Filters.Add(filter);
+
+        if (dialog.ShowDialog(this.Window.WindowHandle) is CommonFileDialogResult.Cancel)
+            return;
 
         // Convert
         this._isConverting = true;
         StateHasChanged();
         try
         {
-            await ConvertToGltf(dialogResult.Path);
+            await ConvertToGltf(dialog.FileName);
             this.Snackbar.Add("Converted to glTF!", MudSeverity.Success);
         }
         catch(Exception exception)

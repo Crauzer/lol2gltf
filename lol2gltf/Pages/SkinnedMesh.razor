@@ -8,14 +8,14 @@
 @using LeagueToolkit.IO.SimpleSkinFile;
 @using LeagueToolkit.Meta;
 @using LeagueToolkit.Toolkit;
-@using NativeFileDialogSharp;
+@using Microsoft.WindowsAPICodePack.Dialogs;
+@using PhotinoNET;
 @using SharpGLTF.Schema2;
 @using System.Reflection;
 @using FluentValidation
 @using SixLabors.ImageSharp.ColorSpaces;
 @using MudSeverity = MudBlazor.Severity;
 @using LeagueSkinnedMesh = LeagueToolkit.Core.Mesh.SkinnedMesh;
-@using SystemDialogResult = NativeFileDialogSharp.DialogResult;
 @using LeagueTexture = LeagueToolkit.Core.Renderer.Texture;
 @using SharpImage = SixLabors.ImageSharp.Image<SixLabors.ImageSharp.PixelFormats.Rgba32>;
 @using SixLabors.ImageSharp.PixelFormats;
@@ -23,6 +23,7 @@
 @using Color = MudBlazor.Color;
 @using Size = MudBlazor.Size;
 @using Severity = MudBlazor.Severity;
+@using lol2gltf.Utils;
 
 @page "/skinnedmesh"
 
@@ -32,143 +33,144 @@
         This means that lol2gltf exports the assets as-is without flipping the X axis (League world is left-handed), so if you want to have the correct handedness in i.e. Blender, you will have to flip the root node/scene across the X axis (Blender is right-handed).
     </MudAlert>
     <MudPaper Elevation="0" Class="pa-6">
-    <MudStack Spacing="4">
-        <MudText Typo="Typo.h4">Skinned Mesh to glTF</MudText>
-        <MudDivider />
-        <MudForm Model="@model" @ref="@form" Validation="@(validator.ValidateValue)">
-            <MudGrid Spacing="2">
-                <MudItem xs="12">
-                    <MudStack Row AlignItems="AlignItems.Center">
-                        <MudFileUpload T="IBrowserFile" Accept=".skn" @bind-Files="model.SimpleSkinFile" For="@(() => model.SimpleSkinFile)" OnFilesChanged="UploadSimpleSkin"
-                                       Class="mt-0">
-                            <ButtonTemplate>
-                                <MudButton HtmlTag="label"
-                                           Variant="Variant.Outlined"
-                                           Color="Color.Primary"
-                                           StartIcon="@Icons.Material.TwoTone.FileOpen"
-                                           for="@context">
-                                    Select Simple Skin
-                                </MudButton>
-                            </ButtonTemplate>
-                        </MudFileUpload>
-                        @if (model.SimpleSkinFile is not null)
-                        {
-                            <MudText Typo="Typo.body1">@model.SimpleSkinFile.Name</MudText>
-                        }
-                    </MudStack>
-                </MudItem>
-                <MudItem xs="12">
-                    <MudStack Row AlignItems="AlignItems.Center">
-                        <MudFileUpload T="IBrowserFile" Accept=".skl" @bind-Files="model.SkeletonFile" For="@(() => model.SkeletonFile)"
-                                       Class="mt-0">
-                            <ButtonTemplate>
-                                <MudButton HtmlTag="label"
-                                           Variant="Variant.Outlined"
-                                           Color="Color.Primary"
-                                           StartIcon="@Icons.Material.TwoTone.FileOpen"
-                                           for="@context">
-                                    Select Skeleton
-                                </MudButton>
-                            </ButtonTemplate>
-                        </MudFileUpload>
-                        @if (model.SkeletonFile is not null)
-                        {
-                            <MudText Typo="Typo.body1">@model.SkeletonFile.Name</MudText>
-                        }
-                    </MudStack>
-                </MudItem>
-                
-                <MudItem xs="12">
-                    <MudGrid Class="dw-100" Spacing="2">
-                        <MudItem xs="6">
-                            @if (model.Materials is not null)
+        <MudStack Spacing="4">
+            <MudText Typo="Typo.h4">Skinned Mesh to glTF</MudText>
+            <MudDivider />
+            <MudForm Model="@model" @ref="@form" Validation="@(validator.ValidateValue)">
+                <MudGrid Spacing="2">
+                    <MudItem xs="12">
+                        <MudStack Row AlignItems="AlignItems.Center">
+                            <MudFileUpload T="IBrowserFile" Accept=".skn" @bind-Files="model.SimpleSkinFile" For="@(() => model.SimpleSkinFile)" OnFilesChanged="UploadSimpleSkin"
+                                           Class="mt-0">
+                                <ButtonTemplate>
+                                    <MudButton HtmlTag="label"
+                                               Variant="Variant.Outlined"
+                                               Color="Color.Primary"
+                                               StartIcon="@Icons.Material.TwoTone.FileOpen"
+                                               for="@context">
+                                        Select Simple Skin
+                                    </MudButton>
+                                </ButtonTemplate>
+                            </MudFileUpload>
+                            @if (model.SimpleSkinFile is not null)
                             {
-                                <MudTable Dense
-                                      Class="flex-grow-1"
-                                      Items="@model.Materials">
-                                     <ColGroup>
-                                         <col style="width: 35%"/>
-                                         <col style="width: 65%" />
-                                     </ColGroup>
-                                    <HeaderContent>
-                                        <MudTh>Material</MudTh>
-                                        <MudTh>Texture</MudTh>
-                                    </HeaderContent>
-                                    <RowTemplate>
-                                        <MudTd DataLabel="Material">@context.Name</MudTd>
-                                        <MudTd DataLabel="Texture">
-                                            <MudStack Row AlignItems="AlignItems.Center">
-                                                <MudFileUpload T="IBrowserFile" Accept=".dds;.tex;.png" @bind-Files="context.TextureFile" For="@(() => context.TextureFile)"
-                                                           Class="mt-0">
-                                                    <ButtonTemplate Context="fileUpload">
-                                                        <MudIconButton HtmlTag="label"
-                                                                   Variant="Variant.Outlined"
-                                                                   Color="Color.Primary"
-                                                                   Icon="@Icons.Material.TwoTone.FileOpen"
-                                                                   for="@fileUpload" />
-                                                    </ButtonTemplate>
-                                                </MudFileUpload>
-                                                @if (context.TextureFile is not null)
-                                                {
-                                                    <MudText Typo="Typo.body1">@context.TextureFile.Name</MudText>
-                                                    <MudIconButton Icon="@Icons.Material.TwoTone.Close" Size="Size.Small" Color="Color.Error" OnClick="@(() => context.TextureFile = null)"/>
-                                                }
-                                                else
-                                                {
-                                                    <MudText Typo="Typo.body1">Select Texture</MudText>
-                                                }
-                                            </MudStack>
-                                        </MudTd>
-                                    </RowTemplate>
-                                </MudTable>
+                                <MudText Typo="Typo.body1">@model.SimpleSkinFile.Name</MudText>
                             }
-                        </MudItem>
-                        <MudItem xs="6">
-                            <MudStack Spacing="2">
-                                 <MudTable Dense FixedHeader Virtualize Height="500px" Items="model.Animations">
-                                     <HeaderContent>
-                                         <MudTh>Animation</MudTh>
-                                         <MudTh>Duration</MudTh>
-                                         <MudTh>FPS</MudTh>
-                                     </HeaderContent>
-                                     <RowTemplate>
-                                         <MudTd DataLabel="Name">@context.Name</MudTd>
-                                        <MudTd DataLabel="Duration">@(Math.Round(context.Asset.Duration, 3)) s</MudTd>
-                                         <MudTd DataLabel="FPS">@(Math.Round(context.Asset.Fps))</MudTd>
-                                     </RowTemplate>
-                                 </MudTable>
-                                 <MudButton Variant="Variant.Filled"
-                                            Color="Color.Primary"
-                                            OnClick="AddAnimations">
+                        </MudStack>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudStack Row AlignItems="AlignItems.Center">
+                            <MudFileUpload T="IBrowserFile" Accept=".skl" @bind-Files="model.SkeletonFile" For="@(() => model.SkeletonFile)"
+                                           Class="mt-0">
+                                <ButtonTemplate>
+                                    <MudButton HtmlTag="label"
+                                               Variant="Variant.Outlined"
+                                               Color="Color.Primary"
+                                               StartIcon="@Icons.Material.TwoTone.FileOpen"
+                                               for="@context">
+                                        Select Skeleton
+                                    </MudButton>
+                                </ButtonTemplate>
+                            </MudFileUpload>
+                            @if (model.SkeletonFile is not null)
+                            {
+                                <MudText Typo="Typo.body1">@model.SkeletonFile.Name</MudText>
+                            }
+                        </MudStack>
+                    </MudItem>
+
+                    <MudItem xs="12">
+                        <MudGrid Class="dw-100" Spacing="2">
+                            <MudItem xs="6">
+                                @if (model.Materials is not null)
+                                {
+                                    <MudTable Dense
+                                          Class="flex-grow-1"
+                                          Items="@model.Materials">
+                                        <ColGroup>
+                                            <col style="width: 35%" />
+                                            <col style="width: 65%" />
+                                        </ColGroup>
+                                        <HeaderContent>
+                                            <MudTh>Material</MudTh>
+                                            <MudTh>Texture</MudTh>
+                                        </HeaderContent>
+                                        <RowTemplate>
+                                            <MudTd DataLabel="Material">@context.Name</MudTd>
+                                            <MudTd DataLabel="Texture">
+                                                <MudStack Row AlignItems="AlignItems.Center">
+                                                    <MudFileUpload T="IBrowserFile" Accept=".dds;.tex;.png" @bind-Files="context.TextureFile" For="@(() => context.TextureFile)"
+                                                               Class="mt-0">
+                                                        <ButtonTemplate Context="fileUpload">
+                                                            <MudIconButton HtmlTag="label"
+                                                                       Variant="Variant.Outlined"
+                                                                       Color="Color.Primary"
+                                                                       Icon="@Icons.Material.TwoTone.FileOpen"
+                                                                       for="@fileUpload" />
+                                                        </ButtonTemplate>
+                                                    </MudFileUpload>
+                                                    @if (context.TextureFile is not null)
+                                                    {
+                                                        <MudText Typo="Typo.body1">@context.TextureFile.Name</MudText>
+                                                        <MudIconButton Icon="@Icons.Material.TwoTone.Close" Size="Size.Small" Color="Color.Error" OnClick="@(() => context.TextureFile = null)" />
+                                                    }
+                                                    else
+                                                    {
+                                                        <MudText Typo="Typo.body1">Select Texture</MudText>
+                                                    }
+                                                </MudStack>
+                                            </MudTd>
+                                        </RowTemplate>
+                                    </MudTable>
+                                }
+                            </MudItem>
+                            <MudItem xs="6">
+                                <MudStack Spacing="2">
+                                    <MudTable Dense FixedHeader Virtualize Height="500px" Items="model.Animations">
+                                        <HeaderContent>
+                                            <MudTh>Animation</MudTh>
+                                            <MudTh>Duration</MudTh>
+                                            <MudTh>FPS</MudTh>
+                                        </HeaderContent>
+                                        <RowTemplate>
+                                            <MudTd DataLabel="Name">@context.Name</MudTd>
+                                            <MudTd DataLabel="Duration">@(Math.Round(context.Asset.Duration, 3)) s</MudTd>
+                                            <MudTd DataLabel="FPS">@(Math.Round(context.Asset.Fps))</MudTd>
+                                            </RowTemplate>
+                                        </MudTable>
+                                        <MudButton Variant="Variant.Filled"
+                                               Color="Color.Primary"
+                                               OnClick="AddAnimations">
                                             Add Animations
-                                 </MudButton>
-                            </MudStack>
+                                        </MudButton>
+                                    </MudStack>
+                                </MudItem>
+                            </MudGrid>
                         </MudItem>
+
                     </MudGrid>
-                </MudItem>
-                
-            </MudGrid>
-        </MudForm>
-        <MudDivider />
-        <MudStack Class="ml-auto">
-            <MudTooltip Text="Export to glTF">
-                <MudButton Disabled="@_isConverting" Variant="Variant.Filled" Color="Color.Primary" OnClick="@Submit">
-                    @if (_isConverting)
-                    {
-                        <MudProgressCircular Indeterminate Size="Size.Small" />
-                    }
-                    else
-                    {
-                        <MudText>GLTF</MudText>
-                    }
-                </MudButton>
-            </MudTooltip>
+                </MudForm>
+                <MudDivider />
+                <MudStack Class="ml-auto">
+                    <MudTooltip Text="Export to glTF">
+                        <MudButton Disabled="@_isConverting" Variant="Variant.Filled" Color="Color.Primary" OnClick="@Submit">
+                            @if (_isConverting)
+                        {
+                            <MudProgressCircular Indeterminate Size="Size.Small" />
+                        }
+                        else
+                        {
+                            <MudText>GLTF</MudText>
+                        }
+                    </MudButton>
+                </MudTooltip>
+            </MudStack>
         </MudStack>
-    </MudStack>
-</MudPaper>
+    </MudPaper>
 </MudStack>
 @code {
     [Inject] ISnackbar Snackbar { get; set; }
+    [Inject] PhotinoWindow Window { get; set; }
 
     private bool _isConverting;
 
@@ -216,7 +218,7 @@
                 .NotEmpty()
                 .DependentRules(() =>
                 {
-                    RuleFor(x => x.SkeletonFile).NotEmpty();    
+                    RuleFor(x => x.SkeletonFile).NotEmpty();
                 });
 
             When(x => x.Animations is not null && x.Animations.Count() is not 0, () =>
@@ -239,28 +241,31 @@
 
         this.model.Materials = skinnedMesh.Ranges.Select(x =>
             new MaterialModel()
-            {
-                Name = x.Material 
-            }
+                {
+                    Name = x.Material
+                }
         ).ToList();
         StateHasChanged();
     }
 
-    public async Task AddAnimations()
+    public void AddAnimations()
     {
-        SystemDialogResult dialogResult = Dialog.FileOpenMultiple("anm");
-        if (dialogResult.IsCancelled) return;
+        CommonOpenFileDialog dialog = new("Add animations") { Multiselect = true };
+        dialog.Filters.Add(new("Animation", "anm"));
+
+        if (dialog.ShowDialog() is CommonFileDialogResult.Cancel)
+            return;
 
         try
         {
-            await Task.Run(() => AddAnimations(dialogResult.Paths));
+            AddAnimations(dialog.FileNames);
         }
-        catch(Exception exception)
+        catch (Exception exception)
         {
             this.Snackbar.Add($"Error: {exception}", MudSeverity.Error, o => o.RequireInteraction = true);
         }
     }
-    private void AddAnimations(IReadOnlyList<string> animationFiles)
+    private void AddAnimations(IEnumerable<string> animationFiles)
     {
         List<AnimationModel> animations = new();
         foreach (string animationFile in animationFiles)
@@ -268,10 +273,10 @@
             using FileStream animationStream = File.OpenRead(animationFile);
 
             animations.Add(new()
-            {
-                Name = Path.GetFileName(animationFile), 
-                Asset = AnimationAsset.Load(animationStream)
-            });
+                {
+                    Name = Path.GetFileName(animationFile),
+                    Asset = AnimationAsset.Load(animationStream)
+                });
         }
 
         this.model.Animations = animations;
@@ -284,19 +289,22 @@
         if (this.form.IsValid is false)
             return;
 
-        // Get handle to output file
-        SystemDialogResult dialogResult = Dialog.FileSave("glb;gltf");
-        if (dialogResult.IsCancelled) return;
+        CommonOpenFileDialog dialog = new("Save glTF") { Multiselect = false };
+        foreach (CommonFileDialogFilter filter in FileDialogUtils.CreateGltfFilters())
+            dialog.Filters.Add(filter);
+
+        if (dialog.ShowDialog(this.Window.WindowHandle) is CommonFileDialogResult.Cancel)
+            return;
 
         // Convert
         this._isConverting = true;
         StateHasChanged();
         try
         {
-            await ConvertToGltf(dialogResult.Path);
+            await ConvertToGltf(dialog.FileName);
             this.Snackbar.Add("Converted to glTF!", MudSeverity.Success);
         }
-        catch(Exception exception)
+        catch (Exception exception)
         {
             this.Snackbar.Add($"Error: {exception}", MudSeverity.Error, o => o.RequireInteraction = true);
         }
@@ -369,7 +377,7 @@
            });
 
         List<(string, Stream)> textures = new();
-        foreach(Task<(string, MemoryStream)> asyncTexture in asyncTextures)
+        foreach (Task<(string, MemoryStream)> asyncTexture in asyncTextures)
         {
             textures.Add(await asyncTexture);
         }

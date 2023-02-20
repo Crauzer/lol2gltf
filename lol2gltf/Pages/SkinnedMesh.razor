@@ -253,7 +253,7 @@
         CommonOpenFileDialog dialog = new("Add animations") { Multiselect = true };
         dialog.Filters.Add(new("Animation", "anm"));
 
-        if (dialog.ShowDialog() is CommonFileDialogResult.Cancel)
+        if (dialog.ShowDialog(this.Window.WindowHandle) is CommonFileDialogResult.Cancel)
             return;
 
         try

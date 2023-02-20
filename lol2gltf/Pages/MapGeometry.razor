@@ -187,7 +187,7 @@
         if (this.form.IsValid is false)
             return;
 
-        CommonOpenFileDialog dialog = new("Save glTF") { Multiselect = false };
+        CommonSaveFileDialog dialog = new("Save glTF");
         foreach (CommonFileDialogFilter filter in FileDialogUtils.CreateGltfFilters())
             dialog.Filters.Add(filter);
 
@@ -222,8 +222,8 @@
         mapGeometryStream.Position = 0;
 
         using EnvironmentAsset environmentAsset = new(mapGeometryStream);
-        
-        environmentAsset.ToGltf(LoadMaterialsBin(),
+
+        environmentAsset.ToGltf(await LoadMaterialsBin(),
            new() 
            {
                MetaEnvironment = MetaEnvironment.Create(Assembly.Load("LeagueToolkit.Meta.Classes").GetExportedTypes().Where(x => x.IsClass)),
@@ -238,12 +238,15 @@
         ).Save(gltfPath);
     }
 
-    private BinTree LoadMaterialsBin()
+    private async Task<BinTree> LoadMaterialsBin()
     {
         if (this.model.MaterialsBinFile is null)
             return null;
 
-        using Stream materialsBinStream = this.model.MaterialsBinFile.OpenReadStream(long.MaxValue);
+        using MemoryStream materialsBinStream = new();
+        await this.model.MaterialsBinFile.OpenReadStream(long.MaxValue).CopyToAsync(materialsBinStream);
+        materialsBinStream.Position = 0;
+
         return new(materialsBinStream);
     }
 }

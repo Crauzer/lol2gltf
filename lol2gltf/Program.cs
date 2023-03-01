@@ -30,8 +30,7 @@ public class Program
 
         PhotinoBlazorApp app = builder.Build();
         // customize window
-        app.MainWindow.UseOsDefaultSize = false;
-        app.MainWindow.SetIconFile("favicon.ico").SetTitle("lol2gltf").Center().SetWidth(1600).SetHeight(1100);
+        app.MainWindow.SetIconFile("favicon.ico").SetTitle("lol2gltf").Center().SetUseOsDefaultSize(true);
 
 #if DEBUG
         app.MainWindow.SetDevToolsEnabled(true);

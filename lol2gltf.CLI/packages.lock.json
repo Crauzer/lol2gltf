@@ -10,13 +10,14 @@
       },
       "LeagueToolkit": {
         "type": "Direct",
-        "requested": "[4.0.0-beta.14, )",
-        "resolved": "4.0.0-beta.14",
-        "contentHash": "O7zFv6KTApx56i4eD1K3XLjs+XyH9NYUroRQ8AyT7m5FfmU0Tt09hxwCHhCR35u0RuhVUJpogEdOvE4EZvdgcQ==",
+        "requested": "[4.0.0-beta.16, )",
+        "resolved": "4.0.0-beta.16",
+        "contentHash": "+OXfhKIjNHU0uzo8VtwLlLJD6vym1MBd7tADu/4snfA0b2bNyorJM8IEl4ERFcbIZ+tkUCwvG0A66Ceoibg7uw==",
         "dependencies": {
           "CommunityToolkit.Diagnostics": "8.0.0",
           "CommunityToolkit.HighPerformance": "8.0.0",
           "FlatSharp.Runtime": "7.0.2",
+          "SharpGLTF.Toolkit": "1.0.0-alpha0027",
           "SixLabors.ImageSharp": "2.1.3",
           "XXHash3.NET": "2.1.0",
           "ZstdSharp.Port": "0.6.7"
@@ -24,12 +25,12 @@
       },
       "LeagueToolkit.IO.Extensions": {
         "type": "Direct",
-        "requested": "[4.0.0-beta.14, )",
-        "resolved": "4.0.0-beta.14",
-        "contentHash": "VPpQPH560hOGPumvSH1wKSIC9+sg6KNJJrXYNoVB220O/Qx++8JHNFpPUpMSg1zUKVcCdPN/TWcUaI+n5dzH2Q==",
+        "requested": "[4.0.0-beta.16, )",
+        "resolved": "4.0.0-beta.16",
+        "contentHash": "/dgNWbmwtXzSKcCdz0b5xzgMrUhNdP7PynVVCDmhSxCqxY+kybKmouDL7DsPO/cYCAaJmqy5ca6CijMLLksSsQ==",
         "dependencies": {
-          "LeagueToolkit": "4.0.0-beta.14",
-          "LeagueToolkit.Meta.Classes": "4.0.0-beta.14",
+          "LeagueToolkit": "4.0.0-beta.16",
+          "LeagueToolkit.Meta.Classes": "4.0.0-beta.16",
           "SharpGLTF.Toolkit": "1.0.0-alpha0027"
         }
       },
@@ -63,10 +64,10 @@
       },
       "LeagueToolkit.Meta.Classes": {
         "type": "Transitive",
-        "resolved": "4.0.0-beta.14",
-        "contentHash": "KDbydlMx8/+HIHMZ04X85vQicRM5ZBaTeaBdXEgBr+WlkvYGm0OvE3YfcgLZaE/XkLSzmI/otDNbTe99UbQorA==",
+        "resolved": "4.0.0-beta.16",
+        "contentHash": "w59LVXYq2nT5aGzmrbrvSocdsLBHsiWEnGcY57iVGuUIL3Ezdf85X35zVNYA7j+MWWr/7sRDPBA0+4rd1e5pvg==",
         "dependencies": {
-          "LeagueToolkit": "4.0.0-beta.14"
+          "LeagueToolkit": "4.0.0-beta.16"
         }
       },
       "Microsoft.NETCore.Platforms": {

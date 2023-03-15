@@ -10,14 +10,14 @@
       },
       "LeagueToolkit": {
         "type": "Direct",
-        "requested": "[4.0.0-beta.16, )",
-        "resolved": "4.0.0-beta.16",
-        "contentHash": "+OXfhKIjNHU0uzo8VtwLlLJD6vym1MBd7tADu/4snfA0b2bNyorJM8IEl4ERFcbIZ+tkUCwvG0A66Ceoibg7uw==",
+        "requested": "[4.0.0-beta.20, )",
+        "resolved": "4.0.0-beta.20",
+        "contentHash": "NwH/wVrPY0TC94lsJmYJQ9ELM3PwKJWGYtOlujKdC2d9id/hR+Jk+jLnaDLuAGiEk9+RIbNjekyBe+gqyOJJGw==",
         "dependencies": {
-          "CommunityToolkit.Diagnostics": "8.0.0",
-          "CommunityToolkit.HighPerformance": "8.0.0",
+          "CommunityToolkit.Diagnostics": "8.1.0",
+          "CommunityToolkit.HighPerformance": "8.1.0",
           "FlatSharp.Runtime": "7.0.2",
-          "SharpGLTF.Toolkit": "1.0.0-alpha0027",
+          "SharpGLTF.Toolkit": "1.0.0-alpha0028",
           "SixLabors.ImageSharp": "2.1.3",
           "XXHash3.NET": "2.1.0",
           "ZstdSharp.Port": "0.6.7"
@@ -25,13 +25,13 @@
       },
       "LeagueToolkit.IO.Extensions": {
         "type": "Direct",
-        "requested": "[4.0.0-beta.16, )",
-        "resolved": "4.0.0-beta.16",
-        "contentHash": "/dgNWbmwtXzSKcCdz0b5xzgMrUhNdP7PynVVCDmhSxCqxY+kybKmouDL7DsPO/cYCAaJmqy5ca6CijMLLksSsQ==",
+        "requested": "[4.0.0-beta.20, )",
+        "resolved": "4.0.0-beta.20",
+        "contentHash": "Jgv14741hslSt7lpIswAvwuYPgXf3eIhpFznCwzizbUn8ujATTCIjvozMMO9DiQyrXlQxEPFUhxGqyUobpPGFw==",
         "dependencies": {
-          "LeagueToolkit": "4.0.0-beta.16",
-          "LeagueToolkit.Meta.Classes": "4.0.0-beta.16",
-          "SharpGLTF.Toolkit": "1.0.0-alpha0027"
+          "LeagueToolkit": "4.0.0-beta.20",
+          "LeagueToolkit.Meta.Classes": "4.0.0-beta.20",
+          "SharpGLTF.Toolkit": "1.0.0-alpha0028"
         }
       },
       "SixLabors.ImageSharp": {
@@ -46,13 +46,13 @@
       },
       "CommunityToolkit.Diagnostics": {
         "type": "Transitive",
-        "resolved": "8.0.0",
-        "contentHash": "wzjy3iA+7qjoL6t89Zhn3qsF9u2linoGEad/sl/MG4i8p8ZnItv3xZ+2/mbIwxwq5u1UdJ0+ZVqMe1wfdV4QRQ=="
+        "resolved": "8.1.0",
+        "contentHash": "R9h5uw8W2ADbmzrJpUJHH7cBpOE2g7jJ0mL/6sJEucfDvTWk3Uq/d4ZgWfVsQTf+MX8wAsWEYsc+UNfeZ3o6LQ=="
       },
       "CommunityToolkit.HighPerformance": {
         "type": "Transitive",
-        "resolved": "8.0.0",
-        "contentHash": "S5Iv1d5UJZNJLJbe/xzJmLqYJ2mhefbLAvhXCZEh3G4sFadUBuQZhQioE4oJG4enY69QMuJX3AX9+6P9rH1bMw=="
+        "resolved": "8.1.0",
+        "contentHash": "kgDi65k02hrgnHy3N0xENecsr0spW13RdIA1tipovi9t16gKziI7uZIu3qkxz0GctCHNM4hfeqXYg//6wHJ6Kw=="
       },
       "FlatSharp.Runtime": {
         "type": "Transitive",
@@ -64,10 +64,10 @@
       },
       "LeagueToolkit.Meta.Classes": {
         "type": "Transitive",
-        "resolved": "4.0.0-beta.16",
-        "contentHash": "w59LVXYq2nT5aGzmrbrvSocdsLBHsiWEnGcY57iVGuUIL3Ezdf85X35zVNYA7j+MWWr/7sRDPBA0+4rd1e5pvg==",
+        "resolved": "4.0.0-beta.20",
+        "contentHash": "D229nixqTLiYBOGQenlHIqgNrUfqbh98f1VhznDIbrhz2Xol0+dKjtms8aYB09vzCliBYDxYiAWdxcjA9PQ0yA==",
         "dependencies": {
-          "LeagueToolkit": "4.0.0-beta.16"
+          "LeagueToolkit": "4.0.0-beta.20"
         }
       },
       "Microsoft.NETCore.Platforms": {
@@ -77,15 +77,15 @@
       },
       "SharpGLTF.Core": {
         "type": "Transitive",
-        "resolved": "1.0.0-alpha0027",
-        "contentHash": "RPv9c2ctq0PoZRMT/WXrZ07C5wWPXJw8AO23xdZWC4VofSMP1D4MKqUSs7Y/es8pczR4Nsk54wMpWvgaWXbriQ=="
+        "resolved": "1.0.0-alpha0028",
+        "contentHash": "ALHHo0St08I77sZGEf/eFOIpSFF8aP/nbWNIvh27omQz/ds9MJADU4aF4MyOrHaW4Ir4bwZ1xF3QLwKyIH3Oow=="
       },
       "SharpGLTF.Toolkit": {
         "type": "Transitive",
-        "resolved": "1.0.0-alpha0027",
-        "contentHash": "7CCcP/trfk4idVjnCkpCqloMdVCk581fr4XCrGu98NwGF/pAHlMxN/Z9jFcKfiNs7p8xBjj5ZbQBXMKUKSzwRA==",
+        "resolved": "1.0.0-alpha0028",
+        "contentHash": "CNw7Cc0vPtbeqag4Jv+/x7Dgc5Vfcz6PmE5TiVzfsyLho4uEve2suQO42KSJa85q8g9MeWU/cMVy0ND/9gz+Qw==",
         "dependencies": {
-          "SharpGLTF.Core": "1.0.0-alpha0027"
+          "SharpGLTF.Core": "1.0.0-alpha0028"
         }
       },
       "System.Memory": {

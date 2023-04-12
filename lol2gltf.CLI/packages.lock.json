@@ -10,9 +10,9 @@
       },
       "LeagueToolkit": {
         "type": "Direct",
-        "requested": "[4.0.0-beta.20, )",
-        "resolved": "4.0.0-beta.20",
-        "contentHash": "NwH/wVrPY0TC94lsJmYJQ9ELM3PwKJWGYtOlujKdC2d9id/hR+Jk+jLnaDLuAGiEk9+RIbNjekyBe+gqyOJJGw==",
+        "requested": "[4.0.0-beta.22, )",
+        "resolved": "4.0.0-beta.22",
+        "contentHash": "VZT3c8sTFJfl3+Sw2ZwGElWKHcKyvGrZQd3g3CNGueI08XnIvOlVJFANFRmgQ55raN0PFZX4KUjraPdW48igWQ==",
         "dependencies": {
           "CommunityToolkit.Diagnostics": "8.1.0",
           "CommunityToolkit.HighPerformance": "8.1.0",
@@ -25,12 +25,12 @@
       },
       "LeagueToolkit.IO.Extensions": {
         "type": "Direct",
-        "requested": "[4.0.0-beta.20, )",
-        "resolved": "4.0.0-beta.20",
-        "contentHash": "Jgv14741hslSt7lpIswAvwuYPgXf3eIhpFznCwzizbUn8ujATTCIjvozMMO9DiQyrXlQxEPFUhxGqyUobpPGFw==",
+        "requested": "[4.0.0-beta.22, )",
+        "resolved": "4.0.0-beta.22",
+        "contentHash": "25sOm8CzyPaga2F/3xrw+rhMNROofmIIxjC+CkaLTiTHcxU9XOgRNxwnJnJ5K0YXC7lvF4MC8bzmq3Ur3C1vWg==",
         "dependencies": {
-          "LeagueToolkit": "4.0.0-beta.20",
-          "LeagueToolkit.Meta.Classes": "4.0.0-beta.20",
+          "LeagueToolkit": "4.0.0-beta.22",
+          "LeagueToolkit.Meta.Classes": "4.0.0-beta.22",
           "SharpGLTF.Toolkit": "1.0.0-alpha0028"
         }
       },
@@ -64,10 +64,10 @@
       },
       "LeagueToolkit.Meta.Classes": {
         "type": "Transitive",
-        "resolved": "4.0.0-beta.20",
-        "contentHash": "D229nixqTLiYBOGQenlHIqgNrUfqbh98f1VhznDIbrhz2Xol0+dKjtms8aYB09vzCliBYDxYiAWdxcjA9PQ0yA==",
+        "resolved": "4.0.0-beta.22",
+        "contentHash": "jBrV/Ce9cp+E3Ky4dQ/IUJqwaoJon2YdHc9vCbWak5C6Bxnoyv+N2Lc6CCO48dkM2RuBPhKDrm+5G95XWOgXZQ==",
         "dependencies": {
-          "LeagueToolkit": "4.0.0-beta.20"
+          "LeagueToolkit": "4.0.0-beta.22"
         }
       },
       "Microsoft.NETCore.Platforms": {

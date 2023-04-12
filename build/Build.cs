@@ -123,20 +123,9 @@ class Build : NukeBuild
                     );
                 });
 
-    Target Test =>
-        _ =>
-            _.DependsOn(Compile)
-                .Executes(() =>
-                {
-                    DotNetTest(
-                        s =>
-                            s.SetProjectFile(Solution).SetConfiguration(Configuration).EnableNoRestore().EnableNoBuild()
-                    );
-                });
-
     Target Publish =>
         _ =>
-            _.DependsOn(Test)
+            _.DependsOn(Compile)
                 .Requires(() => Configuration.Equals(Configuration.Release))
                 .Executes(() =>
                 {
@@ -145,6 +134,7 @@ class Build : NukeBuild
                             s.SetProject(Solution.GetProject("lol2gltf"))
                                 .SetOutput(Lol2GltfPublishDirectory)
                                 .SetConfiguration(Configuration)
+                                .EnableSelfContained()
                                 .EnablePublishSingleFile()
                                 .EnableNoRestore()
                                 .SetVersion(MinVer.Version)

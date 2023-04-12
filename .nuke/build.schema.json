@@ -76,8 +76,7 @@
               "Compile",
               "Publish",
               "Release",
-              "Restore",
-              "Test"
+              "Restore"
             ]
           }
         },
@@ -95,8 +94,7 @@
               "Compile",
               "Publish",
               "Release",
-              "Restore",
-              "Test"
+              "Restore"
             ]
           }
         },

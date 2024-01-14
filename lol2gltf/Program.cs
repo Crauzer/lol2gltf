@@ -30,7 +30,7 @@ public class Program
 
         PhotinoBlazorApp app = builder.Build();
         // customize window
-        app.MainWindow.SetIconFile("favicon.ico").SetTitle("lol2gltf").Center().SetUseOsDefaultSize(true);
+        app.MainWindow.SetIconFile("favicon.ico").SetTitle("lol2gltf").Center();
 
 #if DEBUG
         app.MainWindow.SetDevToolsEnabled(true);
@@ -38,7 +38,7 @@ public class Program
 
         AppDomain.CurrentDomain.UnhandledException += (sender, error) =>
         {
-            app.MainWindow.OpenAlertWindow("Fatal exception", error.ExceptionObject.ToString());
+            app.MainWindow.ShowMessage("Fatal exception", error.ExceptionObject.ToString(), icon: PhotinoNET.PhotinoDialogIcon.Error);
         };
 
         app.Run();

@@ -11,11 +11,11 @@
 
     <ItemGroup>
       <PackageReference Include="FluentValidation" Version="11.9.0" />
-      <PackageReference Include="LeagueToolkit" Version="4.0.0-beta.30" />
-      <PackageReference Include="LeagueToolkit.IO.Extensions" Version="4.0.0-beta.29" />
+      <PackageReference Include="LeagueToolkit" Version="4.0.0-beta.35" />
+      <PackageReference Include="LeagueToolkit.IO.Extensions" Version="4.0.0-beta.35" />
       <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
       <PackageReference Include="MudBlazor" Version="6.1.9" />
-      <PackageReference Include="WindowsAPICodePackShell" Version="8.0.0" />
+      <PackageReference Include="WindowsAPICodePackShell" Version="8.0.2" />
     </ItemGroup>
 
     <ItemGroup>

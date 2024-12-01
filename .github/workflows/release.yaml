@@ -60,6 +60,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./src/${{ env.PROJECT_NAME }}/bin/x64/Release/net8.0/win-x64/publish/${{ env.PROJECT_NAME }}.exe
+          asset_path: ./src/${{ env.PROJECT_NAME }}/bin/Release/net8.0/win-x64/publish/${{ env.PROJECT_NAME }}.exe
           asset_name: ${{ env.PROJECT_NAME }}.exe
           asset_content_type: application/octet-stream

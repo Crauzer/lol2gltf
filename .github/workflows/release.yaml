@@ -40,7 +40,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.PROJECT_NAME }}-${{ github.event.client_payload.tag }}.exe
+          name: ${{ env.PROJECT_NAME }}.exe
           path: ./src/${{ env.PROJECT_NAME }}/bin/x64/Release/net8.0/win-x64/publish/${{ env.PROJECT_NAME }}.exe
 
       - name: Create Release
@@ -61,5 +61,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./src/${{ env.PROJECT_NAME }}/bin/x64/Release/net8.0/win-x64/publish/${{ env.PROJECT_NAME }}.exe
-          asset_name: ${{ env.PROJECT_NAME }}-${{ github.event.client_payload.tag }}.exe
+          asset_name: ${{ env.PROJECT_NAME }}.exe
           asset_content_type: application/octet-stream

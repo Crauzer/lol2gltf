@@ -1,0 +1,71 @@
+name: Build and Release
+
+on:
+  repository_dispatch:
+    types: [new-tag-created]
+
+env:
+  PROJECT_NAME: lol2gltf
+  DOTNET_VERSION: "8.0.x"
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore dependencies
+        working-directory: src
+        run: |
+          dotnet restore
+
+      - name: Build
+        working-directory: src
+        run: |
+          dotnet build -c Release -f net8.0 --no-restore
+
+      - name: Publish
+        working-directory: src
+        run: |
+          dotnet publish -c Release -f net8.0 -r win-x64 --self-contained true --no-restore
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.PROJECT_NAME }}-${{ github.event.client_payload.tag }}.exe
+          path: ./src/bin/x64/Release/net8.0/win-x64/publish/${{ env.PROJECT_NAME }}.exe
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.event.client_payload.tag }}
+          release_name: Release ${{ github.event.client_payload.tag }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./src/bin/x64/Release/net8.0/win-x64/publish/${{ env.PROJECT_NAME }}.exe
+          asset_name: ${{ env.PROJECT_NAME }}-${{ github.event.client_payload.tag }}.exe
+          asset_content_type: application/octet-stream

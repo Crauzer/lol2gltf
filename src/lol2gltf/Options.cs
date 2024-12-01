@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using CommandLine;
 using LeagueToolkit.IO.MapGeometryFile;
 
-namespace lol2gltf.CLI
+namespace lol2gltf
 {
     [Verb("skn2gltf", HelpText = "Converts a Skinned Mesh (skn, skl, anm) into a glTF asset")]
     public class SkinnedMeshToGltfOptions

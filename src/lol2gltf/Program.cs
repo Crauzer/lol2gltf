@@ -19,7 +19,7 @@ using System.Reflection;
 using ImageSharpImage = SixLabors.ImageSharp.Image;
 using LeagueTexture = LeagueToolkit.Core.Renderer.Texture;
 
-namespace lol2gltf.CLI;
+namespace lol2gltf;
 
 class Program
 {

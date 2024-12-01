@@ -12,6 +12,11 @@
     <PublishReadyToRun>true</PublishReadyToRun>
 
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+
+    <PublishTrimmed>true</PublishTrimmed>
+    <TrimMode>link</TrimMode>
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+    <SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
   </PropertyGroup>
 
   <ItemGroup>

@@ -33,15 +33,9 @@ jobs:
         run: |
           dotnet restore
 
-      - name: Build
-        working-directory: src
+      - name: Build Release
         run: |
-          dotnet build -c Release -f net8.0 --no-restore
-
-      - name: Publish
-        working-directory: src
-        run: |
-          dotnet publish -c Release -f net8.0 -r win-x64 --self-contained true --no-restore
+          dotnet publish src/lol2gltf/lol2gltf.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:PublishTrimmed=true
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

@@ -41,7 +41,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.PROJECT_NAME }}.exe
-          path: ./src/${{ env.PROJECT_NAME }}/bin/x64/Release/net8.0/win-x64/publish/${{ env.PROJECT_NAME }}.exe
+          path: ./src/${{ env.PROJECT_NAME }}/bin/Release/net8.0/win-x64/publish/${{ env.PROJECT_NAME }}.exe
 
       - name: Create Release
         id: create_release

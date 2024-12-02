@@ -14,7 +14,7 @@
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
 
     <PublishTrimmed>true</PublishTrimmed>
-    <TrimMode>link</TrimMode>
+    <TrimMode>partial</TrimMode>
     <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
     <SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
   </PropertyGroup>

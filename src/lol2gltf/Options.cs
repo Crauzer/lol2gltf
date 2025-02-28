@@ -94,4 +94,13 @@ namespace lol2gltf
         )]
         public MapGeometryGltfTextureQuality TextureQuality { get; set; }
     }
+
+    public class GltfToStaticMeshOptions
+    {
+        [Option('i', "input", Required = true, HelpText = "Path to the input GLTF file")]
+        public string GltfPath { get; set; }
+
+        [Option('o', "output", Required = true, HelpText = "Path to the output SCB/SCO file")]
+        public string OutputPath { get; set; }
+    }
 }

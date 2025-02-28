@@ -18,6 +18,8 @@ using System.Linq;
 using System.Reflection;
 using ImageSharpImage = SixLabors.ImageSharp.Image;
 using LeagueTexture = LeagueToolkit.Core.Renderer.Texture;
+using System.Diagnostics.CodeAnalysis;
+using LeagueToolkit.Toolkit.Gltf;
 
 namespace lol2gltf;
 
@@ -26,11 +28,12 @@ class Program
     static void Main(string[] args)
     {
         CommandLine.Parser.Default
-            .ParseArguments<SkinnedMeshToGltfOptions, MapGeometryToGltfOptions, GltfToSkinnedMeshOptions>(args)
+            .ParseArguments<SkinnedMeshToGltfOptions, MapGeometryToGltfOptions, GltfToSkinnedMeshOptions, GltfToStaticMeshOptions>(args)
             .MapResult(
                 (SkinnedMeshToGltfOptions opts) => ConvertSkinnedMeshToGltf(opts),
                 (MapGeometryToGltfOptions opts) => ConvertMapGeometryToGltf(opts),
                 (GltfToSkinnedMeshOptions opts) => ConvertGltfToSkinnedMesh(opts),
+                (GltfToStaticMeshOptions opts) => ConvertGltfToStaticMesh(opts),
                 HandleErrors
             );
     }
@@ -98,6 +101,7 @@ class Program
         return 1;
     }
 
+    [RequiresUnreferencedCode("Calls System.Reflection.Assembly.GetExportedTypes()")]
     private static int ConvertMapGeometryToGltf(MapGeometryToGltfOptions options)
     {
         MapGeometryGltfConversionContext conversionContext =
@@ -121,6 +125,33 @@ class Program
         BinTree materialsBin = new(materialsBinStream);
 
         mapGeometry.ToGltf(materialsBin, conversionContext).Save(options.GltfPath);
+
+        return 1;
+    }
+
+    private static int ConvertGltfToStaticMesh(GltfToStaticMeshOptions options)
+    {
+        ModelRoot gltf = ModelRoot.Load(options.GltfPath);
+
+        // Convert GLTF to StaticMesh
+        StaticMesh staticMesh = gltf.ToStaticMesh();
+
+        // Determine if we should save as SCB or SCO based on file extension
+        string extension = Path.GetExtension(options.OutputPath).ToLowerInvariant();
+        using FileStream outputStream = File.Create(options.OutputPath);
+
+        if (extension == ".scb")
+        {
+            staticMesh.WriteBinary(outputStream);
+        }
+        else if (extension == ".sco")
+        {
+            staticMesh.WriteAscii(outputStream);
+        }
+        else
+        {
+            throw new InvalidOperationException("Output file must have .scb or .sco extension");
+        }
 
         return 1;
     }

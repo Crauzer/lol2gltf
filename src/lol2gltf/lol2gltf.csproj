@@ -21,8 +21,8 @@
 
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
-    <PackageReference Include="LeagueToolkit" Version="4.0.0-beta.43" />
-    <PackageReference Include="LeagueToolkit.IO.Extensions" Version="4.0.0-beta.43" />
+    <PackageReference Include="LeagueToolkit" Version="4.0.0-beta.52" />
+    <PackageReference Include="LeagueToolkit.IO.Extensions" Version="4.0.0-beta.52" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.6" />
   </ItemGroup>
 

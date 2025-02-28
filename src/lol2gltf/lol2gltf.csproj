@@ -10,13 +10,9 @@
     <PublishSingleFile>true</PublishSingleFile>
     <SatelliteResourceLanguages> en </SatelliteResourceLanguages>
     <PublishReadyToRun>true</PublishReadyToRun>
+    <Platforms>x64</Platforms>
 
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
-
-    <PublishTrimmed>true</PublishTrimmed>
-    <TrimMode>partial</TrimMode>
-    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
-    <SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
   </PropertyGroup>
 
   <ItemGroup>

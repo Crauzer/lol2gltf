@@ -35,7 +35,7 @@ jobs:
 
       - name: Build Release
         run: |
-          dotnet publish src/lol2gltf/lol2gltf.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:PublishTrimmed=true
+          dotnet publish src/lol2gltf/lol2gltf.csproj -c Release -r win-x64 --self-contained false /p:PublishSingleFile=true
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
